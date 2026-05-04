@@ -1,0 +1,162 @@
+{
+  "_README": "These are DRAFT catalog entries. Do NOT load this file from the server. Review each entry, verify the firmware links and brick-risk claims, and promote to catalog.json one at a time. All entries here are LLM-drafted (not founder-verified) — provenance is set to 'community-reported' but you should confirm against the linked sources before promoting. Drafted 2026-05-04.",
+
+  "candidates": [
+    {
+      "id": "philips-hue-go",
+      "name": "Philips Hue Go (1st gen)",
+      "category": "bulb",
+      "idea_fit_tags": ["bulb", "color-cycle", "ambient", "low-power"],
+      "hack_difficulty": 2,
+      "brick_risk": 1,
+      "brick_provenance": "community-reported",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://github.com/home-assistant/core/tree/dev/homeassistant/components/hue",
+        "https://github.com/openhab/openhab-addons/tree/main/bundles/org.openhab.binding.hue"
+      ],
+      "community_size_bucket": "thriving",
+      "notes": "Portable Hue lamp with battery. Pairs with Zigbee2MQTT or Home Assistant. Programmable color animations are the killer use case for ambient/breathing apps."
+    },
+    {
+      "id": "amazon-echo-dot-2nd-gen",
+      "name": "Amazon Echo Dot (2nd gen)",
+      "category": "speaker",
+      "idea_fit_tags": ["audio-out", "drone", "voice", "ambient"],
+      "hack_difficulty": 4,
+      "brick_risk": 4,
+      "brick_provenance": "llm-inferred",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://github.com/Esh4yk/EchoDotV2-OpenWrt-Firmware-Reverse",
+        "https://www.xda-developers.com/category/echo/"
+      ],
+      "community_size_bucket": "small",
+      "notes": "Cheap on eBay since voice-assistant fatigue. Reverse-engineering attempts exist; bricks are common. Consider as 'amplified speaker via aux-out only' for low-risk use."
+    },
+    {
+      "id": "esp32-devkit-c",
+      "name": "ESP32 DevKit-C",
+      "category": "sbc",
+      "idea_fit_tags": ["sbc", "low-power", "iot", "creative-coding", "sensor"],
+      "hack_difficulty": 1,
+      "brick_risk": 1,
+      "brick_provenance": "founder-verified",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/",
+        "https://github.com/espressif/arduino-esp32",
+        "https://micropython.org/download/esp32/"
+      ],
+      "community_size_bucket": "thriving",
+      "notes": "Default ESP32 board for tinkering. Wi-Fi + BLE, runs MicroPython or Arduino. Common in DIY ambient displays, sensor relays, custom IoT projects."
+    },
+    {
+      "id": "kobo-clara-hd",
+      "name": "Kobo Clara HD",
+      "category": "display",
+      "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient", "kiosk"],
+      "hack_difficulty": 2,
+      "brick_risk": 2,
+      "brick_provenance": "community-reported",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://github.com/koreader/koreader",
+        "https://www.mobileread.com/forums/forumdisplay.php?f=247",
+        "https://github.com/Kobo-InkBox/inkbox"
+      ],
+      "community_size_bucket": "active",
+      "notes": "6-inch e-ink reader, Linux underneath. Telnet/SSH via 'developer mode' file. KOReader and InkBox provide custom OSes. Less common than Kindle but more open."
+    },
+    {
+      "id": "raspberry-pi-zero-2w",
+      "name": "Raspberry Pi Zero 2 W",
+      "category": "sbc",
+      "idea_fit_tags": ["sbc", "low-power", "creative-coding", "kiosk", "iot"],
+      "hack_difficulty": 1,
+      "brick_risk": 1,
+      "brick_provenance": "founder-verified",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
+      ],
+      "community_size_bucket": "thriving",
+      "notes": "Smaller than Pi 4B, lower power. Good for projects that need to be embedded/hidden. Reasonable Wi-Fi. Slightly slow CPU but usually enough."
+    },
+    {
+      "id": "anker-soundcore-mini",
+      "name": "Anker Soundcore Mini (BT speaker)",
+      "category": "speaker",
+      "idea_fit_tags": ["audio-out", "drone", "ambient", "low-power"],
+      "hack_difficulty": 1,
+      "brick_risk": 1,
+      "brick_provenance": "llm-inferred",
+      "last_verified": "2026-05-04",
+      "firmware_links": [],
+      "community_size_bucket": "tiny",
+      "notes": "Common cheap BT speaker. No firmware hack — paired with an ESP32 or Pi as the audio source for ambient drone soundscapes. Listed because the eBay-search use case is real."
+    },
+    {
+      "id": "olimex-esp32-poe",
+      "name": "Olimex ESP32-POE",
+      "category": "sbc",
+      "idea_fit_tags": ["sbc", "low-power", "iot", "network"],
+      "hack_difficulty": 2,
+      "brick_risk": 1,
+      "brick_provenance": "community-reported",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/",
+        "https://github.com/OLIMEX/ESP32-POE"
+      ],
+      "community_size_bucket": "small",
+      "notes": "ESP32 with PoE Ethernet. Single cable for power and network — good for wall-mounted displays/sensors with no wall-warts."
+    },
+    {
+      "id": "tp-link-tl-wr841n",
+      "name": "TP-Link TL-WR841N (router)",
+      "category": "router",
+      "idea_fit_tags": ["network", "iot", "low-power"],
+      "hack_difficulty": 3,
+      "brick_risk": 3,
+      "brick_provenance": "community-reported",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://openwrt.org/toh/tp-link/tl-wr841nd",
+        "https://wiki.openwrt.org/"
+      ],
+      "community_size_bucket": "active",
+      "notes": "Cheap consumer router. OpenWrt support varies by hardware revision (v8+ are more constrained). Listed for projects needing a tiny Linux box with Wi-Fi where Pi is overkill."
+    },
+    {
+      "id": "leapfrog-leappad-2",
+      "name": "LeapFrog LeapPad 2",
+      "category": "handheld",
+      "idea_fit_tags": ["display", "kiosk", "educational", "input"],
+      "hack_difficulty": 4,
+      "brick_risk": 4,
+      "brick_provenance": "llm-inferred",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://wiki.console5.com/wiki/LeapPad_2"
+      ],
+      "community_size_bucket": "tiny",
+      "notes": "Kid-oriented Android-derived tablet. SAFETY NOTE: handheld + llm-inferred = brick-risk score will be stripped from output by the safety rule. Listed because the 'kid coding station' use case occasionally surfaces this."
+    },
+    {
+      "id": "ifixit-pro-tech-toolkit",
+      "name": "iFixit Pro Tech Toolkit",
+      "category": "other",
+      "idea_fit_tags": ["peripheral"],
+      "hack_difficulty": 1,
+      "brick_risk": 1,
+      "brick_provenance": "founder-verified",
+      "last_verified": "2026-05-04",
+      "firmware_links": [
+        "https://www.ifixit.com/Store/Tools/Pro-Tech-Toolkit/IF145-307"
+      ],
+      "community_size_bucket": "thriving",
+      "notes": "Not a hackable device per se. Listed as a meta-recommendation for when proposals require disassembly. Consider deleting if catalog focus tightens."
+    }
+  ]
+}
