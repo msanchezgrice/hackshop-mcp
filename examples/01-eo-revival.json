@@ -1,0 +1,7 @@
+{
+  "idea": "wall-mountable digital art display, sub-$300, supports custom firmware",
+  "expected_devices": [
+    "electric-objects-eo1"
+  ],
+  "notes": "EO revival regression test (P0 from /office-hours). The single E2E anchor: if the agent doesn't surface the EO frame for this idea, the catalog or the system prompt is broken. Do not ship until this passes."
+}

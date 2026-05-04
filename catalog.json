@@ -1,0 +1,97 @@
+[
+  {
+    "id": "electric-objects-eo1",
+    "name": "Electric Objects EO1",
+    "category": "display",
+    "idea_fit_tags": ["display", "framed-art", "ambient", "creative-coding"],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/dasl-/electric-objects-revival",
+      "https://hackaday.com/tag/electric-objects/"
+    ],
+    "community_size_bucket": "small",
+    "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. Founder revived one in ~6h with Claude assistance."
+  },
+  {
+    "id": "raspberry-pi-4b",
+    "name": "Raspberry Pi 4 Model B",
+    "category": "sbc",
+    "idea_fit_tags": ["sbc", "low-power", "creative-coding", "kiosk"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.raspberrypi.com/documentation/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Default tinkerer choice. Boring but always works. Use as baseline; recommend more interesting hardware first."
+  },
+  {
+    "id": "tidbyt-gen1",
+    "name": "Tidbyt (Gen 1)",
+    "category": "display",
+    "idea_fit_tags": ["display", "ambient", "framed-art", "creative-coding", "low-power"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/tidbyt/pixlet",
+      "https://github.com/tronbyt/server"
+    ],
+    "community_size_bucket": "active",
+    "notes": "64x32 LED matrix, ESP32-based. Community firmware (Tronbyt) supports self-hosted apps without Tidbyt cloud."
+  },
+  {
+    "id": "barnes-noble-nook-touch",
+    "name": "Barnes & Noble Nook Simple Touch (BNRV300)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://wiki.mobileread.com/wiki/Nook_ST",
+      "https://forum.xda-developers.com/c/barnes-noble-nook.5045/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "2011 e-reader, runs Android 2.1 underneath. Well-documented root path via SD card image. Community projects use it as a wall-mounted dashboard / status display."
+  },
+  {
+    "id": "amazon-kindle-paperwhite-gen2",
+    "name": "Amazon Kindle Paperwhite (Gen 2, 2013)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient", "kiosk"],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.mobileread.com/forums/forumdisplay.php?f=150",
+      "https://github.com/koreader/koreader"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Older Kindles (PW2 era) jailbreak via known firmware paths; newer ones harder. Used widely as low-power dashboard / calendar / weather displays. KOReader runs custom apps on jailbroken units."
+  },
+  {
+    "id": "ipad-2",
+    "name": "Apple iPad 2",
+    "category": "display",
+    "idea_fit_tags": ["display", "kiosk", "creative-coding", "framed-art"],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://support.apple.com/guided-access",
+      "https://github.com/sponsorpay/iPad-Kiosk"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Dirt-cheap on eBay. Guided Access locks it to a single app for a kiosk display. No jailbreak required for calendar/dashboard use cases. Older models can run iOS 9.x with vintage Safari."
+  }
+]

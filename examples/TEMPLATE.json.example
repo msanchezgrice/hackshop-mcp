@@ -1,0 +1,8 @@
+{
+  "idea": "REPLACE: one sentence describing your project. Vague is fine. Example: 'I want a meditation app for the bedroom.'",
+  "expected_devices": [
+    "REPLACE: device id from catalog.json that you'd expect propose_hardware to surface",
+    "REPLACE: another device id"
+  ],
+  "notes": "OPTIONAL: why these devices fit, any constraints, what surprised you when you researched manually."
+}

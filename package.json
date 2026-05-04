@@ -1,0 +1,52 @@
+{
+  "name": "hackshop-mcp",
+  "version": "0.0.1",
+  "description": "Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.",
+  "type": "module",
+  "bin": {
+    "hackshop-mcp": "./dist/server.js"
+  },
+  "main": "dist/server.js",
+  "files": [
+    "dist",
+    "catalog.json",
+    "tags.md",
+    "examples",
+    "README.md",
+    "SAMPLING.md",
+    "CONTRIBUTING.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/server.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "regress": "tsx scripts/regress.ts",
+    "validate": "tsx scripts/validate-catalog.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "prepublishOnly": "npm run build && npm test && npm run validate"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "hardware",
+    "hacking",
+    "tinkerer",
+    "agent"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

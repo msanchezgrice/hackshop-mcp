@@ -1,0 +1,9 @@
+{
+  "idea": "Always-on family calendar for the kitchen wall. Light colors, no animation, minimalist list of upcoming events for the family (kids' visits, appointments). Don't want a regular LCD monitor — looking for something more like an old e-reader or repurposed tablet.",
+  "expected_devices": [
+    "barnes-noble-nook-touch",
+    "amazon-kindle-paperwhite-gen2",
+    "ipad-2"
+  ],
+  "notes": "Founder's first hand-curated example (2026-05-04). Constraints: e-ink preferred for the no-animation/light-colors aesthetic; iPad 2 as cheap kiosk fallback. Per founder research: B&N Nook Touch (Android 2.1, well-documented hack) and Amazon Kindle (older models jailbreakable) are real candidates. The agent should NOT default to Raspberry Pi for this idea — that misses the e-paper / minimalist intent."
+}
