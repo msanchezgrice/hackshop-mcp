@@ -36,6 +36,15 @@
     "agent"
   ],
   "license": "MIT",
+  "author": "Miguel Sanchez-Grice <msanchezgrice@gmail.com>",
+  "homepage": "https://github.com/msanchezgrice/hackshop-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msanchezgrice/hackshop-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/msanchezgrice/hackshop-mcp/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.0"
