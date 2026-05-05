@@ -1,0 +1,428 @@
+[
+  {
+    "id": "electric-objects-eo1",
+    "name": "Electric Objects EO1",
+    "category": "display",
+    "idea_fit_tags": ["display", "framed-art", "ambient", "creative-coding"],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/dasl-/electric-objects-revival",
+      "https://hackaday.com/tag/electric-objects/"
+    ],
+    "community_size_bucket": "small",
+    "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. Founder revived one in ~6h with Claude assistance."
+  },
+  {
+    "id": "raspberry-pi-4b",
+    "name": "Raspberry Pi 4 Model B",
+    "category": "sbc",
+    "idea_fit_tags": ["sbc", "low-power", "creative-coding", "kiosk"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.raspberrypi.com/documentation/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Default tinkerer choice. Boring but always works. Use as baseline; recommend more interesting hardware first."
+  },
+  {
+    "id": "raspberry-pi-zero-2w",
+    "name": "Raspberry Pi Zero 2 W",
+    "category": "sbc",
+    "idea_fit_tags": ["sbc", "low-power", "creative-coding", "kiosk", "iot"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Smaller than Pi 4B, lower power. Good for projects that need to be embedded/hidden. Reasonable Wi-Fi. Slightly slow CPU but usually enough."
+  },
+  {
+    "id": "tidbyt-gen1",
+    "name": "Tidbyt (Gen 1)",
+    "category": "display",
+    "idea_fit_tags": ["display", "ambient", "framed-art", "creative-coding", "low-power"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/tidbyt/pixlet",
+      "https://github.com/tronbyt/server"
+    ],
+    "community_size_bucket": "active",
+    "notes": "64x32 LED matrix, ESP32-based. Community firmware (Tronbyt) supports self-hosted apps without Tidbyt cloud."
+  },
+  {
+    "id": "barnes-noble-nook-touch",
+    "name": "Barnes & Noble Nook Simple Touch (BNRV300)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://wiki.mobileread.com/wiki/Nook_ST",
+      "https://forum.xda-developers.com/c/barnes-noble-nook.5045/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "2011 e-reader, Android 2.1 underneath. Well-documented root via SD card. Used widely as wall-mounted dashboard / status display."
+  },
+  {
+    "id": "amazon-kindle-paperwhite-gen2",
+    "name": "Amazon Kindle Paperwhite (Gen 2, 2013)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient", "kiosk"],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.mobileread.com/forums/forumdisplay.php?f=150",
+      "https://github.com/koreader/koreader"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Older Kindles (PW2 era) jailbreak via known firmware paths. Used widely as low-power dashboard / calendar / weather displays. KOReader runs custom apps."
+  },
+  {
+    "id": "kobo-clara-hd",
+    "name": "Kobo Clara HD",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient", "kiosk"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/koreader/koreader",
+      "https://www.mobileread.com/forums/forumdisplay.php?f=247",
+      "https://github.com/Kobo-InkBox/inkbox"
+    ],
+    "community_size_bucket": "active",
+    "notes": "6-inch e-ink reader, Linux underneath. Telnet/SSH via 'developer mode' file. KOReader and InkBox provide custom OSes. More open than Kindle."
+  },
+  {
+    "id": "ipad-2",
+    "name": "Apple iPad 2",
+    "category": "display",
+    "idea_fit_tags": ["display", "kiosk", "creative-coding", "framed-art"],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://support.apple.com/guided-access"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Dirt-cheap on eBay. Guided Access locks it to a single app for kiosk use. No jailbreak required for calendar/dashboard. Older models can run iOS 9.x."
+  },
+  {
+    "id": "philips-hue-go",
+    "name": "Philips Hue Go (1st gen)",
+    "category": "bulb",
+    "idea_fit_tags": ["bulb", "color-cycle", "ambient", "low-power"],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/home-assistant/core/tree/dev/homeassistant/components/hue",
+      "https://github.com/openhab/openhab-addons/tree/main/bundles/org.openhab.binding.hue"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Portable Hue lamp with battery. Pairs with Zigbee2MQTT or Home Assistant. Programmable color animations are the killer use case for ambient/breathing apps."
+  },
+  {
+    "id": "esp32-devkit-c",
+    "name": "ESP32 DevKit-C",
+    "category": "sbc",
+    "idea_fit_tags": ["sbc", "low-power", "iot", "creative-coding", "sensor"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/",
+      "https://github.com/espressif/arduino-esp32",
+      "https://micropython.org/download/esp32/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Default ESP32 board for tinkering. Wi-Fi + BLE, runs MicroPython or Arduino. Common in DIY ambient displays, sensor relays, custom IoT projects."
+  },
+  {
+    "id": "olimex-esp32-poe",
+    "name": "Olimex ESP32-POE",
+    "category": "sbc",
+    "idea_fit_tags": ["sbc", "low-power", "iot", "network"],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/",
+      "https://github.com/OLIMEX/ESP32-POE"
+    ],
+    "community_size_bucket": "small",
+    "notes": "ESP32 with PoE Ethernet. Single cable for power and network — good for wall-mounted displays/sensors with no wall-warts."
+  },
+  {
+    "id": "tp-link-tl-wr841n",
+    "name": "TP-Link TL-WR841N (router)",
+    "category": "router",
+    "idea_fit_tags": ["network", "iot", "low-power"],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://openwrt.org/toh/tp-link/tl-wr841nd"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Cheap consumer router. OpenWrt support varies by hardware revision (v8+ are constrained). Listed for projects needing a tiny Linux box with Wi-Fi where Pi is overkill."
+  },
+  {
+    "id": "wyze-cam-v2",
+    "name": "Wyze Cam v2",
+    "category": "sensor",
+    "idea_fit_tags": ["sensor", "iot", "low-power"],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/openmiko/openmiko",
+      "https://github.com/HclX/WyzeHacks"
+    ],
+    "community_size_bucket": "active",
+    "notes": "$25 cloud camera. Custom firmware (openmiko) gives RTSP and frees from Wyze cloud. Good for home automation streams; the older v2 is the documented target."
+  },
+  {
+    "id": "pebble-time",
+    "name": "Pebble Time (smartwatch)",
+    "category": "wearable",
+    "idea_fit_tags": ["wearable", "display", "e-ink", "low-power"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://rebble.io/",
+      "https://help.rebble.io/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Discontinued e-paper smartwatch. Rebble.io keeps it alive with free app store and custom watchfaces. Cheap on eBay; week-long battery; SDK still works."
+  },
+  {
+    "id": "chromecast-1st-gen",
+    "name": "Google Chromecast (1st gen, H2G2-42)",
+    "category": "display",
+    "idea_fit_tags": ["display", "low-power", "creative-coding", "ambient"],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://wiki.exotic.org.uk/wiki/Chromecast",
+      "https://github.com/chromecast-mods"
+    ],
+    "community_size_bucket": "small",
+    "notes": "$5-15 on eBay. Original Chromecast (not Ultra/Audio). Linux-based; community 'eureka-rom' projects exist for full control. HDMI output for an ambient TV display."
+  },
+  {
+    "id": "dell-wyse-5070",
+    "name": "Dell Wyse 5070 (thin client)",
+    "category": "mini-pc",
+    "idea_fit_tags": ["sbc", "mini-pc", "kiosk", "low-power"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://parkytowers.me.uk/thin/Dell5070/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "x86 thin client (Pentium Silver, 4GB RAM, fanless). $40-80 on eBay. Boots any Linux distro from USB. Better than a Pi for desktop-grade workloads, low power."
+  },
+  {
+    "id": "hp-t620-plus",
+    "name": "HP t620 Plus (thin client)",
+    "category": "mini-pc",
+    "idea_fit_tags": ["sbc", "mini-pc", "kiosk", "low-power", "industrial"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://parkytowers.me.uk/thin/hp/T620P/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "AMD GX-420CA, dual NIC, 4 USB. $30-60. Popular as a tiny pfSense/OPNsense firewall, Pi-hole box, or home server. Common in homelab community."
+  },
+  {
+    "id": "nintendo-3ds",
+    "name": "Nintendo 3DS",
+    "category": "handheld",
+    "idea_fit_tags": ["retrogaming", "handheld", "display", "input"],
+    "hack_difficulty": 2,
+    "brick_risk": 4,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://3ds.hacks.guide/",
+      "https://github.com/LumaTeam/Luma3DS"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Massive modding scene. CFW (Luma3DS) enables homebrew, emulators, region-free play. Brick risk REAL on bad installs — the 3ds.hacks.guide walkthrough is the canonical source."
+  },
+  {
+    "id": "atari-flashback",
+    "name": "Atari Flashback (HDMI plug-and-play)",
+    "category": "handheld",
+    "idea_fit_tags": ["retrogaming", "creative-coding", "input"],
+    "hack_difficulty": 4,
+    "brick_risk": 4,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://atariage.com/forums/forum/116-modern-classic/"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Retro-styled mini-console. Hacking is non-trivial. Llm-inferred + handheld = brick-risk score will be stripped from output by safety rule."
+  },
+  {
+    "id": "arduino-uno-r3",
+    "name": "Arduino Uno R3",
+    "category": "sbc",
+    "idea_fit_tags": ["sbc", "low-power", "iot", "creative-coding", "sensor", "input"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "founder-verified",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://docs.arduino.cc/hardware/uno-rev3"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "The classic. Not Wi-Fi, not powerful, but trivially programmable for sensors, motor control, blinkenlights. First step before ESP32 for many tinkerers."
+  },
+  {
+    "id": "waveshare-7-5-epaper-hat",
+    "name": "Waveshare 7.5\" e-Paper HAT (V2)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient", "kiosk"],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT",
+      "https://github.com/waveshare/e-Paper",
+      "https://github.com/speedyg0nz/MagInkCal"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "800x480 mono e-paper, drives off Pi Zero W via SPI. THE canonical kitchen-calendar build (MagInkCal, InkyPi). Refresh ~2-5s; perfect for static daily layouts. Pair with Pi Zero W for the classic combo."
+  },
+  {
+    "id": "waveshare-10-3-epaper",
+    "name": "Waveshare 10.3\" e-Paper (HD, parallel/SPI)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient"],
+    "hack_difficulty": 3,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.waveshare.com/wiki/10.3inch_e-Paper",
+      "https://github.com/waveshare/e-Paper"
+    ],
+    "community_size_bucket": "active",
+    "notes": "1872x1404 mono e-ink. Larger than 7.5\" so suits a kitchen wall calendar or magazine-style display. Needs IT8951 driver board. More expensive (~$200+) but gorgeous."
+  },
+  {
+    "id": "pimoroni-inky-impression-7-3",
+    "name": "Pimoroni Inky Impression 7.3\" (7-color)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "ambient", "color-cycle", "creative-coding"],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://shop.pimoroni.com/products/inky-impression-7-3",
+      "https://github.com/pimoroni/inky"
+    ],
+    "community_size_bucket": "active",
+    "notes": "800x480 SEVEN-COLOR e-paper HAT. 7-color e-ink is rare — great for ambient art rotation, family photos, weather displays. Slow refresh (~30s) so static-frame use only. Pi Zero W compatible."
+  },
+  {
+    "id": "remarkable-2",
+    "name": "reMarkable 2 (e-paper tablet)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "kiosk", "creative-coding"],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://remarkable.guide/",
+      "https://github.com/Eeems-Org/oxide",
+      "https://github.com/toltec-dev/toltec"
+    ],
+    "community_size_bucket": "active",
+    "notes": "10.3\" mono e-paper with stylus. Linux underneath. Toltec package manager + Oxide launcher = full custom OS. Premium ($300+) but a polished tinkerer device. Expensive failure mode if bricked."
+  },
+  {
+    "id": "pimoroni-hyperpixel-4",
+    "name": "Pimoroni HyperPixel 4.0 (Pi LCD)",
+    "category": "display",
+    "idea_fit_tags": ["display", "kiosk", "creative-coding", "input", "framed-art"],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/pimoroni/hyperpixel4"
+    ],
+    "community_size_bucket": "active",
+    "notes": "4-inch high-PPI IPS LCD that mounts directly on a Pi (no HDMI cable). Great for self-contained dashboards, smart-home controllers, pi-in-a-box projects. Touch variant available."
+  },
+  {
+    "id": "lilygo-ttgo-t5-epaper",
+    "name": "LILYGO TTGO T5 V2.3 (ESP32 + 2.13\" e-Paper)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "iot", "wearable"],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://github.com/Xinyuan-LilyGO/LilyGo-EPD47",
+      "https://www.lilygo.cc/products/t5-2-13-inch-e-paper"
+    ],
+    "community_size_bucket": "active",
+    "notes": "All-in-one ESP32 + 2.13\" e-paper. Tiny, battery-friendly, $20-30. Perfect for badge displays, weather stations, status indicators. Larger 4.7\" T5 variant exists for bigger projects."
+  },
+  {
+    "id": "boox-poke-3",
+    "name": "Boox Poke 3 (Android e-reader)",
+    "category": "display",
+    "idea_fit_tags": ["display", "e-ink", "low-power", "framed-art", "kiosk", "creative-coding"],
+    "hack_difficulty": 2,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-04",
+    "firmware_links": [
+      "https://www.mobileread.com/forums/forumdisplay.php?f=275"
+    ],
+    "community_size_bucket": "small",
+    "notes": "6\" e-ink with stock Android 10 + Google Play. Sideload any Android app — Google Calendar, custom dashboards, kiosk launchers. Less hacking required than a Kindle/Kobo because it's already open."
+  }
+]
