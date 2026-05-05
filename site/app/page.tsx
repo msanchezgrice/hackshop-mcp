@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DemoForm } from "@/components/DemoForm";
 
 export default function Home() {
@@ -30,6 +31,13 @@ export default function Home() {
         Real API call to a real catalog. Submit a project idea below and the
         agent picks 3-5 candidates with reasoning. The same logic ships in the
         npm package; this page is the proof.
+      </p>
+      <p style={{ fontSize: 14, color: "var(--muted)" }}>
+        Need inspiration?{" "}
+        <Link href="/templates">
+          Browse 25 verified project templates →
+        </Link>{" "}
+        (old phone as a clock, e-paper calendar, Roomba as a robot, etc.)
       </p>
       <DemoForm />
 

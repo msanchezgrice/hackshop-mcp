@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { ProposeResponse } from "@/lib/types";
 
 const EXAMPLES = [
@@ -11,13 +12,30 @@ const EXAMPLES = [
   "Status display for my server rack, low power, low refresh",
 ];
 
-export function DemoForm() {
+function DemoFormInner() {
+  const searchParams = useSearchParams();
   const [idea, setIdea] = useState("");
   const [budget, setBudget] = useState("");
   const [constraints, setConstraints] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProposeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Prefill from ?idea=... when arriving from /templates.
+  useEffect(() => {
+    const fromUrl = searchParams.get("idea");
+    if (fromUrl && !idea) {
+      setIdea(fromUrl);
+      // Scroll to the form so the user sees what's about to happen.
+      setTimeout(() => {
+        document.getElementById("idea")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -189,5 +207,15 @@ export function DemoForm() {
         )}
       </div>
     </>
+  );
+}
+
+// Wrapped in Suspense because useSearchParams() requires a Suspense boundary
+// during static rendering. Next.js 16 throws a build error otherwise.
+export function DemoForm() {
+  return (
+    <Suspense fallback={<div className="demo-form">Loading…</div>}>
+      <DemoFormInner />
+    </Suspense>
   );
 }
