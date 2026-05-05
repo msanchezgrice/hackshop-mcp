@@ -60,6 +60,15 @@ function parseLoose<T>(text: string): T | null {
   }
 }
 
+function isOpenSourceFromLinks(links: string[]): boolean {
+  // Heuristic: any github/gitlab/codeberg repo in firmware_links counts.
+  // Manufacturer doc pages alone do not. Used for the "open-source only"
+  // filter on the homepage.
+  return links.some((u) =>
+    /\b(github\.com|gitlab\.com|codeberg\.org|sourceforge\.net)\b/.test(u),
+  );
+}
+
 function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
   const safety = applyBrickRiskSafety(device);
   const links = buildLinks(device);
@@ -68,6 +77,13 @@ function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
   let est_price_label: string | undefined;
   if (typeof mn === "number" && typeof mx === "number") {
     est_price_label = mn === mx ? `~$${mn}` : `$${mn}-${mx}`;
+  }
+  const sMn = device.est_setup_hours_min;
+  const sMx = device.est_setup_hours_max;
+  let est_setup_label: string | undefined;
+  if (typeof sMn === "number" && typeof sMx === "number") {
+    est_setup_label =
+      sMn === sMx ? `~${sMn}h setup` : `${sMn}-${sMx}h setup`;
   }
   return {
     id: device.id,
@@ -83,6 +99,9 @@ function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
     notes: device.notes,
     links,
     est_price_label,
+    est_setup_label,
+    image_url: device.image_url,
+    is_open_source: isOpenSourceFromLinks(device.firmware_links),
   };
 }
 
@@ -98,13 +117,30 @@ export async function propose(
     };
   }
 
+  // Open-source filter: keep only entries with a GitHub-class repo in
+  // firmware_links. Cheap derived check, applied before the LLM sees them.
+  const filtered = input.open_source_only
+    ? catalog.filter((d) =>
+        d.firmware_links.some((u) =>
+          /\b(github\.com|gitlab\.com|codeberg\.org|sourceforge\.net)\b/.test(u),
+        ),
+      )
+    : catalog;
+
+  const inventoryDevices = input.inventory_ids
+    ? catalog.filter((d) => input.inventory_ids!.includes(d.id))
+    : [];
+
   const userPrompt = [
     `Project idea: ${input.idea}`,
     input.budget_usd ? `Budget (USD): ${input.budget_usd}` : null,
     input.constraints ? `Constraints: ${input.constraints}` : null,
+    inventoryDevices.length > 0
+      ? `\nUser already owns: ${inventoryDevices.map((d) => d.name).join(", ")}. Prioritize ideas they can build with what they have. If the project genuinely benefits from something they don't own, propose it but flag it as something they'd need to add.`
+      : null,
     "",
     "Candidate hardware:",
-    candidateContext(catalog),
+    candidateContext(filtered),
   ]
     .filter(Boolean)
     .join("\n");

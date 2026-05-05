@@ -93,6 +93,13 @@ function buildPremiumProposal(
     device.price_usd_min === device.price_usd_max
       ? `$${device.price_usd_min}`
       : `$${device.price_usd_min}-${device.price_usd_max}`;
+  const sMn = device.est_setup_hours_min;
+  const sMx = device.est_setup_hours_max;
+  let est_setup_label: string | undefined;
+  if (typeof sMn === "number" && typeof sMx === "number") {
+    est_setup_label =
+      sMn === sMx ? `~${sMn}h setup` : `${sMn}-${sMx}h setup`;
+  }
   return {
     id: device.id,
     name: device.name,
@@ -108,6 +115,8 @@ function buildPremiumProposal(
     actuation_risk: device.actuation_risk,
     privacy_risk: device.privacy_risk,
     risk_callouts: deriveRiskCallouts(device),
+    image_url: device.image_url,
+    est_setup_label,
   };
 }
 

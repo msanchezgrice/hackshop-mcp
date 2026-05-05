@@ -36,6 +36,14 @@ export const DeviceEntry = z.object({
   notes: z.string().max(500),
   est_used_price_usd_min: z.number().int().nonnegative().optional(),
   est_used_price_usd_max: z.number().int().nonnegative().optional(),
+  // Best-effort hotlink to a manufacturer / Wikipedia / GitHub product image.
+  // UI shows a neutral placeholder when missing. Optional because many older
+  // entries don't have a stable canonical URL.
+  image_url: z.string().url().optional(),
+  // Realistic time to a working build for a tinkerer (first time). Includes
+  // assembly + firmware flash + software config. Conservative.
+  est_setup_hours_min: z.number().nonnegative().optional(),
+  est_setup_hours_max: z.number().nonnegative().optional(),
 });
 
 export type DeviceEntry = z.infer<typeof DeviceEntry>;
@@ -54,10 +62,13 @@ export const proposeInput = z.object({
   idea: z.string().min(3, "idea is too short").max(2000, "idea is too long"),
   budget_usd: z.number().positive().max(100000).optional(),
   constraints: z.string().max(500).optional(),
-  // When true, also propose 0-3 premium open-source hardware products
-  // (Reachy Mini, Crazyflie, M5Stack, etc.). Used hardware is still the
-  // primary path; premium picks render as a secondary section.
   include_premium: z.boolean().optional(),
+  // Filter: only propose devices with open-source firmware/software
+  // (any github/gitlab/codeberg link in firmware_links).
+  open_source_only: z.boolean().optional(),
+  // Inventory: device IDs the user already owns. When set, the agent
+  // ranks ideas they can build with what they have first.
+  inventory_ids: z.array(z.string()).max(50).optional(),
 });
 
 export type ProposeInput = z.infer<typeof proposeInput>;
@@ -89,8 +100,11 @@ export interface Proposal {
   community_size: string;
   notes: string;
   links: DeviceLinks;
-  ebay_live?: EbayLive | null; // present only when EBAY_CLIENT_ID is set
-  est_price_label?: string; // e.g. "$30-70" — populated from catalog estimate
+  ebay_live?: EbayLive | null;
+  est_price_label?: string;
+  est_setup_label?: string; // e.g. "1-2 hr setup" or "~4 hr setup"
+  image_url?: string;
+  is_open_source: boolean; // derived from firmware_links: any github/gitlab repo counts
 }
 
 import type { PremiumProposal } from "./premium-types";

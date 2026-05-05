@@ -32,7 +32,10 @@
     ],
     "notes": "Desktop expressive robot. Lite kit ($299) or full autonomous version ($449) with onboard compute + battery. Camera + mic array + speaker means it does conversation, gesture recognition, and CV out of the box. Fully open hardware + software.",
     "actuation_risk": 3,
-    "privacy_risk": 4
+    "privacy_risk": 4,
+    "image_url": "https://huggingface.co/datasets/reachy-mini/cover/resolve/main/Reachy_Mini.png",
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 6
   },
   {
     "id": "crazyflie-2-1-plus",
@@ -62,7 +65,10 @@
     ],
     "notes": "Open-source nano-drone. Stack expansion decks (Lighthouse positioning, Multi-ranger, AI-deck with camera) for autonomous flight, swarms, indoor positioning. Used in research and education widely.",
     "actuation_risk": 4,
-    "privacy_risk": 1
+    "privacy_risk": 1,
+    "image_url": "https://www.bitcraze.io/images/crazyflie-2-1-plus/crazyflie-2-1-plus.png",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
   },
   {
     "id": "m5stack-core2",
@@ -98,7 +104,10 @@
     ],
     "notes": "All-in-one ESP32 dev kit with touchscreen, audio, RTC, battery in a finished case. Modular base and HAT ecosystem. Best 'just works out of the box' option for IoT prototypes.",
     "actuation_risk": 1,
-    "privacy_risk": 3
+    "privacy_risk": 3,
+    "image_url": "https://static-cdn.m5stack.com/resource/docs/products/core/Core2/img-9b0bea50-09a8-46cd-83d2-d05f43e23ddc.webp",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   },
   {
     "id": "adafruit-magtag",
@@ -132,7 +141,10 @@
     ],
     "notes": "Magnetic e-paper display you slap on the fridge. CircuitPython supported. Batteries last weeks. Drop-in replacement for the 'Pi + Waveshare HAT' build if you want it pre-assembled.",
     "actuation_risk": 1,
-    "privacy_risk": 1
+    "privacy_risk": 1,
+    "image_url": "https://cdn-shop.adafruit.com/970x728/4800-09.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   },
   {
     "id": "pimoroni-tufty-2040",
@@ -162,7 +174,10 @@
     ],
     "notes": "Tiny RP2040 board with built-in color LCD. Works as a conference badge, status display, or generative-art frame. Cheap enough to build many.",
     "actuation_risk": 1,
-    "privacy_risk": 1
+    "privacy_risk": 1,
+    "image_url": "https://shop.pimoroni.com/cdn/shop/products/tufty-2040.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   },
   {
     "id": "pinetime",
@@ -193,7 +208,10 @@
     ],
     "notes": "Open-source smartwatch under $30. Default firmware (InfiniTime) is mature; Wasp-OS adds a Python runtime if you want to write watchfaces in micropython. Pebble's spiritual successor.",
     "actuation_risk": 1,
-    "privacy_risk": 2
+    "privacy_risk": 2,
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/PineTime_in_use.jpg/640px-PineTime_in_use.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   },
   {
     "id": "pocketbeagle-2",
@@ -225,7 +243,9 @@
     ],
     "notes": "Pi Zero alternative with REAL-TIME hardware (PRUs) for motor control, signal generation, hard-deadline I/O. Open hardware down to the schematic.",
     "actuation_risk": 1,
-    "privacy_risk": 1
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
   },
   {
     "id": "limesdr-mini-2",
@@ -255,6 +275,8 @@
     ],
     "notes": "Open-source software-defined radio. Receive AND transmit (where legal) from 10MHz to 3.5GHz. ADS-B aircraft tracking, GSM eavesdropping (with SIM), LoRa testing, GPS spoofing for testing. Premium price; serious capability.",
     "actuation_risk": 1,
-    "privacy_risk": 4
+    "privacy_risk": 4,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 6
   }
 ]

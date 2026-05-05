@@ -42,6 +42,9 @@ export const PremiumDevice = z.object({
   // Both 1-5: 1 = harmless, 5 = real concern, requires user awareness.
   actuation_risk: z.number().int().min(1).max(5),
   privacy_risk: z.number().int().min(1).max(5),
+  image_url: z.string().url().optional(),
+  est_setup_hours_min: z.number().nonnegative().optional(),
+  est_setup_hours_max: z.number().nonnegative().optional(),
 });
 
 export type PremiumDevice = z.infer<typeof PremiumDevice>;
@@ -64,5 +67,7 @@ export interface PremiumProposal {
   notes: string;
   actuation_risk: number;
   privacy_risk: number;
-  risk_callouts: string[]; // human-readable per-axis flags, e.g. "camera + mic"
+  risk_callouts: string[];
+  image_url?: string;
+  est_setup_label?: string; // "1-2 hr setup"
 }

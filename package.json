@@ -1,6 +1,6 @@
 {
   "name": "hackshop-mcp",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.",
   "type": "module",
   "bin": {

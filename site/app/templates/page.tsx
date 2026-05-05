@@ -59,7 +59,10 @@ function ProjectCard({ t }: { t: Template }) {
             ? `~$${t.est_cost_usd.max} or free`
             : t.est_cost_usd.min === t.est_cost_usd.max
               ? `~$${t.est_cost_usd.min}`
-              : `$${t.est_cost_usd.min}-${t.est_cost_usd.max}`}
+              : `$${t.est_cost_usd.min}-${t.est_cost_usd.max}`}{" "}
+          {t.est_setup_hours_max
+            ? `· ${t.est_setup_hours_min === t.est_setup_hours_max ? `~${t.est_setup_hours_min}h` : `${t.est_setup_hours_min}-${t.est_setup_hours_max}h`} setup`
+            : ""}
         </span>
       </div>
       <p style={{ margin: "0 0 10px", fontSize: 15, color: "var(--fg)" }}>

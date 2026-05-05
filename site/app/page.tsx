@@ -15,6 +15,12 @@ export default function Home() {
           catalog with brick-risk, firmware links, and live eBay searches.
         </p>
         <div className="badges">
+          <Link className="badge" href="/templates">
+            25 templates
+          </Link>
+          <Link className="badge" href="/inventory">
+            Your inventory
+          </Link>
           <a className="badge" href="https://github.com/msanchezgrice/hackshop-mcp">
             GitHub
           </a>
@@ -22,7 +28,7 @@ export default function Home() {
             npm
           </a>
           <span className="badge">MIT</span>
-          <span className="badge">v0.0.2</span>
+          <span className="badge">v0.0.3</span>
         </div>
       </header>
 

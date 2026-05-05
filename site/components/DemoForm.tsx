@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { ProposeResponse } from "@/lib/types";
+import { loadInventory } from "@/lib/inventory";
 
 const EXAMPLES = [
   "Always-on family calendar in the kitchen, light colors, no animation, e-paper preferred",
@@ -18,9 +19,27 @@ function DemoFormInner() {
   const [budget, setBudget] = useState("");
   const [constraints, setConstraints] = useState("");
   const [includePremium, setIncludePremium] = useState(false);
+  const [openSourceOnly, setOpenSourceOnly] = useState(false);
+  const [useInventory, setUseInventory] = useState(false);
+  const [inventoryCount, setInventoryCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProposeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [howtoFor, setHowtoFor] = useState<string | null>(null);
+  const [howtoMd, setHowtoMd] = useState<string | null>(null);
+  const [howtoLoading, setHowtoLoading] = useState(false);
+
+  // Track inventory size; refresh when other tabs/pages change it.
+  useEffect(() => {
+    const refresh = () => setInventoryCount(loadInventory().length);
+    refresh();
+    window.addEventListener("hackshop:inventory-changed", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("hackshop:inventory-changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   // Prefill from ?idea=... when arriving from /templates.
   useEffect(() => {
@@ -50,6 +69,11 @@ function DemoFormInner() {
       if (!Number.isNaN(b) && b > 0) body.budget_usd = b;
       if (constraints.trim()) body.constraints = constraints.trim();
       if (includePremium) body.include_premium = true;
+      if (openSourceOnly) body.open_source_only = true;
+      if (useInventory) {
+        const inv = loadInventory();
+        if (inv.length > 0) body.inventory_ids = inv;
+      }
 
       const res = await fetch("/api/propose", {
         method: "POST",
@@ -120,25 +144,53 @@ function DemoFormInner() {
           </div>
         </div>
 
-        <label
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            cursor: "pointer",
-            marginTop: 16,
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={includePremium}
-            onChange={(e) => setIncludePremium(e.target.checked)}
-            style={{ width: "auto", margin: 0 }}
-          />
-          <span style={{ fontSize: 14, color: "var(--fg)", margin: 0 }}>
-            Also show <strong>premium open-source hardware</strong> (Reachy Mini, Crazyflie, M5Stack, etc.) — buy new, not used
-          </span>
-        </label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={useInventory}
+              onChange={(e) => setUseInventory(e.target.checked)}
+              disabled={inventoryCount === 0}
+              style={{ width: "auto", margin: 0 }}
+            />
+            <span style={{ fontSize: 14, color: inventoryCount === 0 ? "var(--muted)" : "var(--fg)" }}>
+              <strong>Use what I already own</strong> ({inventoryCount} items in inventory){" "}
+              {inventoryCount === 0 ? (
+                <a href="/inventory" style={{ marginLeft: 4 }}>
+                  add some →
+                </a>
+              ) : (
+                <a href="/inventory" style={{ marginLeft: 4, fontSize: 12 }}>
+                  (edit)
+                </a>
+              )}
+            </span>
+          </label>
+
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={openSourceOnly}
+              onChange={(e) => setOpenSourceOnly(e.target.checked)}
+              style={{ width: "auto", margin: 0 }}
+            />
+            <span style={{ fontSize: 14, color: "var(--fg)" }}>
+              <strong>Open-source firmware only</strong> — filter to devices with a public GitHub/GitLab repo
+            </span>
+          </label>
+
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={includePremium}
+              onChange={(e) => setIncludePremium(e.target.checked)}
+              style={{ width: "auto", margin: 0 }}
+            />
+            <span style={{ fontSize: 14, color: "var(--fg)" }}>
+              Also show <strong>premium open-source hardware</strong> (Reachy Mini, Crazyflie, M5Stack, etc.) — buy new
+            </span>
+          </label>
+        </div>
 
         <button type="submit" disabled={loading || !idea.trim()}>
           {loading ? (
@@ -178,12 +230,34 @@ function DemoFormInner() {
 
             {result.proposals.map((p) => (
               <article key={p.id} className="proposal">
+                {p.image_url && (
+                  <div style={{ marginBottom: 12 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.image_url}
+                      alt={p.name}
+                      style={{
+                        maxHeight: 160,
+                        maxWidth: "100%",
+                        borderRadius: 6,
+                        background: "var(--code-bg-2)",
+                      }}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
                 <div className="proposal-head">
                   <h3>{p.name}</h3>
                   <div className="proposal-meta">
                     <span className="pill">{p.category}</span>
                     {p.est_price_label && (
                       <span className="pill ok">{p.est_price_label} used</span>
+                    )}
+                    {p.est_setup_label && (
+                      <span className="pill">{p.est_setup_label}</span>
+                    )}
+                    {p.is_open_source && (
+                      <span className="pill ok">open-source</span>
                     )}
                     <span className="pill">hack {p.hack_difficulty}/5</span>
                     <span
@@ -238,7 +312,93 @@ function DemoFormInner() {
                       Firmware: {new URL(url).hostname.replace("www.", "")}
                     </a>
                   ))}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setHowtoFor(p.id);
+                      setHowtoMd(null);
+                      setHowtoLoading(true);
+                      try {
+                        const res = await fetch("/api/howto", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            device_id: p.id,
+                            idea: idea.trim() || undefined,
+                          }),
+                        });
+                        const data = await res.json();
+                        setHowtoMd(data.markdown ?? data.error ?? "(no response)");
+                      } catch (e) {
+                        setHowtoMd(`(error fetching guide: ${(e as Error).message})`);
+                      } finally {
+                        setHowtoLoading(false);
+                      }
+                    }}
+                    style={{
+                      fontSize: 12,
+                      padding: "4px 10px",
+                      borderRadius: 4,
+                      background: "var(--accent)",
+                      color: "#fff",
+                      border: 0,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Get how-to →
+                  </button>
                 </div>
+                {howtoFor === p.id && (
+                  <div
+                    style={{
+                      marginTop: 14,
+                      padding: 14,
+                      background: "var(--code-bg-2)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 8 }}>
+                      AI-generated guide. Verify against the linked communities before flashing.
+                    </div>
+                    {howtoLoading ? (
+                      <div>
+                        <span className="spinner" /> Generating walkthrough…
+                      </div>
+                    ) : (
+                      <pre style={{
+                        background: "transparent",
+                        border: 0,
+                        padding: 0,
+                        whiteSpace: "pre-wrap",
+                        fontFamily: "inherit",
+                        margin: 0,
+                      }}>{howtoMd}</pre>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHowtoFor(null);
+                        setHowtoMd(null);
+                      }}
+                      style={{
+                        marginTop: 10,
+                        background: "transparent",
+                        color: "var(--muted)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 4,
+                        padding: "4px 10px",
+                        fontSize: 12,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
               </article>
             ))}
 
@@ -267,11 +427,30 @@ function DemoFormInner() {
                 </p>
                 {result.premium_proposals.map((p) => (
                   <article key={p.id} className="proposal">
+                    {p.image_url && (
+                      <div style={{ marginBottom: 12 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={p.image_url}
+                          alt={p.name}
+                          style={{
+                            maxHeight: 160,
+                            maxWidth: "100%",
+                            borderRadius: 6,
+                            background: "var(--code-bg-2)",
+                          }}
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="proposal-head">
                       <h3>{p.name}</h3>
                       <div className="proposal-meta">
                         <span className="pill">{p.category}</span>
                         <span className="pill ok">{p.price_range}</span>
+                        {p.est_setup_label && (
+                          <span className="pill">{p.est_setup_label}</span>
+                        )}
                         <span className="pill">{p.manufacturer}</span>
                         {p.actuation_risk >= 3 && (
                           <span className="pill warn">
