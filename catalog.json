@@ -21,7 +21,6 @@
     "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. Founder revived one in ~6h with Claude assistance.",
     "est_used_price_usd_min": 80,
     "est_used_price_usd_max": 200,
-    "image_url": "https://image.wsj.net/im-86037",
     "est_setup_hours_min": 4,
     "est_setup_hours_max": 8
   },
@@ -46,7 +45,7 @@
     "notes": "Default tinkerer choice. Boring but always works. Use as baseline; recommend more interesting hardware first.",
     "est_used_price_usd_min": 35,
     "est_used_price_usd_max": 65,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Raspberry_Pi_4_Model_B_-_Side.jpg/640px-Raspberry_Pi_4_Model_B_-_Side.jpg",
+    "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Raspberry_Pi_4_Model_B_-_Side.jpg?width=640",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -72,7 +71,6 @@
     "notes": "Smaller than Pi 4B, lower power. Good for projects that need to be embedded/hidden. Reasonable Wi-Fi. Slightly slow CPU but usually enough.",
     "est_used_price_usd_min": 15,
     "est_used_price_usd_max": 25,
-    "image_url": "https://www.raspberrypi.com/app/uploads/2021/10/db5be9bd-2792-46cf-91dc-fb3a91ce5a45.png",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -99,7 +97,6 @@
     "notes": "64x32 LED matrix, ESP32-based. Community firmware (Tronbyt) supports self-hosted apps without Tidbyt cloud.",
     "est_used_price_usd_min": 120,
     "est_used_price_usd_max": 200,
-    "image_url": "https://m.media-amazon.com/images/I/61j8KPFQOEL._UF1000,1000_QL80_.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 3
   },
@@ -126,7 +123,7 @@
     "notes": "2011 e-reader, Android 2.1 underneath. Well-documented root via SD card. Used widely as wall-mounted dashboard / status display.",
     "est_used_price_usd_min": 15,
     "est_used_price_usd_max": 35,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/B%26N_Nook_Simple_Touch_with_GlowLight.jpg/640px-B%26N_Nook_Simple_Touch_with_GlowLight.jpg",
+    "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Nook_Simple_Touch.jpg?width=640",
     "est_setup_hours_min": 2,
     "est_setup_hours_max": 5
   },
@@ -154,7 +151,6 @@
     "notes": "Older Kindles (PW2 era) jailbreak via known firmware paths. Used widely as low-power dashboard / calendar / weather displays. KOReader runs custom apps.",
     "est_used_price_usd_min": 25,
     "est_used_price_usd_max": 50,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Amazon_Kindle_Paperwhite_2.jpg/640px-Amazon_Kindle_Paperwhite_2.jpg",
     "est_setup_hours_min": 3,
     "est_setup_hours_max": 8
   },
@@ -207,7 +203,6 @@
     "notes": "Dirt-cheap on eBay. Guided Access locks it to a single app for kiosk use. No jailbreak required for calendar/dashboard. Older models can run iOS 9.x.",
     "est_used_price_usd_min": 30,
     "est_used_price_usd_max": 70,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Ipad-2.jpg/640px-Ipad-2.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -260,7 +255,6 @@
     "notes": "Default ESP32 board for tinkering. Wi-Fi + BLE, runs MicroPython or Arduino. Common in DIY ambient displays, sensor relays, custom IoT projects.",
     "est_used_price_usd_min": 5,
     "est_used_price_usd_max": 15,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Espressif_ESP32_Chip%2C_microcontroller.jpg/640px-Espressif_ESP32_Chip%2C_microcontroller.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 3
   },
@@ -358,7 +352,6 @@
     "notes": "Discontinued e-paper smartwatch. Rebble.io keeps it alive with free app store and custom watchfaces. Cheap on eBay; week-long battery; SDK still works.",
     "est_used_price_usd_min": 30,
     "est_used_price_usd_max": 60,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Pebble_Time_Steel_Black.jpg/640px-Pebble_Time_Steel_Black.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -384,7 +377,6 @@
     "notes": "$5-15 on eBay. Original Chromecast (not Ultra/Audio). Linux-based; community 'eureka-rom' projects exist for full control. HDMI output for an ambient TV display.",
     "est_used_price_usd_min": 5,
     "est_used_price_usd_max": 15,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Google_Chromecast_-_2nd_Generation.jpg/640px-Google_Chromecast_-_2nd_Generation.jpg",
     "est_setup_hours_min": 2,
     "est_setup_hours_max": 5
   },
@@ -459,7 +451,7 @@
     "notes": "Massive modding scene. CFW (Luma3DS) enables homebrew, emulators, region-free play. Brick risk REAL on bad installs \u2014 the 3ds.hacks.guide walkthrough is the canonical source.",
     "est_used_price_usd_min": 50,
     "est_used_price_usd_max": 150,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Nintendo-3DS-AquaOpen.png/640px-Nintendo-3DS-AquaOpen.png",
+    "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Nintendo-3DS-AquaOpen.png?width=640",
     "est_setup_hours_min": 2,
     "est_setup_hours_max": 4
   },
@@ -509,7 +501,7 @@
     "notes": "The classic. Not Wi-Fi, not powerful, but trivially programmable for sensors, motor control, blinkenlights. First step before ESP32 for many tinkerers.",
     "est_used_price_usd_min": 10,
     "est_used_price_usd_max": 25,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Arduino_Uno_-_R3.jpg/640px-Arduino_Uno_-_R3.jpg",
+    "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Arduino_Uno_-_R3.jpg?width=640",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -538,7 +530,6 @@
     "notes": "800x480 mono e-paper, drives off Pi Zero W via SPI. THE canonical kitchen-calendar build (MagInkCal, InkyPi). Refresh ~2-5s; perfect for static daily layouts. Pair with Pi Zero W for the classic combo.",
     "est_used_price_usd_min": 50,
     "est_used_price_usd_max": 90,
-    "image_url": "https://www.waveshare.com/img/devkit/general/7.5inch-e-Paper-HAT/7.5inch-e-Paper-HAT-1.jpg",
     "est_setup_hours_min": 4,
     "est_setup_hours_max": 8
   },
@@ -593,7 +584,6 @@
     "notes": "800x480 SEVEN-COLOR e-paper HAT. 7-color e-ink is rare \u2014 great for ambient art rotation, family photos, weather displays. Slow refresh (~30s) so static-frame use only. Pi Zero W compatible.",
     "est_used_price_usd_min": 90,
     "est_used_price_usd_max": 130,
-    "image_url": "https://shop.pimoroni.com/cdn/shop/files/inky-impression-7-3-2025-edition-1.jpg",
     "est_setup_hours_min": 3,
     "est_setup_hours_max": 6
   },
@@ -622,7 +612,6 @@
     "notes": "10.3\" mono e-paper with stylus. Linux underneath. Toltec package manager + Oxide launcher = full custom OS. Premium ($300+) but a polished tinkerer device. Expensive failure mode if bricked.",
     "est_used_price_usd_min": 200,
     "est_used_price_usd_max": 400,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/ReMarkable_2.png/640px-ReMarkable_2.png",
     "est_setup_hours_min": 2,
     "est_setup_hours_max": 5
   },

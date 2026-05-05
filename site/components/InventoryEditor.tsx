@@ -187,6 +187,7 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
                     alt=""
                     width={48}
                     height={48}
+                    referrerPolicy="no-referrer"
                     style={{ objectFit: "cover", width: "100%", height: "100%" }}
                   />
                 ) : (

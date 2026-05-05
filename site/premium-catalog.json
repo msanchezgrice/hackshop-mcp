@@ -33,7 +33,6 @@
     "notes": "Desktop expressive robot. Lite kit ($299) or full autonomous version ($449) with onboard compute + battery. Camera + mic array + speaker means it does conversation, gesture recognition, and CV out of the box. Fully open hardware + software.",
     "actuation_risk": 3,
     "privacy_risk": 4,
-    "image_url": "https://huggingface.co/datasets/reachy-mini/cover/resolve/main/Reachy_Mini.png",
     "est_setup_hours_min": 2,
     "est_setup_hours_max": 6
   },
@@ -66,7 +65,6 @@
     "notes": "Open-source nano-drone. Stack expansion decks (Lighthouse positioning, Multi-ranger, AI-deck with camera) for autonomous flight, swarms, indoor positioning. Used in research and education widely.",
     "actuation_risk": 4,
     "privacy_risk": 1,
-    "image_url": "https://www.bitcraze.io/images/crazyflie-2-1-plus/crazyflie-2-1-plus.png",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 3
   },
@@ -105,7 +103,6 @@
     "notes": "All-in-one ESP32 dev kit with touchscreen, audio, RTC, battery in a finished case. Modular base and HAT ecosystem. Best 'just works out of the box' option for IoT prototypes.",
     "actuation_risk": 1,
     "privacy_risk": 3,
-    "image_url": "https://static-cdn.m5stack.com/resource/docs/products/core/Core2/img-9b0bea50-09a8-46cd-83d2-d05f43e23ddc.webp",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -175,7 +172,6 @@
     "notes": "Tiny RP2040 board with built-in color LCD. Works as a conference badge, status display, or generative-art frame. Cheap enough to build many.",
     "actuation_risk": 1,
     "privacy_risk": 1,
-    "image_url": "https://shop.pimoroni.com/cdn/shop/products/tufty-2040.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },
@@ -209,7 +205,7 @@
     "notes": "Open-source smartwatch under $30. Default firmware (InfiniTime) is mature; Wasp-OS adds a Python runtime if you want to write watchfaces in micropython. Pebble's spiritual successor.",
     "actuation_risk": 1,
     "privacy_risk": 2,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/PineTime_in_use.jpg/640px-PineTime_in_use.jpg",
+    "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/PineTime_smartwatch.jpg?width=640",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
   },

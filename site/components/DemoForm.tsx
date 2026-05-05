@@ -236,6 +236,7 @@ function DemoFormInner() {
                     <img
                       src={p.image_url}
                       alt={p.name}
+                      referrerPolicy="no-referrer"
                       style={{
                         maxHeight: 160,
                         maxWidth: "100%",
