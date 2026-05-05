@@ -34,6 +34,8 @@ export const DeviceEntry = z.object({
   firmware_links: z.array(z.string().url()).default([]),
   community_size_bucket: CommunitySize,
   notes: z.string().max(500),
+  est_used_price_usd_min: z.number().int().nonnegative().optional(),
+  est_used_price_usd_max: z.number().int().nonnegative().optional(),
 });
 
 export type DeviceEntry = z.infer<typeof DeviceEntry>;
@@ -52,6 +54,10 @@ export const proposeInput = z.object({
   idea: z.string().min(3, "idea is too short").max(2000, "idea is too long"),
   budget_usd: z.number().positive().max(100000).optional(),
   constraints: z.string().max(500).optional(),
+  // When true, also propose 0-3 premium open-source hardware products
+  // (Reachy Mini, Crazyflie, M5Stack, etc.). Used hardware is still the
+  // primary path; premium picks render as a secondary section.
+  include_premium: z.boolean().optional(),
 });
 
 export type ProposeInput = z.infer<typeof proposeInput>;
@@ -61,6 +67,13 @@ export interface DeviceLinks {
   hackaday_search_url: string;
   reddit_search_url: string;
   google_search_url: string;
+}
+
+export interface EbayLive {
+  count: number;
+  min_price_usd: number | null;
+  currency: string | null;
+  sample_url: string | null;
 }
 
 export interface Proposal {
@@ -76,11 +89,18 @@ export interface Proposal {
   community_size: string;
   notes: string;
   links: DeviceLinks;
+  ebay_live?: EbayLive | null; // present only when EBAY_CLIENT_ID is set
+  est_price_label?: string; // e.g. "$30-70" — populated from catalog estimate
 }
+
+import type { PremiumProposal } from "./premium-types";
+
+export type { PremiumProposal };
 
 export interface ProposeResponse {
   proposals: Proposal[];
   reasoning: string;
   degraded: boolean;
   message?: string;
+  premium_proposals?: PremiumProposal[]; // present only when include_premium was true
 }

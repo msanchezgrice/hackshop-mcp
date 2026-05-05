@@ -17,6 +17,7 @@ function DemoFormInner() {
   const [idea, setIdea] = useState("");
   const [budget, setBudget] = useState("");
   const [constraints, setConstraints] = useState("");
+  const [includePremium, setIncludePremium] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProposeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +49,7 @@ function DemoFormInner() {
       const b = parseFloat(budget);
       if (!Number.isNaN(b) && b > 0) body.budget_usd = b;
       if (constraints.trim()) body.constraints = constraints.trim();
+      if (includePremium) body.include_premium = true;
 
       const res = await fetch("/api/propose", {
         method: "POST",
@@ -118,6 +120,26 @@ function DemoFormInner() {
           </div>
         </div>
 
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            marginTop: 16,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={includePremium}
+            onChange={(e) => setIncludePremium(e.target.checked)}
+            style={{ width: "auto", margin: 0 }}
+          />
+          <span style={{ fontSize: 14, color: "var(--fg)", margin: 0 }}>
+            Also show <strong>premium open-source hardware</strong> (Reachy Mini, Crazyflie, M5Stack, etc.) — buy new, not used
+          </span>
+        </label>
+
         <button type="submit" disabled={loading || !idea.trim()}>
           {loading ? (
             <>
@@ -160,6 +182,9 @@ function DemoFormInner() {
                   <h3>{p.name}</h3>
                   <div className="proposal-meta">
                     <span className="pill">{p.category}</span>
+                    {p.est_price_label && (
+                      <span className="pill ok">{p.est_price_label} used</span>
+                    )}
                     <span className="pill">hack {p.hack_difficulty}/5</span>
                     <span
                       className={`pill ${
@@ -183,8 +208,21 @@ function DemoFormInner() {
                 )}
                 <p className="proposal-notes">{p.notes}</p>
                 <div className="proposal-links">
-                  <a className="ebay" href={p.links.ebay_search_url} target="_blank" rel="noreferrer">
-                    eBay listings →
+                  <a
+                    className="ebay"
+                    href={p.ebay_live?.sample_url ?? p.links.ebay_search_url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {p.ebay_live
+                      ? p.ebay_live.count > 0
+                        ? `eBay (${p.ebay_live.count} listing${p.ebay_live.count === 1 ? "" : "s"}${
+                            p.ebay_live.min_price_usd !== null
+                              ? `, from $${Math.round(p.ebay_live.min_price_usd)}`
+                              : ""
+                          }) →`
+                        : "eBay (no current listings)"
+                      : "eBay listings →"}
                   </a>
                   <a href={p.links.hackaday_search_url} target="_blank" rel="noreferrer">
                     Hackaday
@@ -203,6 +241,74 @@ function DemoFormInner() {
                 </div>
               </article>
             ))}
+
+            {result.premium_proposals && result.premium_proposals.length > 0 && (
+              <>
+                <h3
+                  style={{
+                    margin: "32px 0 12px",
+                    fontSize: 18,
+                    color: "var(--accent)",
+                  }}
+                >
+                  Premium open-source hardware (buy new)
+                </h3>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "var(--muted)",
+                    marginTop: 0,
+                    marginBottom: 14,
+                  }}
+                >
+                  These are open-source NEW products from Pollen Robotics,
+                  Bitcraze, Adafruit, Pimoroni, Pine64, etc. Premium price; full
+                  capability sets out of the box.
+                </p>
+                {result.premium_proposals.map((p) => (
+                  <article key={p.id} className="proposal">
+                    <div className="proposal-head">
+                      <h3>{p.name}</h3>
+                      <div className="proposal-meta">
+                        <span className="pill">{p.category}</span>
+                        <span className="pill ok">{p.price_range}</span>
+                        <span className="pill">{p.manufacturer}</span>
+                      </div>
+                    </div>
+                    <p className="proposal-why">{p.why_this_fits}</p>
+                    <p className="proposal-notes">
+                      <strong style={{ color: "var(--fg)" }}>Capabilities: </strong>
+                      {p.capabilities.join(" · ")}
+                    </p>
+                    <p className="proposal-notes">
+                      <strong style={{ color: "var(--fg)" }}>Software: </strong>
+                      {p.software_stack.join(" · ")}
+                    </p>
+                    <p className="proposal-notes">{p.notes}</p>
+                    <div className="proposal-links">
+                      <a
+                        className="ebay"
+                        href={p.vendor_url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Buy from {p.manufacturer.split(" ")[0]} →
+                      </a>
+                      {p.open_source_repo && (
+                        <a
+                          className="firmware"
+                          href={p.open_source_repo}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open source repo
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </>
+            )}
           </>
         )}
       </div>

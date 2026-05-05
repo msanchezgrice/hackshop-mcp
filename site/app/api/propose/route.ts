@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { proposeInput } from "@/lib/types";
 import { loadCatalog } from "@/lib/catalog";
 import { propose } from "@/lib/propose";
+import { loadPremiumCatalog, proposePremium } from "@/lib/premium";
 
 export const runtime = "nodejs";
 // Per Vercel knowledge: default function timeout is 300s on Fluid Compute.
@@ -67,6 +68,19 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const { devices } = loadCatalog();
-  const result = await propose(parsed.data, devices);
+
+  // Run primary (used hardware) and premium (open-source new) in parallel
+  // when include_premium is set. Used hardware is the lead path either way.
+  const [result, premiumProposals] = await Promise.all([
+    propose(parsed.data, devices),
+    parsed.data.include_premium
+      ? proposePremium(parsed.data.idea, loadPremiumCatalog()).catch(() => [])
+      : Promise.resolve([]),
+  ]);
+
+  if (parsed.data.include_premium) {
+    result.premium_proposals = premiumProposals;
+  }
+
   return NextResponse.json(result);
 }

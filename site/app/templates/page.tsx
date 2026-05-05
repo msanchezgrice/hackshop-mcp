@@ -54,7 +54,12 @@ function ProjectCard({ t }: { t: Template }) {
             letterSpacing: "0.04em",
           }}
         >
-          {VIABILITY_LABEL[t.viability]} · diff {t.difficulty}/5
+          {VIABILITY_LABEL[t.viability]} · diff {t.difficulty}/5 ·{" "}
+          {t.est_cost_usd.min === 0
+            ? `~$${t.est_cost_usd.max} or free`
+            : t.est_cost_usd.min === t.est_cost_usd.max
+              ? `~$${t.est_cost_usd.min}`
+              : `$${t.est_cost_usd.min}-${t.est_cost_usd.max}`}
         </span>
       </div>
       <p style={{ margin: "0 0 10px", fontSize: 15, color: "var(--fg)" }}>

@@ -8,7 +8,8 @@ import type {
   ProposeResponse,
 } from "./types";
 import { applyBrickRiskSafety } from "./safety";
-import { buildLinks } from "./links";
+import { buildLinks, buildEbayQuery } from "./links";
+import { fetchEbayLiveData, isEbayConfigured } from "./ebay";
 
 const SYSTEM_PROMPT = `You are a hardware-literate AI scout for tinkerers. The user gives you a project idea (often vague). You pick 3-5 hardware items from the candidate list that creatively fit the idea. Surface options the user wouldn't have thought of. Avoid recommending the obvious choice (Raspberry Pi) unless the idea genuinely calls for it.
 
@@ -62,6 +63,12 @@ function parseLoose<T>(text: string): T | null {
 function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
   const safety = applyBrickRiskSafety(device);
   const links = buildLinks(device);
+  const mn = device.est_used_price_usd_min;
+  const mx = device.est_used_price_usd_max;
+  let est_price_label: string | undefined;
+  if (typeof mn === "number" && typeof mx === "number") {
+    est_price_label = mn === mx ? `~$${mn}` : `$${mn}-${mx}`;
+  }
   return {
     id: device.id,
     name: device.name,
@@ -75,6 +82,7 @@ function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
     community_size: device.community_size_bucket,
     notes: device.notes,
     links,
+    est_price_label,
   };
 }
 
@@ -135,6 +143,32 @@ export async function propose(
     const device = catalog.find((d) => d.id === pick.id);
     if (!device) continue;
     proposals.push(buildProposal(device, pick.why_this_fits));
+  }
+
+  // Live eBay enrichment when credentials are set. Parallel fetches (~200-500ms
+  // each but they run together). Fail-soft: any error leaves ebay_live=null and
+  // the URL fallback still works.
+  if (isEbayConfigured() && proposals.length > 0) {
+    const liveData = await Promise.all(
+      proposals.map((p) => {
+        const device = catalog.find((d) => d.id === p.id);
+        if (!device) return Promise.resolve(null);
+        return fetchEbayLiveData(buildEbayQuery(device));
+      }),
+    );
+    for (let i = 0; i < proposals.length; i++) {
+      const proposal = proposals[i];
+      if (proposal) proposal.ebay_live = liveData[i] ?? null;
+    }
+    // Drop proposals with zero live listings — they make the demo look broken.
+    // Keep at least 2 proposals though, so a slow eBay day doesn't return empty.
+    const withListings = proposals.filter(
+      (p) => !p.ebay_live || p.ebay_live.count > 0,
+    );
+    if (withListings.length >= 2) {
+      proposals.length = 0;
+      proposals.push(...withListings);
+    }
   }
 
   if (proposals.length === 0) {
