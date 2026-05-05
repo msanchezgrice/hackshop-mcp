@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "Project templates · hackshop-mcp",
   description:
-    "25 verified project templates: idea + recommended hardware + viability assessment. Repurpose old phones, e-readers, Roombas, and DSLRs into useful new things.",
+    "23 verified project templates: idea + recommended hardware + viability assessment. Repurpose old phones, e-readers, Roombas, and DSLRs into useful new things.",
 };
 
 const VIABILITY_LABEL: Record<Template["viability"], string> = {
@@ -115,7 +115,7 @@ export default function TemplatesPage() {
       <header>
         <h1>Project templates</h1>
         <p className="tagline">
-          25 verified project templates. Each one is a real path —{" "}
+          23 verified project templates. Each one is a real path —{" "}
           <span style={{ color: "var(--ok)" }}>verified</span> means the hack is
           documented and reproducible;{" "}
           <span style={{ color: "var(--warn)" }}>iffy</span> works with caveats

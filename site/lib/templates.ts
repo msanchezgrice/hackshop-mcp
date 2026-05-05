@@ -1,4 +1,4 @@
-// 25 project templates that prime the propose_hardware tool.
+// 23 project templates that prime the propose_hardware tool.
 //
 // Each entry includes a `viability` field documenting whether the underlying
 // hack is real (community-verified path), iffy (works but with caveats), or

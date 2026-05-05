@@ -16,7 +16,7 @@ export default function Home() {
         </p>
         <div className="badges">
           <Link className="badge" href="/templates">
-            25 templates
+            23 templates
           </Link>
           <Link className="badge" href="/inventory">
             Your inventory
@@ -41,7 +41,7 @@ export default function Home() {
       <p style={{ fontSize: 14, color: "var(--muted)" }}>
         Need inspiration?{" "}
         <Link href="/templates">
-          Browse 25 verified project templates →
+          Browse 23 verified project templates →
         </Link>{" "}
         (old phone as a clock, e-paper calendar, Roomba as a robot, etc.)
       </p>
