@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "hackshop-mcp — an AI agent that knows what hardware is hackable",
+  title:
+    "hackshop-mcp — an AI agent that knows what hardware is hackable, repurposable, or protocol-native",
   description:
-    "An open-source MCP server that maps a project idea to hackable hardware. Tell your AI agent what you want to build; it returns 3-5 candidates with brick-risk, firmware links, and live eBay searches.",
+    "An open-source MCP server that maps a project idea to hackable, repurposable, or protocol-native hardware. Tell your AI agent what you want to build; it returns 3-5 candidates with brick-risk, firmware links, and live eBay searches.",
   openGraph: {
     title: "hackshop-mcp",
     description:

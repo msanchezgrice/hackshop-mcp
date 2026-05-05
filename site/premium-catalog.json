@@ -2,14 +2,14 @@
   {
     "id": "reachy-mini",
     "name": "Reachy Mini",
-    "manufacturer": "Pollen Robotics × Hugging Face",
+    "manufacturer": "Pollen Robotics \u00d7 Hugging Face",
     "category": "robot",
     "capabilities": [
       "wide-angle HD camera",
       "4-mic array (sound localization)",
       "5W speaker",
       "6-DoF head (pan/tilt/roll)",
-      "360° body rotation",
+      "360\u00b0 body rotation",
       "2 animated antennas",
       "Wi-Fi (full version)",
       "onboard battery (full version)"
@@ -24,8 +24,15 @@
     "price_usd_max": 449,
     "vendor_url": "https://huggingface.co/blog/reachy-mini",
     "open_source_repo": "https://github.com/pollen-robotics/reachy_mini",
-    "idea_fit_tags": ["voice", "creative-coding", "ambient", "input"],
-    "notes": "Desktop expressive robot. Lite kit ($299) or full autonomous version ($449) with onboard compute + battery. Camera + mic array + speaker means it does conversation, gesture recognition, and CV out of the box. Fully open hardware + software."
+    "idea_fit_tags": [
+      "voice",
+      "creative-coding",
+      "ambient",
+      "input"
+    ],
+    "notes": "Desktop expressive robot. Lite kit ($299) or full autonomous version ($449) with onboard compute + battery. Camera + mic array + speaker means it does conversation, gesture recognition, and CV out of the box. Fully open hardware + software.",
+    "actuation_risk": 3,
+    "privacy_risk": 4
   },
   {
     "id": "crazyflie-2-1-plus",
@@ -48,8 +55,14 @@
     "price_usd_max": 480,
     "vendor_url": "https://www.bitcraze.io/products/crazyflie-2-1/",
     "open_source_repo": "https://github.com/bitcraze/crazyflie-firmware",
-    "idea_fit_tags": ["sensor", "creative-coding", "wearable"],
-    "notes": "Open-source nano-drone. Stack expansion decks (Lighthouse positioning, Multi-ranger, AI-deck with camera) for autonomous flight, swarms, indoor positioning. Used in research and education widely."
+    "idea_fit_tags": [
+      "sensor",
+      "creative-coding",
+      "wearable"
+    ],
+    "notes": "Open-source nano-drone. Stack expansion decks (Lighthouse positioning, Multi-ranger, AI-deck with camera) for autonomous flight, swarms, indoor positioning. Used in research and education widely.",
+    "actuation_risk": 4,
+    "privacy_risk": 1
   },
   {
     "id": "m5stack-core2",
@@ -75,8 +88,17 @@
     "price_usd_max": 75,
     "vendor_url": "https://shop.m5stack.com/products/m5stack-core2-esp32-iot-development-kit-v1-1",
     "open_source_repo": "https://github.com/m5stack/M5Core2",
-    "idea_fit_tags": ["display", "iot", "sensor", "creative-coding", "low-power", "kiosk"],
-    "notes": "All-in-one ESP32 dev kit with touchscreen, audio, RTC, battery in a finished case. Modular base and HAT ecosystem. Best 'just works out of the box' option for IoT prototypes."
+    "idea_fit_tags": [
+      "display",
+      "iot",
+      "sensor",
+      "creative-coding",
+      "low-power",
+      "kiosk"
+    ],
+    "notes": "All-in-one ESP32 dev kit with touchscreen, audio, RTC, battery in a finished case. Modular base and HAT ecosystem. Best 'just works out of the box' option for IoT prototypes.",
+    "actuation_risk": 1,
+    "privacy_risk": 3
   },
   {
     "id": "adafruit-magtag",
@@ -100,8 +122,17 @@
     "price_usd_max": 45,
     "vendor_url": "https://www.adafruit.com/product/4800",
     "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPython_MagTag",
-    "idea_fit_tags": ["display", "e-ink", "low-power", "iot", "framed-art", "ambient"],
-    "notes": "Magnetic e-paper display you slap on the fridge. CircuitPython supported. Batteries last weeks. Drop-in replacement for the 'Pi + Waveshare HAT' build if you want it pre-assembled."
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "low-power",
+      "iot",
+      "framed-art",
+      "ambient"
+    ],
+    "notes": "Magnetic e-paper display you slap on the fridge. CircuitPython supported. Batteries last weeks. Drop-in replacement for the 'Pi + Waveshare HAT' build if you want it pre-assembled.",
+    "actuation_risk": 1,
+    "privacy_risk": 1
   },
   {
     "id": "pimoroni-tufty-2040",
@@ -123,8 +154,15 @@
     "price_usd_max": 25,
     "vendor_url": "https://shop.pimoroni.com/products/tufty-2040",
     "open_source_repo": "https://github.com/pimoroni/pimoroni-pico",
-    "idea_fit_tags": ["display", "low-power", "creative-coding", "wearable"],
-    "notes": "Tiny RP2040 board with built-in color LCD. Works as a conference badge, status display, or generative-art frame. Cheap enough to build many."
+    "idea_fit_tags": [
+      "display",
+      "low-power",
+      "creative-coding",
+      "wearable"
+    ],
+    "notes": "Tiny RP2040 board with built-in color LCD. Works as a conference badge, status display, or generative-art frame. Cheap enough to build many.",
+    "actuation_risk": 1,
+    "privacy_risk": 1
   },
   {
     "id": "pinetime",
@@ -148,8 +186,14 @@
     "price_usd_max": 50,
     "vendor_url": "https://www.pine64.org/pinetime/",
     "open_source_repo": "https://github.com/InfiniTimeOrg/InfiniTime",
-    "idea_fit_tags": ["wearable", "display", "low-power"],
-    "notes": "Open-source smartwatch under $30. Default firmware (InfiniTime) is mature; Wasp-OS adds a Python runtime if you want to write watchfaces in micropython. Pebble's spiritual successor."
+    "idea_fit_tags": [
+      "wearable",
+      "display",
+      "low-power"
+    ],
+    "notes": "Open-source smartwatch under $30. Default firmware (InfiniTime) is mature; Wasp-OS adds a Python runtime if you want to write watchfaces in micropython. Pebble's spiritual successor.",
+    "actuation_risk": 1,
+    "privacy_risk": 2
   },
   {
     "id": "pocketbeagle-2",
@@ -173,8 +217,15 @@
     "price_usd_max": 50,
     "vendor_url": "https://www.beagleboard.org/boards/pocketbeagle-2",
     "open_source_repo": "https://git.beagleboard.org/beagleboard/pocketbeagle-2",
-    "idea_fit_tags": ["sbc", "low-power", "iot", "sensor"],
-    "notes": "Pi Zero alternative with REAL-TIME hardware (PRUs) for motor control, signal generation, hard-deadline I/O. Open hardware down to the schematic."
+    "idea_fit_tags": [
+      "sbc",
+      "low-power",
+      "iot",
+      "sensor"
+    ],
+    "notes": "Pi Zero alternative with REAL-TIME hardware (PRUs) for motor control, signal generation, hard-deadline I/O. Open hardware down to the schematic.",
+    "actuation_risk": 1,
+    "privacy_risk": 1
   },
   {
     "id": "limesdr-mini-2",
@@ -182,7 +233,7 @@
     "manufacturer": "Lime Microsystems / Crowd Supply",
     "category": "tool",
     "capabilities": [
-      "10 MHz – 3.5 GHz transceiver",
+      "10 MHz \u2013 3.5 GHz transceiver",
       "30.72 MHz bandwidth",
       "USB 3.0 powered",
       "fully open RF design"
@@ -197,7 +248,13 @@
     "price_usd_max": 459,
     "vendor_url": "https://www.crowdsupply.com/lime-micro/limesdr-mini-2",
     "open_source_repo": "https://github.com/myriadrf/LimeSDR-Mini-v2",
-    "idea_fit_tags": ["sensor", "iot", "creative-coding"],
-    "notes": "Open-source software-defined radio. Receive AND transmit (where legal) from 10MHz to 3.5GHz. ADS-B aircraft tracking, GSM eavesdropping (with SIM), LoRa testing, GPS spoofing for testing. Premium price; serious capability."
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "creative-coding"
+    ],
+    "notes": "Open-source software-defined radio. Receive AND transmit (where legal) from 10MHz to 3.5GHz. ADS-B aircraft tracking, GSM eavesdropping (with SIM), LoRa testing, GPS spoofing for testing. Premium price; serious capability.",
+    "actuation_risk": 1,
+    "privacy_risk": 4
   }
 ]

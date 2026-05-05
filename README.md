@@ -8,7 +8,7 @@ You describe a project. The agent surfaces 3-5 hackable hardware options you wou
 
 A tinkerer has an idea. The idea would be cooler with the right piece of hardware attached: an old screen, an abandoned smart speaker, a bricked frame, a hackable handheld. The tinkerer doesn't know what hardware exists, what's hackable, or what would creatively *fit* the idea. So the idea stays purely software, or gets paired with a Raspberry Pi.
 
-This is a hardware-knowledge layer on top of LLMs. Two tools, fifty hand-vetted devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable.
+This is a hardware-knowledge layer on top of LLMs. Two tools, 27 hand-vetted devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable.
 
 ## Status
 
@@ -57,7 +57,7 @@ Lookup by id, exact name, or substring. Returns the same shape as a single propo
 
 - TypeScript + `@modelcontextprotocol/sdk`
 - LLM reasoning delegated to the host via `sampling/createMessage` (no Anthropic SDK bundled, no BYO key)
-- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, ~50 devices in V1)
+- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 27 devices in V0.0.2 — growing)
 - Tag vocabulary in `tags.md`, validated at boot — server refuses to start on tag drift
 - eBay integration is **not** in this server. Compose with [`ebay-mcp`](https://github.com/YosefHayim/ebay-mcp) at the host level.
 

@@ -9,7 +9,7 @@ export default function Home() {
         <p className="tagline">
           An AI agent that knows{" "}
           <span style={{ color: "var(--accent)" }}>
-            what hardware is hackable.
+            what hardware is hackable, repurposable, or protocol-native.
           </span>{" "}
           Tell it your project idea; it returns 3-5 candidates from a hand-vetted
           catalog with brick-risk, firmware links, and live eBay searches.

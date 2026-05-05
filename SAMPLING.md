@@ -74,11 +74,17 @@ JSON only, no markdown. Code-fence allowed (the parser strips it).
 
 The retry is in `sampleJson` itself (`src/sampling.ts`).
 
-### What the server NEVER does
+### What the server does (v0.0.2 contract)
 
-- Bundle an Anthropic / OpenAI / other-provider SDK.
-- Read a user-side `ANTHROPIC_API_KEY` env var.
-- Make HTTP calls to provider endpoints directly.
-- Crash on sampling failure.
+- **Always tries host sampling first** via `sampling/createMessage`. No key needed; host pays.
+- **Reads `ANTHROPIC_API_KEY` only as a fallback** when host sampling fails twice. Optional: if the env var is unset, the server returns a degraded response instead of calling Anthropic directly.
+- **Bundles `@anthropic-ai/sdk`** as a runtime dependency for the fallback path. (V0.0.1 promised "no SDK" — V0.0.2 chose pragmatism after live testing showed Claude Desktop's sampling support is spotty.)
+- **Never crashes on sampling failure** — degraded response is the floor.
+- **Never makes provider calls when `ANTHROPIC_API_KEY` is unset** — keyless installs stay keyless.
 
-If a future feature seems to need a direct provider call, treat that as a redesign signal — not a quick patch.
+### What the server still NEVER does
+
+- Bundle an OpenAI / other non-Anthropic SDK.
+- Hard-require `ANTHROPIC_API_KEY` (it's optional, host sampling is the preferred path).
+- Persist user prompts or proposals.
+- Make outbound calls beyond the Anthropic API + the user's MCP host.

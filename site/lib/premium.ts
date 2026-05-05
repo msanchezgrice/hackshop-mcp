@@ -72,6 +72,19 @@ function parseLoose<T>(text: string): T | null {
   }
 }
 
+// Cheap heuristic: scan capabilities for camera/mic/radio/motor terms and
+// surface a human-readable callout list. Lets the UI show "camera + mic" in
+// red without each consumer of PremiumProposal re-implementing the scan.
+function deriveRiskCallouts(device: PremiumDevice): string[] {
+  const haystack = device.capabilities.join(" ").toLowerCase();
+  const flags: string[] = [];
+  if (/camera|cam\b/.test(haystack)) flags.push("camera");
+  if (/microphone|\bmic\b|mic-array|mic array/.test(haystack)) flags.push("microphone");
+  if (/motor|servo|actuator|dof|movement|wheel|propeller/.test(haystack)) flags.push("motors");
+  if (/radio|transceiver|sdr|wi-fi|wifi|ble|bluetooth|zigbee/.test(haystack)) flags.push("radio");
+  return flags;
+}
+
 function buildPremiumProposal(
   device: PremiumDevice,
   whyThisFits: string,
@@ -92,6 +105,9 @@ function buildPremiumProposal(
     vendor_url: device.vendor_url,
     open_source_repo: device.open_source_repo ?? null,
     notes: device.notes,
+    actuation_risk: device.actuation_risk,
+    privacy_risk: device.privacy_risk,
+    risk_callouts: deriveRiskCallouts(device),
   };
 }
 

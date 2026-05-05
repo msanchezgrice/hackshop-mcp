@@ -36,6 +36,12 @@ export const PremiumDevice = z.object({
   open_source_repo: z.string().url().optional(),
   idea_fit_tags: z.array(z.string().min(1)).min(1).max(8),
   notes: z.string().max(500),
+  // Premium-only risk axes. brick_risk is replaced by these because open-source
+  // hardware is rarely "bricked" in the consumer-electronics sense — but it
+  // CAN move (motors), see/hear (cameras/mics), or transmit (radios).
+  // Both 1-5: 1 = harmless, 5 = real concern, requires user awareness.
+  actuation_risk: z.number().int().min(1).max(5),
+  privacy_risk: z.number().int().min(1).max(5),
 });
 
 export type PremiumDevice = z.infer<typeof PremiumDevice>;
@@ -56,4 +62,7 @@ export interface PremiumProposal {
   vendor_url: string;
   open_source_repo: string | null;
   notes: string;
+  actuation_risk: number;
+  privacy_risk: number;
+  risk_callouts: string[]; // human-readable per-axis flags, e.g. "camera + mic"
 }

@@ -17,7 +17,7 @@ import {
 } from "./tools/assess_hackability.js";
 
 const NAME = "hackshop-mcp";
-const VERSION = "0.0.1";
+const VERSION = "0.0.2";
 
 async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.

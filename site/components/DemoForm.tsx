@@ -273,6 +273,19 @@ function DemoFormInner() {
                         <span className="pill">{p.category}</span>
                         <span className="pill ok">{p.price_range}</span>
                         <span className="pill">{p.manufacturer}</span>
+                        {p.actuation_risk >= 3 && (
+                          <span className="pill warn">
+                            actuation {p.actuation_risk}/5
+                          </span>
+                        )}
+                        {p.privacy_risk >= 3 && (
+                          <span className="pill warn">
+                            privacy {p.privacy_risk}/5
+                            {p.risk_callouts.length > 0
+                              ? ` (${p.risk_callouts.join(" + ")})`
+                              : ""}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <p className="proposal-why">{p.why_this_fits}</p>
