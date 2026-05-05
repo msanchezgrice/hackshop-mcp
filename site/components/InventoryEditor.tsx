@@ -180,19 +180,24 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
                   color: "var(--muted)",
                 }}
               >
-                {d.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={d.image_url}
-                    alt=""
-                    width={48}
-                    height={48}
-                    referrerPolicy="no-referrer"
-                    style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                  />
-                ) : (
-                  d.category.slice(0, 3).toUpperCase()
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/api/img?slug=${d.id}`}
+                  alt=""
+                  width={48}
+                  height={48}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    img.style.display = "none";
+                    const fallback = img.nextElementSibling as HTMLElement | null;
+                    if (fallback) fallback.style.display = "block";
+                  }}
+                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                />
+                <span style={{ display: "none" }}>
+                  {d.category.slice(0, 3).toUpperCase()}
+                </span>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{d.name}</div>

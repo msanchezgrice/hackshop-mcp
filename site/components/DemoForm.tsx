@@ -230,23 +230,24 @@ function DemoFormInner() {
 
             {result.proposals.map((p) => (
               <article key={p.id} className="proposal">
-                {p.image_url && (
-                  <div style={{ marginBottom: 12 }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={p.image_url}
-                      alt={p.name}
-                      referrerPolicy="no-referrer"
-                      style={{
-                        maxHeight: 160,
-                        maxWidth: "100%",
-                        borderRadius: 6,
-                        background: "var(--code-bg-2)",
-                      }}
-                      loading="lazy"
-                    />
-                  </div>
-                )}
+                <div style={{ marginBottom: 12 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/api/img?slug=${p.id}`}
+                    alt={p.name}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                    style={{
+                      maxHeight: 160,
+                      maxWidth: "100%",
+                      borderRadius: 6,
+                      background: "var(--code-bg-2)",
+                    }}
+                    loading="lazy"
+                  />
+                </div>
                 <div className="proposal-head">
                   <h3>{p.name}</h3>
                   <div className="proposal-meta">
@@ -428,22 +429,24 @@ function DemoFormInner() {
                 </p>
                 {result.premium_proposals.map((p) => (
                   <article key={p.id} className="proposal">
-                    {p.image_url && (
-                      <div style={{ marginBottom: 12 }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={p.image_url}
-                          alt={p.name}
-                          style={{
-                            maxHeight: 160,
-                            maxWidth: "100%",
-                            borderRadius: 6,
-                            background: "var(--code-bg-2)",
-                          }}
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
+                    <div style={{ marginBottom: 12 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`/api/img?slug=${p.id}`}
+                        alt={p.name}
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                        style={{
+                          maxHeight: 160,
+                          maxWidth: "100%",
+                          borderRadius: 6,
+                          background: "var(--code-bg-2)",
+                        }}
+                        loading="lazy"
+                      />
+                    </div>
                     <div className="proposal-head">
                       <h3>{p.name}</h3>
                       <div className="proposal-meta">
