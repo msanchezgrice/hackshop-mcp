@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { DeviceEntry } from "../catalog/schema.js";
 import { applyBrickRiskSafety } from "../safety.js";
+import { buildLinks, type DeviceLinks } from "../links.js";
 
 export const assessHackabilityInput = z.object({
   device_name: z.string().min(1).max(200),
@@ -23,6 +24,7 @@ export interface AssessOutput {
     community_size: string;
     last_verified: string;
     notes: string;
+    links: DeviceLinks;
   };
   message?: string;
 }
@@ -51,6 +53,7 @@ export function assessHackability(
   }
 
   const safety = applyBrickRiskSafety(match);
+  const links = buildLinks(match);
 
   return {
     found: true,
@@ -67,6 +70,7 @@ export function assessHackability(
       community_size: match.community_size_bucket,
       last_verified: match.last_verified,
       notes: match.notes,
+      links,
     },
   };
 }

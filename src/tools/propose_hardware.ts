@@ -3,6 +3,7 @@ import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import type { DeviceEntry } from "../catalog/schema.js";
 import { applyBrickRiskSafety } from "../safety.js";
 import { sampleJson } from "../sampling.js";
+import { buildLinks, type DeviceLinks } from "../links.js";
 
 export const proposeHardwareInput = z.object({
   idea: z.string().min(3, "idea is too short").max(2000, "idea is too long"),
@@ -23,8 +24,9 @@ export interface Proposal {
   brick_risk_disclaimer: string | null;
   firmware_links: string[];
   community_size: string;
-  ebay_query_suggestion: string;
   notes: string;
+  links: DeviceLinks;
+  ebay_query_suggestion: string;
 }
 
 export interface ProposeOutput {
@@ -53,13 +55,40 @@ Rules:
 - Pick 3-5 devices. Never more than 5.
 - Only pick from the candidate list provided. Do not invent devices.
 - "why_this_fits" must mention the user's idea explicitly. No generic praise.
-- If candidates are weak for the idea, say so in the rationale rather than padding with bad picks.`;
+- Respect explicit constraints in the idea: if the user says "e-paper preferred", prioritize devices with the "e-ink" tag. If the user says "low power", prioritize "low-power" tagged devices.
+- If candidates are weak for the idea, say so in the rationale rather than padding with bad picks.
+- Display HATs (Waveshare, Pimoroni Inky) require a host SBC; if you propose one, also propose a Pi Zero W (raspberry-pi-zero-2w) as the driver.`;
 
-function buildEbayQuery(device: DeviceEntry, idea: string): string {
-  // Suggest an eBay search query the user can pass to ebay-mcp at the host.
-  // Avoid LLM model names; use the device's marketing name.
-  const cond = device.brick_risk >= 4 ? "working" : "used";
-  return `${device.name} ${cond}`;
+// Token-aliasing: user-text terms → catalog tag terms.
+// Lets "e-paper" match "e-ink", "tablet" match "display", etc.
+const TAG_ALIASES: Record<string, string[]> = {
+  "e-paper": ["e-ink"],
+  "epaper": ["e-ink"],
+  "e ink": ["e-ink"],
+  "eink": ["e-ink"],
+  "tablet": ["display", "kiosk"],
+  "smart bulb": ["bulb", "color-cycle"],
+  "lamp": ["bulb"],
+  "dashboard": ["kiosk", "display"],
+  "calendar": ["display", "kiosk", "framed-art"],
+  "art frame": ["framed-art", "ambient", "display"],
+  "always-on": ["low-power"],
+  "battery": ["low-power"],
+  "speaker": ["audio-out"],
+  "music": ["audio-out"],
+  "mic": ["voice"],
+  "microphone": ["voice"],
+};
+
+function expandIdeaTerms(idea: string): Set<string> {
+  const lower = idea.toLowerCase();
+  const tags = new Set<string>();
+  for (const [phrase, mapped] of Object.entries(TAG_ALIASES)) {
+    if (lower.includes(phrase)) {
+      for (const t of mapped) tags.add(t);
+    }
+  }
+  return tags;
 }
 
 function candidateContext(catalog: DeviceEntry[]): string {
@@ -71,18 +100,22 @@ function candidateContext(catalog: DeviceEntry[]): string {
     .join("\n");
 }
 
-function shortlistCandidates(
+// Always pass the full catalog when small (<100 devices). The LLM is the
+// real selector; pre-filtering hurts more than it helps once the catalog
+// fits in context. Shortlist is only used for the degraded fallback.
+export function shortlistCandidates(
   catalog: DeviceEntry[],
   idea: string,
 ): DeviceEntry[] {
-  // Naive prefilter: if the idea text mentions any tag substring, prefer those.
-  // Otherwise return the full catalog (LLM does the real picking).
   const lower = idea.toLowerCase();
-  const tagged = catalog.filter((d) =>
-    d.idea_fit_tags.some((t) => lower.includes(t.replace("-", " "))),
-  );
-  if (tagged.length >= 5) return tagged;
-  return catalog;
+  const aliasedTags = expandIdeaTerms(idea);
+  const tagged = catalog.filter((d) => {
+    return d.idea_fit_tags.some(
+      (t) => lower.includes(t.replace("-", " ")) || aliasedTags.has(t),
+    );
+  });
+  if (tagged.length === 0) return catalog;
+  return tagged;
 }
 
 export async function proposeHardware(
@@ -98,7 +131,9 @@ export async function proposeHardware(
     };
   }
 
-  const candidates = shortlistCandidates(catalog, input.idea);
+  // Pass the FULL catalog to sampling when small; lets the LLM weigh all
+  // options. Shortlist only as the degraded-mode fallback.
+  const fullCatalog = catalog.length <= 100 ? catalog : shortlistCandidates(catalog, input.idea);
 
   const userPrompt = [
     `Project idea: ${input.idea}`,
@@ -106,7 +141,7 @@ export async function proposeHardware(
     input.constraints ? `Constraints: ${input.constraints}` : null,
     "",
     "Candidate hardware:",
-    candidateContext(candidates),
+    candidateContext(fullCatalog),
   ]
     .filter(Boolean)
     .join("\n");
@@ -118,13 +153,18 @@ export async function proposeHardware(
     maxTokens: 1500,
   });
 
-  // Degraded path: sampling failed twice. Return raw shortlist matches with a
-  // clear "reasoning unavailable" note. No hallucination, no crash.
+  // Degraded path: every reasoning attempt failed (host sampling + retry +
+  // optional Anthropic API fallback). Use the alias-aware shortlist as the
+  // best available approximation. Honest about the degradation.
   if (!sampled || !Array.isArray(sampled.picks)) {
-    const fallback = candidates.slice(0, 3).map((d) => buildProposal(d, input.idea, "Reasoning unavailable; raw catalog match."));
+    const shortlisted = shortlistCandidates(catalog, input.idea);
+    const fallback = shortlisted.slice(0, 5).map((d) =>
+      buildProposal(d, "Reasoning unavailable; matched against catalog tags only."),
+    );
     return {
       proposals: fallback,
-      reasoning: "Reasoning unavailable. The host LLM failed twice. Returning raw catalog matches; verify hackability against the linked communities.",
+      reasoning:
+        "Reasoning unavailable. The host LLM failed and no Anthropic API fallback was configured. Returning catalog matches by tag overlap. Set ANTHROPIC_API_KEY in the MCP server's env config to enable reasoning even on hosts without sampling/createMessage support.",
       degraded: true,
     };
   }
@@ -133,7 +173,7 @@ export async function proposeHardware(
   for (const pick of sampled.picks.slice(0, 5)) {
     const device = catalog.find((d) => d.id === pick.id);
     if (!device) continue; // sampler hallucinated an id; drop it
-    proposals.push(buildProposal(device, input.idea, pick.why_this_fits));
+    proposals.push(buildProposal(device, pick.why_this_fits));
   }
 
   if (proposals.length === 0) {
@@ -141,7 +181,8 @@ export async function proposeHardware(
       proposals: [],
       reasoning: sampled.rationale ?? "No catalog match for this idea.",
       degraded: false,
-      message: "No catalog devices fit this idea well. Consider expanding the catalog or trying a more concrete description.",
+      message:
+        "No catalog devices fit this idea well. Consider expanding the catalog or trying a more concrete description.",
     };
   }
 
@@ -152,12 +193,9 @@ export async function proposeHardware(
   };
 }
 
-function buildProposal(
-  device: DeviceEntry,
-  idea: string,
-  whyThisFits: string,
-): Proposal {
+function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
   const safety = applyBrickRiskSafety(device);
+  const links = buildLinks(device);
   return {
     id: device.id,
     name: device.name,
@@ -169,7 +207,10 @@ function buildProposal(
     brick_risk_disclaimer: safety.brick_risk_disclaimer,
     firmware_links: device.firmware_links,
     community_size: device.community_size_bucket,
-    ebay_query_suggestion: buildEbayQuery(device, idea),
     notes: device.notes,
+    links,
+    ebay_query_suggestion: links.ebay_search_url.includes("_nkw=")
+      ? decodeURIComponent(links.ebay_search_url.split("_nkw=")[1]?.split("&")[0] ?? "")
+      : device.name,
   };
 }

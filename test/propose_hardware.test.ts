@@ -114,6 +114,37 @@ describe("propose_hardware happy path", () => {
     expect(out.proposals[0]?.id).toBe("tidbyt-gen1");
     expect(out.proposals[0]?.why_this_fits).toContain("ambient");
     expect(out.proposals[0]?.ebay_query_suggestion).toContain("Tidbyt");
+    expect(out.proposals[0]?.links.ebay_search_url).toContain("ebay.com/sch");
+    expect(out.proposals[0]?.links.hackaday_search_url).toContain("hackaday.com");
+    expect(out.proposals[0]?.links.reddit_search_url).toContain("reddit.com");
+  });
+
+  it("aliases user-friendly terms to catalog tags (e-paper -> e-ink)", async () => {
+    // Add a fake e-ink device for the alias test
+    const epaperFixture = [
+      ...fixture,
+      {
+        ...fixture[0]!,
+        id: "fake-eink",
+        name: "Fake E-Ink",
+        idea_fit_tags: ["e-ink", "display", "low-power"],
+      },
+    ];
+    const sampler = makeMockServer({
+      reply: JSON.stringify({
+        picks: [{ id: "fake-eink", why_this_fits: "matches e-paper preference" }],
+        rationale: "x",
+      }),
+    });
+
+    const out = await proposeHardware(
+      { idea: "always-on family calendar, e-paper preferred" },
+      epaperFixture,
+      sampler.server as any,
+    );
+
+    expect(out.proposals).toHaveLength(1);
+    expect(out.proposals[0]?.id).toBe("fake-eink");
   });
 
   it("strips picks whose ids aren't in the catalog (defense against sampler hallucination)", async () => {
@@ -196,19 +227,27 @@ describe("propose_hardware safety rule integration", () => {
 });
 
 describe("propose_hardware degraded paths", () => {
-  it("degrades gracefully when sampling fails twice", async () => {
-    const sampler = makeMockServer({ throwOn: 2 });
+  it("degrades gracefully when sampling fails twice and no Anthropic key", async () => {
+    // Ensure ANTHROPIC_API_KEY is NOT set for this test
+    const prevKey = process.env.ANTHROPIC_API_KEY;
+    delete process.env.ANTHROPIC_API_KEY;
+    try {
+      const sampler = makeMockServer({ throwOn: 2 });
 
-    const out = await proposeHardware(
-      { idea: "doesn't matter, sampler is dead" },
-      fixture,
-      sampler.server as any,
-    );
+      const out = await proposeHardware(
+        { idea: "doesn't matter, sampler is dead" },
+        fixture,
+        sampler.server as any,
+      );
 
-    expect(out.degraded).toBe(true);
-    expect(out.proposals.length).toBeGreaterThan(0);
-    expect(out.proposals[0]?.why_this_fits).toContain("Reasoning unavailable");
-    expect(out.reasoning).toContain("Reasoning unavailable");
+      expect(out.degraded).toBe(true);
+      expect(out.proposals.length).toBeGreaterThan(0);
+      expect(out.proposals[0]?.why_this_fits).toContain("Reasoning unavailable");
+      expect(out.reasoning).toContain("Reasoning unavailable");
+      expect(out.reasoning).toContain("ANTHROPIC_API_KEY");
+    } finally {
+      if (prevKey !== undefined) process.env.ANTHROPIC_API_KEY = prevKey;
+    }
   });
 
   it("retries once on transient failure", async () => {

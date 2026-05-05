@@ -68,4 +68,13 @@ describe("assess_hackability", () => {
     expect(out.device?.brick_risk).toBe(2);
     expect(out.device?.brick_risk_disclaimer).toBeNull();
   });
+
+  it("includes clickable links in the output (eBay, Hackaday, Reddit, Google)", () => {
+    const out = assessHackability({ device_name: "tidbyt-gen1" }, fixture);
+    expect(out.device?.links.ebay_search_url).toContain("ebay.com");
+    expect(out.device?.links.ebay_search_url).toContain("Tidbyt");
+    expect(out.device?.links.hackaday_search_url).toContain("hackaday.com");
+    expect(out.device?.links.reddit_search_url).toContain("reddit.com");
+    expect(out.device?.links.google_search_url).toContain("google.com");
+  });
 });

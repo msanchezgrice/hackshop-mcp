@@ -12,7 +12,27 @@ This is a hardware-knowledge layer on top of LLMs. Two tools, fifty hand-vetted 
 
 ## Status
 
-V0.0.1 — local development only. Not yet on npm or the MCP registry.
+V0.0.2 — published on npm. Install with `npx hackshop-mcp` or add to your MCP client config.
+
+## Install in 30 seconds
+
+Add to your MCP client config (Claude Desktop / Claude Code / Cursor):
+
+```json
+{
+  "mcpServers": {
+    "hackshop": {
+      "command": "npx",
+      "args": ["-y", "hackshop-mcp"],
+      "env": {
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      }
+    }
+  }
+}
+```
+
+The `ANTHROPIC_API_KEY` env var is **optional but recommended**. The server first tries `sampling/createMessage` (host-delegated reasoning, no key needed). If your host doesn't support that — many don't yet — the server falls back to a direct Anthropic API call when this key is set. Without it, you'll get raw catalog matches in degraded mode.
 
 ## Tools
 

@@ -34,6 +34,10 @@ interface ExampleResult {
 }
 
 function runOne(example: Example, file: string, deviceIds: Set<string>): ExampleResult {
+  // Catalog-presence check: every expected_device must exist in catalog.json.
+  // (The agentic regression — does propose_hardware actually surface them when
+  // an LLM is hooked up — has to run inside an MCP host. This runner catches
+  // catalog drift, which is the most common bug at edit time.)
   const missing: string[] = [];
   const unknown: string[] = [];
   for (const id of example.expected_devices) {

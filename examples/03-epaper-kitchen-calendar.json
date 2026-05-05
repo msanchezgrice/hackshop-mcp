@@ -1,0 +1,11 @@
+{
+  "idea": "always-on family calendar in the kitchen, light colors, no animation, e-paper preferred, ideally 7-13 inch with low refresh cadence so it can sit in a frame",
+  "expected_devices": [
+    "waveshare-7-5-epaper-hat",
+    "pimoroni-inky-impression-7-3",
+    "remarkable-2",
+    "barnes-noble-nook-touch",
+    "kobo-clara-hd"
+  ],
+  "notes": "Regression for the gap Cowork called out (2026-05-04 dogfood session): an e-paper kitchen-calendar idea must surface real e-paper hardware, not just LCD frames. Includes the canonical maker-community devices (Waveshare HAT for MagInkCal-style builds, Pimoroni Inky Impression for color e-ink, reMarkable 2 for the polished tablet route, plus jailbroken e-readers). At least 3 of these 5 should appear; if only 0-2 do, prompt or catalog needs work."
+}

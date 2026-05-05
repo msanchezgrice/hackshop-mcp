@@ -1,6 +1,14 @@
 # Sampling Contract
 
-This server uses MCP's `sampling/createMessage` to delegate LLM reasoning to the host. No Anthropic / OpenAI SDK is bundled. The host pays for tokens; users don't ship a second API key.
+This server prefers MCP's `sampling/createMessage` to delegate LLM reasoning to the host. The host pays for tokens; users don't manage a second API key.
+
+**Update (V0.0.2):** since not every MCP host implements sampling reliably (Claude Code does; Claude Desktop is spotty; many other clients don't yet), V0.0.2 adds an opt-in **direct Anthropic API fallback**. Set `ANTHROPIC_API_KEY` in the MCP server's env config and the server will use the Anthropic SDK directly when sampling fails. Without it, the server returns degraded responses (raw catalog matches with a clear note).
+
+The fallback order is:
+1. `server.createMessage` (host sampling) — preferred
+2. retry `server.createMessage` once
+3. direct Anthropic API call IF `ANTHROPIC_API_KEY` is set
+4. degraded response (catalog matches by tag overlap, no reasoning)
 
 ## Boot probe
 
