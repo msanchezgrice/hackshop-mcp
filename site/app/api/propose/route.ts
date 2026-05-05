@@ -13,14 +13,20 @@ export const maxDuration = 60;
 // across concurrent invocations, so this catches the common abuse pattern.
 // For production, swap for Upstash Redis / Vercel KV via the marketplace.
 //
-// Tunable via RATE_LIMIT_PER_HOUR env var. Default 30/hour/IP — generous
-// enough for real users dogfooding the demo, tight enough to bound Anthropic
-// cost from abuse. At ~$0.002/call (Haiku), worst case is $0.06/hour/IP.
-const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_HOUR ?? "30", 10);
+// Off switches:
+//   SKIP_RATE_LIMIT=true     -> no rate limiting at all
+//   RATE_LIMIT_PER_HOUR=200  -> override the per-IP cap (default 200/hr)
+//
+// Default of 200/hr is generous for active dogfooding. At Haiku pricing
+// (~$0.002/call) the absolute-worst single-IP cost is ~$0.40/hour, ~$10/day.
+// Bound that in your Anthropic console with a monthly spend cap.
+const SKIP = process.env.SKIP_RATE_LIMIT === "true";
+const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_HOUR ?? "200", 10);
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
 function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
+  if (SKIP) return { ok: true };
   const now = Date.now();
   const b = buckets.get(ip);
   if (!b || b.resetAt < now) {
