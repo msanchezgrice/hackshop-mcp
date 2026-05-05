@@ -113,8 +113,10 @@ export type { PremiumProposal };
 
 export interface ProposeResponse {
   proposals: Proposal[];
-  reasoning: string;
+  reasoning: string;          // legacy plain-text fallback
+  rationale_md?: string;      // structured markdown — lead bold line + bullets
+  next_steps_md?: string;     // structured markdown — concrete actions
   degraded: boolean;
   message?: string;
-  premium_proposals?: PremiumProposal[]; // present only when include_premium was true
+  premium_proposals?: PremiumProposal[];
 }

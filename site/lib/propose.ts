@@ -13,25 +13,34 @@ import { fetchEbayLiveData, isEbayConfigured } from "./ebay";
 
 const SYSTEM_PROMPT = `You are a hardware-literate AI scout for tinkerers. The user gives you a project idea (often vague). You pick 3-5 hardware items from the candidate list that creatively fit the idea. Surface options the user wouldn't have thought of. Avoid recommending the obvious choice (Raspberry Pi) unless the idea genuinely calls for it.
 
-Return JSON only, no markdown, with this shape:
+Return JSON only (no surrounding fence), with this shape:
 {
   "picks": [
-    { "id": "<device id from candidate list>", "why_this_fits": "<one sentence, concrete>" }
+    { "id": "<device id>", "why_this_fits": "<one tight sentence, mentions user's idea>" }
   ],
-  "rationale": "<one paragraph on the overall theme of your picks>"
+  "rationale_md": "<MARKDOWN — see formatting rules>",
+  "next_steps_md": "<MARKDOWN — bulleted ordered actions>"
 }
 
-Rules:
-- Pick 3-5 devices. Never more than 5.
-- Only pick from the candidate list provided. Do not invent devices.
-- "why_this_fits" must mention the user's idea explicitly. No generic praise.
-- Respect explicit constraints: "e-paper preferred" -> prioritize e-ink tagged devices. "low power" -> prioritize low-power tagged.
-- Display HATs (Waveshare, Pimoroni Inky) need a host SBC; pair them with raspberry-pi-zero-2w when proposing.
-- If candidates are weak for the idea, say so in the rationale rather than padding.`;
+FORMATTING (rationale_md, next_steps_md):
+- Use markdown. Encouraged: bullet lists ('- '), bold (**word**), inline code (\`token\`), short headers ('## Heading').
+- rationale_md: lead with **one bold one-liner** summarizing the recommended path. Then a 3-5 bullet list of reasons / tradeoffs / constraints. Keep under 8 lines.
+- next_steps_md: 3-5 bulleted concrete actions, each starting with a verb ("Order...", "Flash...", "Wire..."), each one short sentence.
+- Reference real project names (MagInkCal, Luma3DS, openmiko, Rebble, KOReader, Tronbyt, ESPHome, Home Assistant, Frigate, etc.) — the frontend renders them so the user can recognize.
+- Do NOT invent URLs you're unsure about; project names alone are enough.
+
+GENERAL:
+- Pick 3-5 devices, never more than 5.
+- Only pick from the candidate list. Do not invent devices.
+- "why_this_fits" must mention the user's idea explicitly.
+- Respect constraints: "e-paper preferred" -> prioritize e-ink tag; "low power" -> prioritize low-power tag.
+- Display HATs (Waveshare, Pimoroni Inky) need a host SBC; pair with raspberry-pi-zero-2w.
+- If candidates are weak, say so in rationale_md rather than padding.`;
 
 interface SamplerPick {
   picks: Array<{ id: string; why_this_fits: string }>;
-  rationale: string;
+  rationale_md: string;
+  next_steps_md: string;
 }
 
 function candidateContext(catalog: DeviceEntry[]): string {
@@ -207,10 +216,28 @@ export async function propose(
     }
   }
 
+  // Backward-compatible plain-text reasoning derived from the markdown so any
+  // legacy consumer that reads `reasoning` still works. The new fields
+  // rationale_md / next_steps_md carry the structured output.
+  const stripMd = (md: string): string =>
+    md
+      .replace(/^#+\s+/gm, "")
+      .replace(/\*\*/g, "")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/^[-*]\s+/gm, "• ")
+      .trim();
+
+  const rationale_md = sampled.rationale_md ?? "";
+  const next_steps_md = sampled.next_steps_md ?? "";
+  const reasoning = stripMd(rationale_md) || "No catalog match for this idea.";
+
   if (proposals.length === 0) {
     return {
       proposals: [],
-      reasoning: sampled.rationale ?? "No catalog match for this idea.",
+      reasoning,
+      rationale_md,
+      next_steps_md,
       degraded: false,
       message:
         "No catalog devices fit this idea well. Try a more concrete description, or open a catalog PR.",
@@ -219,7 +246,9 @@ export async function propose(
 
   return {
     proposals,
-    reasoning: sampled.rationale ?? "",
+    reasoning,
+    rationale_md,
+    next_steps_md,
     degraded: false,
   };
 }

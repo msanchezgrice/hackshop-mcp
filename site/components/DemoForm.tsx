@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import type { ProposeResponse } from "@/lib/types";
 import { loadInventory } from "@/lib/inventory";
 
@@ -28,6 +29,9 @@ function DemoFormInner() {
   const [howtoFor, setHowtoFor] = useState<string | null>(null);
   const [howtoMd, setHowtoMd] = useState<string | null>(null);
   const [howtoLoading, setHowtoLoading] = useState(false);
+  const [diagramB64, setDiagramB64] = useState<string | null>(null);
+  const [diagramLoading, setDiagramLoading] = useState(false);
+  const [diagramError, setDiagramError] = useState<string | null>(null);
 
   // Track inventory size; refresh when other tabs/pages change it.
   useEffect(() => {
@@ -218,9 +222,102 @@ function DemoFormInner() {
               </div>
             )}
 
-            {!result.degraded && result.reasoning && (
+            {!result.degraded && (result.rationale_md || result.reasoning) && (
               <div className="reasoning">
-                <strong>Why these:</strong> {result.reasoning}
+                <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Why these
+                </div>
+                {result.rationale_md ? (
+                  <div className="md">
+                    <ReactMarkdown>{result.rationale_md}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <div>{result.reasoning}</div>
+                )}
+              </div>
+            )}
+
+            {!result.degraded && result.next_steps_md && (
+              <div className="reasoning" style={{ borderLeftColor: "var(--ok)" }}>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Next steps
+                </div>
+                <div className="md">
+                  <ReactMarkdown>{result.next_steps_md}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+
+            {!result.degraded && result.proposals.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                {!diagramB64 && !diagramLoading && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setDiagramLoading(true);
+                      setDiagramError(null);
+                      try {
+                        const res = await fetch("/api/diagram", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            idea: idea.trim(),
+                            device_ids: result.proposals.map((p) => p.id),
+                          }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                          setDiagramError(
+                            data.configured === false
+                              ? "Diagram generation isn't enabled on this deployment yet (needs OPENAI_API_KEY)."
+                              : data.error ?? `Server returned ${res.status}`,
+                          );
+                        } else if (data.image_b64) {
+                          setDiagramB64(data.image_b64);
+                        }
+                      } catch (e) {
+                        setDiagramError((e as Error).message);
+                      } finally {
+                        setDiagramLoading(false);
+                      }
+                    }}
+                    style={{
+                      fontSize: 13,
+                      padding: "8px 14px",
+                      borderRadius: 6,
+                      background: "var(--code-bg)",
+                      color: "var(--fg)",
+                      border: "1px solid var(--accent)",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Generate architecture diagram →
+                  </button>
+                )}
+                {diagramLoading && (
+                  <div className="reasoning" style={{ borderLeftColor: "var(--accent)" }}>
+                    <span className="spinner" /> Generating diagram via gpt-image-1 (~10-30s)…
+                  </div>
+                )}
+                {diagramError && <div className="error">{diagramError}</div>}
+                {diagramB64 && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Architecture sketch (AI-generated)
+                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`data:image/png;base64,${diagramB64}`}
+                      alt="Generated architecture diagram"
+                      style={{
+                        maxWidth: "100%",
+                        borderRadius: 8,
+                        border: "1px solid var(--border)",
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
