@@ -12,8 +12,12 @@ export const maxDuration = 60;
 // Naive in-process rate limit. A single Fluid Compute instance reuses memory
 // across concurrent invocations, so this catches the common abuse pattern.
 // For production, swap for Upstash Redis / Vercel KV via the marketplace.
-const RATE_LIMIT = 5; // requests
-const RATE_WINDOW_MS = 60 * 60 * 1000; // per hour
+//
+// Tunable via RATE_LIMIT_PER_HOUR env var. Default 30/hour/IP — generous
+// enough for real users dogfooding the demo, tight enough to bound Anthropic
+// cost from abuse. At ~$0.002/call (Haiku), worst case is $0.06/hour/IP.
+const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_HOUR ?? "30", 10);
+const RATE_WINDOW_MS = 60 * 60 * 1000;
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
 function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
@@ -46,7 +50,7 @@ export async function POST(req: Request): Promise<Response> {
   if (!limit.ok) {
     return NextResponse.json(
       {
-        error: `Rate limit hit. Try again in ${limit.resetIn}s. (5 requests/hour per IP.)`,
+        error: `Rate limit hit. Try again in ${limit.resetIn}s. (${RATE_LIMIT} requests/hour per IP.)`,
       },
       { status: 429 },
     );
