@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>hackshop-mcp — an AI agent that knows what hardware is hackable</title>
+<meta name="description" content="An open-source MCP server that maps a project idea to hackable hardware. Tell your AI agent what you want to build; it returns 3-5 candidates with brick-risk, firmware links, and live eBay searches." />
+<meta property="og:title" content="hackshop-mcp" />
+<meta property="og:description" content="Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP." />
+<meta property="og:url" content="https://msanchezgrice.github.io/hackshop-mcp/" />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0a0a0a" />
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --fg: #f5f5f5;
+    --muted: #888;
+    --accent: #f97316;
+    --code-bg: #161616;
+    --border: #232323;
+    --max: 760px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: var(--max); margin: 0 auto; padding: 64px 24px 96px; }
+  header { padding-bottom: 40px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+  h1 { font-size: 40px; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; font-weight: 700; }
+  h1 .accent { color: var(--accent); }
+  .tagline { font-size: 19px; color: var(--muted); max-width: 580px; margin: 0; }
+  h2 { font-size: 22px; margin: 56px 0 16px; letter-spacing: -0.01em; font-weight: 600; }
+  h3 { font-size: 16px; margin: 28px 0 10px; color: var(--fg); font-weight: 600; }
+  p { margin: 0 0 16px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, pre, kbd {
+    font-family: "SF Mono", ui-monospace, "Menlo", "Cascadia Mono", monospace;
+    font-size: 14px;
+  }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); }
+  pre {
+    background: var(--code-bg); padding: 18px 20px; border-radius: 8px;
+    border: 1px solid var(--border); overflow-x: auto; margin: 12px 0 24px;
+  }
+  pre code { background: transparent; padding: 0; border: 0; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 999px; font-size: 13px; color: var(--fg);
+  }
+  .badge:hover { border-color: var(--accent); text-decoration: none; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0 24px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } h1 { font-size: 32px; } }
+  .feature { background: var(--code-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border); }
+  .feature .num { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 22px; display: block; margin-bottom: 4px; }
+  .feature .title { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  .feature .desc { font-size: 14px; color: var(--muted); margin: 0; }
+  .demo {
+    background: var(--code-bg); border-left: 3px solid var(--accent);
+    padding: 16px 20px; border-radius: 4px; font-size: 14px; line-height: 1.6;
+    margin: 16px 0;
+  }
+  .demo .role { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .demo .input { color: var(--fg); margin: 4px 0 12px; }
+  .demo .output { color: var(--fg); }
+  .demo .device { font-weight: 600; color: var(--accent); }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 56px 0; }
+  footer { color: var(--muted); font-size: 13px; padding-top: 24px; border-top: 1px solid var(--border); margin-top: 56px; }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--fg); }
+  ul { padding-left: 18px; }
+  li { margin-bottom: 6px; }
+  .install-note { color: var(--muted); font-size: 13px; margin-top: -16px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>hackshop-mcp</h1>
+  <p class="tagline">An AI agent that knows <span style="color:var(--accent)">what hardware is hackable.</span> Tell it your project idea; it returns 3-5 candidates from a hand-vetted catalog with brick-risk, firmware links, and live eBay searches.</p>
+  <div class="badges">
+    <a class="badge" href="https://github.com/msanchezgrice/hackshop-mcp">GitHub</a>
+    <a class="badge" href="https://www.npmjs.com/package/hackshop-mcp">npm</a>
+    <span class="badge">MIT</span>
+    <span class="badge">v0.0.2</span>
+  </div>
+</header>
+
+<h2>The story</h2>
+<p>I had an Electric Objects EO1 picture frame. The company shut down. The frame bricked. It took six hours of forum-diving and Claude assistance to revive it. The hack was fun. Finding what hardware is even hackable was the time-sink.</p>
+<p>hackshop-mcp closes that gap. Two MCP tools. 27 hand-vetted devices. A strict safety rule for hardware classes where bricks are unrecoverable. Built so an agent can do the part you don't know how to do.</p>
+
+<h2>Try it in 30 seconds</h2>
+<p>Add this to your MCP client config (Claude Desktop, Claude Code, or any MCP-aware host):</p>
+<pre><code>{
+  "mcpServers": {
+    "hackshop": {
+      "command": "npx",
+      "args": ["-y", "hackshop-mcp"],
+      "env": {
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      }
+    }
+  }
+}</code></pre>
+<p class="install-note">The <code>ANTHROPIC_API_KEY</code> is optional but recommended. The server prefers MCP <code>sampling/createMessage</code> for reasoning; if your host doesn't support it, the server falls back to a direct Anthropic call when this key is set.</p>
+
+<p>Then ask your agent something like:</p>
+<div class="demo">
+  <span class="role">You</span>
+  <div class="input">"Always-on family calendar in the kitchen. Light colors, no animation, e-paper preferred."</div>
+  <span class="role">Agent (via hackshop)</span>
+  <div class="output">
+    <strong>1. <span class="device">Waveshare 7.5" e-Paper HAT</span></strong> — pair with a Pi Zero W. The canonical maker-community kitchen-calendar build (MagInkCal, InkyPi). 800×480 mono, 2-5s refresh, perfect for a static daily layout. <em>brick-risk 1/5 (community-reported)</em><br>
+    <strong>2. <span class="device">Pimoroni Inky Impression 7.3"</span></strong> — 7-color e-paper if you want to differentiate event categories visually.<br>
+    <strong>3. <span class="device">reMarkable 2</span></strong> — 10.3" tablet form-factor; Toltec gives you a custom OS.<br>
+    <strong>4. <span class="device">Barnes & Noble Nook Simple Touch</span></strong> — $20 e-reader, root via SD card image. Dirt-cheap pilot route.<br>
+    <strong>5. <span class="device">Boox Poke 3</span></strong> — stock Android e-reader, sideload Google Calendar directly.
+  </div>
+</div>
+<p>Each proposal ships with a clickable eBay search URL, Hackaday tag link, Reddit hack-search, firmware repo links, and brick-risk score (or "unknown" with a disclaimer for hardware classes where the score would be guessed).</p>
+
+<h2>What's in the box</h2>
+<div class="grid">
+  <div class="feature">
+    <span class="num">27</span>
+    <div class="title">Hand-vetted devices</div>
+    <p class="desc">Each entry has explicit brick-risk provenance: founder-verified, community-reported, or LLM-inferred.</p>
+  </div>
+  <div class="feature">
+    <span class="num">2</span>
+    <div class="title">MCP tools</div>
+    <p class="desc"><code>propose_hardware</code> for idea-to-device mapping. <code>assess_hackability</code> for direct lookups.</p>
+  </div>
+  <div class="feature">
+    <span class="num">P0</span>
+    <div class="title">Safety rule</div>
+    <p class="desc">For handhelds and SBCs with LLM-inferred risk, the server refuses to surface a fabricated brick-risk score. Tested as a release gate.</p>
+  </div>
+</div>
+
+<h2>Why an MCP server</h2>
+<p>Because the agent should know what's hackable, even when you don't. MCP lets it do the hardware-knowledge half of the work; you bring the project. And it composes — pair with <a href="https://github.com/YosefHayim/ebay-mcp">ebay-mcp</a> at the host level for live listings without adding code on this side.</p>
+
+<h2>Design choices worth noting</h2>
+<ul>
+  <li><strong>Compose, don't vendor.</strong> hackshop-mcp doesn't bundle eBay integration. Every proposal returns an eBay search URL the host can hand to ebay-mcp. Two MCP servers, one workflow. Keeps each one focused.</li>
+  <li><strong>Sampling first, API fallback.</strong> The server prefers MCP's <code>sampling/createMessage</code> so users don't ship a key. When the host doesn't support sampling, an env-gated Anthropic API fallback kicks in. Best of both.</li>
+  <li><strong>Closed-set tag vocabulary.</strong> 24 tags in <code>tags.md</code>; boot validation refuses to start if catalog drifts. No 70-tag mess in three months.</li>
+  <li><strong>JSON catalog, not SQLite.</strong> 27 devices fit in a diffable file. Community contributions are a PR. SQLite was scope creep for V1.</li>
+</ul>
+
+<h2>Contributing devices</h2>
+<p>The catalog is the moat. PRs welcome — see <a href="https://github.com/msanchezgrice/hackshop-mcp/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>. New entries default to <code>community-reported</code> provenance; <code>founder-verified</code> requires the maintainer's signature. Adding a tag means editing <code>tags.md</code> in the same PR.</p>
+
+<h2>Status</h2>
+<p>V0.0.2 is the demand experiment. If installs and issue traffic clear a stretch threshold, V0.1 expands the catalog and adds a third tool. If not, the package keeps existing as a personal tool — that's the deal with N=1 builder mode.</p>
+
+<hr />
+
+<footer>
+  <p>Built by <a href="https://github.com/msanchezgrice">@msanchezgrice</a>. MIT-licensed. <a href="https://github.com/msanchezgrice/hackshop-mcp">Source</a> · <a href="https://www.npmjs.com/package/hackshop-mcp">npm</a> · <a href="https://github.com/msanchezgrice/hackshop-mcp/issues">Issues</a></p>
+</footer>
+</main>
+</body>
+</html>
