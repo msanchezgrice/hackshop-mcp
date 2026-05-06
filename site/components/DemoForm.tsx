@@ -275,7 +275,20 @@ function DemoFormInner() {
                             device_ids: result.proposals.map((p) => p.id),
                           }),
                         });
-                        const data = await res.json();
+                        // Read as text first; only JSON-parse if content-type is JSON.
+                        // Vercel returns plaintext on function-level errors (timeouts,
+                        // crashes), and res.json() chokes with "Unexpected token A".
+                        const ct = res.headers.get("content-type") ?? "";
+                        const text = await res.text();
+                        if (!ct.includes("application/json")) {
+                          setDiagramError(
+                            res.status === 504 || text.toLowerCase().includes("timeout")
+                              ? "Diagram generation timed out (>5 min). gpt-image-2 was busy. Try again in a moment."
+                              : `Server returned ${res.status}: ${text.slice(0, 140)}`,
+                          );
+                          return;
+                        }
+                        const data = JSON.parse(text);
                         if (!res.ok) {
                           setDiagramError(
                             data.configured === false

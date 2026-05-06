@@ -4,9 +4,9 @@ import OpenAI from "openai";
 import { loadCatalog } from "@/lib/catalog";
 
 export const runtime = "nodejs";
-// Image generation can take 10-30s. Fluid Compute default 300s ceiling
-// is way more than we need.
-export const maxDuration = 90;
+// gpt-image-2 with the 4-zone schematic prompt can take 20-90s for complex
+// prompts. Vercel Fluid Compute default ceiling is 300s on all plans — use it.
+export const maxDuration = 300;
 
 const diagramInput = z.object({
   idea: z.string().min(3).max(2000),
