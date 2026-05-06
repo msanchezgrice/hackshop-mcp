@@ -1880,7 +1880,7 @@
       "Rust",
       "Go"
     ],
-    "price_usd_min": 3.5,
+    "price_usd_min": 4,
     "price_usd_max": 5,
     "vendor_url": "https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html",
     "open_source_repo": "https://github.com/micropython/micropython",
