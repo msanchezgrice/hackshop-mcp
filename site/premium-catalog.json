@@ -624,5 +624,1316 @@
     "privacy_risk": 2,
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
+  },
+  {
+    "id": "so-arm101",
+    "name": "SO-ARM101 6-Axis Robotic Arm",
+    "manufacturer": "TheRobotStudio / HuggingFace LeRobot",
+    "category": "robot",
+    "capabilities": [
+      "imitation-learning",
+      "teleoperation",
+      "object-manipulation",
+      "vision-guided-grasping",
+      "dataset-recording"
+    ],
+    "software_stack": [
+      "LeRobot",
+      "HuggingFace Transformers",
+      "PyTorch",
+      "OpenCV"
+    ],
+    "price_usd_min": 89,
+    "price_usd_max": 440,
+    "vendor_url": "https://www.waveshare.com/so-arm100-3dp-parts-kit.htm",
+    "open_source_repo": "https://github.com/TheRobotStudio/SO-ARM100",
+    "idea_fit_tags": [
+      "educational",
+      "creative-coding",
+      "peripheral"
+    ],
+    "notes": "3D-printed 6-DOF robotic arm designed for HuggingFace LeRobot. Leader-follower teleoperation kit for imitation learning. Includes 30kg torque bus servos, magnetic encoders, and gripper-mounted camera mount. Works out-of-box with LeRobot record/train/deploy pipeline. Requires 3D printing (STL provided) unless buying assembled. Multiple vendors: Waveshare ($90 parts), Seeed ($235 kit), Hiwonder ($440 assembled).",
+    "actuation_risk": 3,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 8
+  },
+  {
+    "id": "koch-v1-1",
+    "name": "Koch v1.1 Low-Cost Robot Arm",
+    "manufacturer": "Alexander Koch / HuggingFace LeRobot",
+    "category": "robot",
+    "capabilities": [
+      "imitation-learning",
+      "teleoperation",
+      "leader-follower-control",
+      "cloth-folding",
+      "pick-and-place"
+    ],
+    "software_stack": [
+      "LeRobot",
+      "DynamixelSDK",
+      "ROS 2",
+      "PyTorch"
+    ],
+    "price_usd_min": 213,
+    "price_usd_max": 630,
+    "vendor_url": "https://www.robotis.us/koch-v1-1-low-cost-robot-arm-follower/",
+    "open_source_repo": "https://github.com/huggingface/lerobot",
+    "idea_fit_tags": [
+      "educational",
+      "creative-coding",
+      "peripheral"
+    ],
+    "notes": "Low-cost 6-DOF robotic arm using Robotis Dynamixel XL330/XL430 servos. Leader-follower teleoperation pair for under $500 total. Direct integration with HuggingFace LeRobot ML pipeline for dataset recording and policy training. 3D-printed hardware design (STL files in original repo). Pre-assembled TwinArm sets also available from WowRobo. Supports folding clothes, grasping objects, and drawer opening tasks.",
+    "actuation_risk": 3,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 4,
+    "est_setup_hours_max": 10
+  },
+  {
+    "id": "petoi-bittle",
+    "name": "Petoi Bittle Robot Dog",
+    "manufacturer": "Petoi",
+    "category": "robot",
+    "capabilities": [
+      "quadruped-locomotion",
+      "programmable-gaits",
+      "balance-control",
+      "obstacle-avoidance",
+      "voice-command"
+    ],
+    "software_stack": [
+      "OpenCat",
+      "Arduino IDE",
+      "Python API",
+      "Raspberry Pi"
+    ],
+    "price_usd_min": 231,
+    "price_usd_max": 289,
+    "vendor_url": "https://www.petoi.com/products/petoi-bittle-robot-dog",
+    "open_source_repo": "https://github.com/PetoiCamp/OpenCat-Quadruped-Robot",
+    "idea_fit_tags": [
+      "educational",
+      "iot",
+      "creative-coding"
+    ],
+    "notes": "Open-source quadruped robot dog kit. 8-DOF (2 per leg), NyBoard V1 controller, 1-hour playtime. Pre-programmed with 35+ lifelike movements. Programmable via block-based coding, Python, C++, or Arduino. Optional Raspberry Pi and camera modules for AI vision tasks. Mobile app and Bluetooth remote control. STEM curriculum included. Assembles in ~1 hour. MIT-licensed OpenCat firmware.",
+    "actuation_risk": 3,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "petoi-nybble",
+    "name": "Petoi Nybble Robot Cat",
+    "manufacturer": "Petoi",
+    "category": "robot",
+    "capabilities": [
+      "quadruped-locomotion",
+      "programmable-gaits",
+      "balance-control",
+      "object-avoidance",
+      "LED-expression"
+    ],
+    "software_stack": [
+      "OpenCat",
+      "Arduino IDE",
+      "Python API",
+      "Raspberry Pi"
+    ],
+    "price_usd_min": 299,
+    "price_usd_max": 299,
+    "vendor_url": "https://www.petoi.com/products/petoi-nybble-robot-cat",
+    "open_source_repo": "https://github.com/PetoiCamp/OpenCat-Quadruped-Robot",
+    "idea_fit_tags": [
+      "educational",
+      "iot",
+      "creative-coding"
+    ],
+    "notes": "Open-source quadruped robot cat, the original OpenCat platform. Wooden frame + acrylic body. NyBoard V1 with Arduino compatibility. 11 DOF including head and tail. Programmable via block coding, Python, C++, or Arduino IDE. Optional ultrasonic sensor for distance detection and LED programming. Mobile app control via Bluetooth. STEM education focused with free coding curriculum. Build time 3-4 hours.",
+    "actuation_risk": 3,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 3,
+    "est_setup_hours_max": 6
+  },
+  {
+    "id": "mini-pupper-2",
+    "name": "Mini Pupper 2 Quadruped Robot",
+    "manufacturer": "MangDang",
+    "category": "robot",
+    "capabilities": [
+      "quadruped-walking",
+      "ROS-2-SLAM",
+      "LiDAR-navigation",
+      " gait-animation",
+      "opencv-computer-vision"
+    ],
+    "software_stack": [
+      "ROS 2",
+      "OpenCV",
+      "StanfordQuadruped",
+      "Python",
+      "Raspberry Pi"
+    ],
+    "price_usd_min": 649,
+    "price_usd_max": 649,
+    "vendor_url": "https://mangdang.store/products/mp2",
+    "open_source_repo": "https://github.com/mangdangroboticsclub/QuadrupedRobot",
+    "idea_fit_tags": [
+      "educational",
+      "sensor",
+      "network"
+    ],
+    "notes": "ROS 2 quadruped robot inspired by Stanford Pupper. Pre-assembled kit with 12x CLS6336HV servos, Raspberry Pi 4B, Ubuntu 22.04. Optional STL-06P LiDAR for SLAM/navigation and Pi camera v2 for computer vision. Supports walking gaits, obstacle avoidance, and OpenCV-based gesture control. Web-based calibration. 1-hour assembly for pre-assembled kit. Full ROS 2 simulation in Gazebo.",
+    "actuation_risk": 3,
+    "privacy_risk": 3,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "pimoroni-inky-frame-57",
+    "name": "Pimoroni Inky Frame 5.7\"",
+    "manufacturer": "Pimoroni",
+    "category": "display",
+    "capabilities": [
+      "5.7-inch 7-color e-paper display 600x448",
+      "Raspberry Pi Pico W onboard 2.4GHz WiFi",
+      "5 tactile buttons with LED indicators",
+      "microSD card slot",
+      "RTC deep-sleep wake 20uA",
+      "2x Qw/ST STEMMA QT connectors",
+      "battery connector JST-PH"
+    ],
+    "software_stack": [
+      "MicroPython",
+      "Pimoroni PicoGraphics",
+      "C/C++ SDK",
+      "Pico W wireless"
+    ],
+    "price_usd_min": 69,
+    "price_usd_max": 89,
+    "vendor_url": "https://shop.pimoroni.com/products/inky-frame-5-7",
+    "open_source_repo": "https://github.com/pimoroni/inky-frame",
+    "idea_fit_tags": [
+      "display",
+      "framed-art",
+      "e-ink",
+      "ambient",
+      "low-power",
+      "iot"
+    ],
+    "notes": "7-color ACeP e-paper photo frame powered by Pico W. Pre-flashed MicroPython with WiFi examples (NASA APOD, news, jokes). 30-sec refresh. Deep-sleep RTC wakes at 20uA for months of battery life. 2x Qw/ST ports for sensor breakouts. 8MB PSRAM. Ideal for always-on dashboards, art frames, and conference badges.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "lilygo-t-display-s3",
+    "name": "LILYGO T-Display S3",
+    "manufacturer": "LILYGO",
+    "category": "display",
+    "capabilities": [
+      "1.9-inch ST7789V IPS TFT 170x320",
+      "ESP32-S3R8 dual-core LX7 240MHz",
+      "16MB Flash 8MB PSRAM",
+      "2 programmable buttons",
+      "Wi-Fi 802.11 BLE 5",
+      "battery voltage detection IO04",
+      "STEMMA QT Qwiic JST-SH",
+      "optional capacitive touch variant"
+    ],
+    "software_stack": [
+      "Arduino",
+      "PlatformIO",
+      "MicroPython",
+      "ESP-IDF",
+      "TFT_eSPI",
+      "LVGL"
+    ],
+    "price_usd_min": 9,
+    "price_usd_max": 18,
+    "vendor_url": "https://lilygo.cc/en-us/products/t-display-s3",
+    "open_source_repo": "https://github.com/Xinyuan-LilyGO/T-Display-S3",
+    "idea_fit_tags": [
+      "display",
+      "iot",
+      "low-power",
+      "creative-coding",
+      "wearable"
+    ],
+    "notes": "Compact ESP32-S3 dev board with 1.9-inch color TFT. I8080 parallel interface for fast refresh. Non-soldered and soldered pin versions. Optional touch and acrylic shell variants. Arduino/PlatformIO libs include TFT_eSPI and LVGL examples. JST-GH 1.25mm battery connector. WiFi+BLE for connected displays.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "lilygo-t-display-s3-amoled-plus",
+    "name": "LILYGO T-Display S3 AMOLED Plus",
+    "manufacturer": "LILYGO",
+    "category": "display",
+    "capabilities": [
+      "1.91-inch RM67162 AMOLED 240x536",
+      "ESP32-S3R8 dual-core 240MHz",
+      "16MB Flash 8MB PSRAM",
+      "capacitive touch",
+      "RTC PMU TF card slot",
+      "battery holder built-in",
+      "Wi-Fi BLE 5",
+      "external FPC antenna",
+      "metal shielding cover"
+    ],
+    "software_stack": [
+      "Arduino",
+      "PlatformIO",
+      "MicroPython",
+      "ESP-IDF",
+      "LilyGo-AMOLED-Series"
+    ],
+    "price_usd_min": 30,
+    "price_usd_max": 33,
+    "vendor_url": "https://lilygo.cc/en-us/products/t-display-s3-amoled-plus",
+    "open_source_repo": "https://github.com/Xinyuan-LilyGO/T-Display-S3-AMOLED",
+    "idea_fit_tags": [
+      "display",
+      "iot",
+      "wearable",
+      "creative-coding"
+    ],
+    "notes": "ESP32-S3 with vibrant AMOLED display. Individual pixel illumination for true blacks and high contrast. Plus variant adds RTC, PMU, SD card slot, and battery holder. QSPI interface for fast screen updates. Supports touch input. Self-illuminating pixels work well in dark environments. Arduino/PlatformIO/MicroPython all supported.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "lilygo-t5-47-epaper",
+    "name": "LILYGO T5 4.7\" e-Paper V2.3",
+    "manufacturer": "LILYGO",
+    "category": "display",
+    "capabilities": [
+      "4.7-inch e-paper 540x960 16 grayscale",
+      "ESP32-S3-WROOM-1 16MB Flash 8MB PSRAM",
+      "ED047TC1 driver wide viewing angle",
+      "PCF8563 RTC battery capacity detection",
+      "Wi-Fi Bluetooth 5.0",
+      "microSD card slot",
+      "ultra-low power consumption",
+      "full refresh 3.5s partial 0.6s"
+    ],
+    "software_stack": [
+      "Arduino",
+      "ESP-IDF",
+      "PlatformIO",
+      "EPDiy",
+      "LVGL"
+    ],
+    "price_usd_min": 40,
+    "price_usd_max": 40,
+    "vendor_url": "https://lilygo.cc/en-us/products/t5-4-7-inch-e-paper-v2-3",
+    "open_source_repo": "https://github.com/Xinyuan-LilyGO/T5S3-4.7-e-paper-PRO",
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "low-power",
+      "ambient",
+      "iot"
+    ],
+    "notes": "Large high-res e-paper dev board with ESP32-S3. 16 grayscale levels for photo-quality images. 540x960 resolution at 4.7 inches. RTC for scheduled wake/sleep. SD card for image caching. EPDiy library provides optimized parallel e-ink driving. Good for weather stations, e-readers, price tags, and info panels. Battery connector for portable use.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "m5stack-m5paper",
+    "name": "M5Stack M5Paper V1.1",
+    "manufacturer": "M5Stack",
+    "category": "display",
+    "capabilities": [
+      "4.7-inch e-ink touchscreen 960x540 16 grayscale",
+      "ESP32-D0WDQ6-V3 dual-core",
+      "GT911 capacitive 2-point touch",
+      "16GB internal flash",
+      "microSD card slot",
+      "1150mAh LiPo battery",
+      "SHT30 temp/humidity sensor",
+      "3x HY2.0-4P expansion ports",
+      "BM8563 RTC deep sleep",
+      "FM24C02 EEPROM 256KB"
+    ],
+    "software_stack": [
+      "Arduino",
+      "M5Unified",
+      "M5GFX",
+      "MicroPython",
+      "UIFlow",
+      "ESP-IDF"
+    ],
+    "price_usd_min": 70,
+    "price_usd_max": 90,
+    "vendor_url": "https://shop.m5stack.com/collections/controllers/e-paper",
+    "open_source_repo": "https://github.com/m5stack/M5Unified",
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "low-power",
+      "ambient",
+      "iot",
+      "kiosk"
+    ],
+    "notes": "Pocket-sized programmable e-ink tablet with touch. 235 ppi 16-shade grayscale for crisp text and images. 1150mAh battery lasts weeks with RTC wake. 3 expansion ports connect to M5Stack sensor ecosystem. Pre-installed apps include calculator, weather, e-book reader. M5Unified/M5GFX libs provide display, audio, power, IMU abstraction. Good for smart remote, info panel, e-reader.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "m5stack-m5stickc-plus2",
+    "name": "M5Stack M5StickC PLUS2",
+    "manufacturer": "M5Stack",
+    "category": "display",
+    "capabilities": [
+      "1.14-inch ST7789V IPS TFT 135x240",
+      "ESP32-PICO-V3-02 dual-core",
+      "built-in IMU BMI270",
+      "IR transmitter",
+      "microphone",
+      "RTC BM8563",
+      "120mAh battery",
+      "USB-C",
+      "HY2.0-4P Grove port",
+      "2 user buttons"
+    ],
+    "software_stack": [
+      "Arduino",
+      "M5Unified",
+      "M5GFX",
+      "UIFlow",
+      "MicroPython",
+      "ESP-IDF"
+    ],
+    "price_usd_min": 20,
+    "price_usd_max": 23,
+    "vendor_url": "https://shop.m5stack.com/products/m5stickc-plus2-esp32-mini-iot-development-kit",
+    "open_source_repo": "https://github.com/m5stack/M5Unified",
+    "idea_fit_tags": [
+      "display",
+      "wearable",
+      "iot",
+      "low-power"
+    ],
+    "notes": "Thumb-sized ESP32 dev kit with color TFT. Wearable form factor with lanyard/watch accessories. BMI270 IMU for motion sensing. IR blaster for remote control apps. Built-in mic for voice projects. M5Unified library handles display, audio, power, sensors. UIFlow blocky drag-and-drop IDE for beginners. ~120mAh battery for portable projects.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "pimoroni-cosmic-unicorn",
+    "name": "Pimoroni Cosmic Unicorn 32x32 LED Matrix",
+    "manufacturer": "Pimoroni",
+    "category": "display",
+    "capabilities": [
+      "32x32 RGB LED matrix 1024 pixels",
+      "Raspberry Pi Pico W onboard WiFi BLE",
+      "1W speaker with onboard amp",
+      "4 tactile buttons",
+      "phototransistor light sensor",
+      "2x Qw/ST STEMMA QT ports",
+      "battery connector up to 5.5V",
+      "300 fps 14-bit LED refresh",
+      "205x205mm footprint"
+    ],
+    "software_stack": [
+      "MicroPython",
+      "Pimoroni PicoGraphics",
+      "Pimoroni Unicorn library",
+      "C/C++ SDK"
+    ],
+    "price_usd_min": 80,
+    "price_usd_max": 80,
+    "vendor_url": "https://shop.pimoroni.com/products/cosmic-unicorn",
+    "open_source_repo": "https://github.com/pimoroni/unicorn",
+    "idea_fit_tags": [
+      "display",
+      "color-cycle",
+      "ambient",
+      "creative-coding",
+      "iot"
+    ],
+    "notes": "Large square RGB LED matrix display with wireless connectivity. 1024 individually addressable squircular RGB LEDs with built-in diffusion. 300fps at 14-bit for flicker-free video recording. Onboard speaker for audio alerts. 4 buttons for mode selection. Pre-loaded MicroPython with flame, rainbow, pixel, and prompt demos. Web-based paint example lets you draw from a browser. Battery-powered for portable installations.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "waveshare-esp32-s3-epaper-397",
+    "name": "Waveshare ESP32-S3 3.97\" e-Paper Development Board",
+    "manufacturer": "Waveshare",
+    "category": "display",
+    "capabilities": [
+      "3.97-inch e-paper 800x480 4 grayscale",
+      "ESP32-S3R8 dual-core 240MHz",
+      "8MB PSRAM 16MB Flash",
+      "ES8311 audio codec + microphone",
+      "3-way rotary navigation switch",
+      "QMI8658 6-axis IMU",
+      "SHTC3 temp/humidity sensor",
+      "PCF85063 RTC",
+      "TF card slot",
+      "LiPo battery charging TG28 PMU"
+    ],
+    "software_stack": [
+      "Arduino",
+      "ESP-IDF",
+      "MicroPython",
+      "Waveshare e-Paper Lib"
+    ],
+    "price_usd_min": 35,
+    "price_usd_max": 48,
+    "vendor_url": "https://www.waveshare.com/esp32-s3-epaper-3.97.htm",
+    "open_source_repo": "https://github.com/waveshareteam/ESP32-S3-ePaper-3.97",
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "low-power",
+      "ambient",
+      "iot",
+      "voice"
+    ],
+    "notes": "All-in-one e-paper IoT board with voice interaction capability. 3.97-inch 800x480 e-ink with fast refresh 2.8s. Audio codec + mic enable AI voice assistant integration (DeepSeek, Doubao). Rotary switch for navigation. IMU for gesture control. PMU manages battery charging and power. TF card for media storage. Good for smart calendar, voice-enabled info panel, e-reader, weather display.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "adafruit-sharp-memory-display",
+    "name": "Adafruit SHARP Memory Display Breakout 1.3\"",
+    "manufacturer": "Adafruit",
+    "category": "display",
+    "capabilities": [
+      "1.3-inch Memory LCD 168x144 monochrome",
+      "ultra-low power hybrid eInk/LCD",
+      "fast refresh like LCD",
+      "retains image without power like eInk",
+      "3V regulator onboard",
+      "level shifting circuitry",
+      "4 mounting holes",
+      "ZIF socket for display",
+      "3-pin SPI interface"
+    ],
+    "software_stack": [
+      "Arduino",
+      "Adafruit SHARP Memory Display Library",
+      "Adafruit GFX",
+      "CircuitPython"
+    ],
+    "price_usd_min": 25,
+    "price_usd_max": 45,
+    "vendor_url": "https://www.adafruit.com/product/3502",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_SHARP_Memory_Display",
+    "idea_fit_tags": [
+      "display",
+      "low-power",
+      "wearable",
+      "iot"
+    ],
+    "notes": "Unique hybrid between eInk and LCD. Reflective monochrome display with 168x144 resolution. Ultra-low static power draw (image retained with no power). Fast update rate unlike traditional e-paper. 3-pin SPI interface (SCK, DI, CS). Works with Adafruit GFX for drawing text, shapes, bitmaps. No backlight but daylight readable. Ideal for battery-powered wearable displays, sensor readouts, and low-power badges.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "adafruit-sht40",
+    "name": "Adafruit Sensirion SHT40 Temperature & Humidity Sensor",
+    "manufacturer": "Adafruit Industries",
+    "category": "sensor",
+    "capabilities": [
+      "temperature \u00b10.2\u00b0C accuracy",
+      "relative humidity \u00b11.8% accuracy",
+      "I2C interface",
+      "STEMMA QT / Qwiic"
+    ],
+    "software_stack": [
+      "Arduino library",
+      "CircuitPython library",
+      "Python/Adafruit_Blinka"
+    ],
+    "price_usd_min": 5,
+    "price_usd_max": 6,
+    "vendor_url": "https://www.adafruit.com/product/4885",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPython_SHT4x",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "low-power"
+    ],
+    "notes": "Fourth-gen Sensirion SHT40 with true I2C. Measures 0-75\u00b0C at \u00b10.2\u00b0C and 25-75% RH at \u00b11.8%. STEMMA QT connectors allow plug-and-play with no soldering. 3V/5V compliant. 25.5x17.7x4.8mm. Ideal for environmental monitoring, HVAC, and weather stations.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1
+  },
+  {
+    "id": "adafruit-bme680",
+    "name": "Adafruit BME680 Temperature, Humidity, Pressure and Gas Sensor",
+    "manufacturer": "Adafruit Industries",
+    "category": "sensor",
+    "capabilities": [
+      "temperature \u00b11.0\u00b0C accuracy",
+      "humidity \u00b13% accuracy",
+      "barometric pressure \u00b11 hPa",
+      "VOC gas sensing",
+      "I2C/SPI interface",
+      "STEMMA QT / Qwiic"
+    ],
+    "software_stack": [
+      "Arduino library",
+      "CircuitPython library",
+      "Python/Adafruit_Blinka",
+      "BSEC software"
+    ],
+    "price_usd_min": 18,
+    "price_usd_max": 19,
+    "vendor_url": "https://www.adafruit.com/product/3660",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPython_BME680",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "low-power"
+    ],
+    "notes": "Bosch BME680 4-in-1 environmental sensor. Measures temp (\u00b11\u00b0C), humidity (\u00b13%), pressure (\u00b11 hPa absolute, usable as altimeter \u00b11m), and VOC gas via heated MOX sensor. Single resistance value for total VOC content. Requires 48-hour burn-in. STEMMA QT compatible. 3V/5V compliant.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "adafruit-scd40",
+    "name": "Adafruit SCD-40 True CO2, Temperature and Humidity Sensor",
+    "manufacturer": "Adafruit Industries",
+    "category": "sensor",
+    "capabilities": [
+      "true CO2 measurement 400-2000ppm",
+      "photoacoustic sensor technology",
+      "temperature and humidity integrated",
+      "I2C interface",
+      "STEMMA QT / Qwiic"
+    ],
+    "software_stack": [
+      "Arduino library",
+      "CircuitPython library",
+      "Python/Adafruit_Blinka"
+    ],
+    "price_usd_min": 44,
+    "price_usd_max": 45,
+    "vendor_url": "https://www.adafruit.com/product/5187",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPython_SCD4X",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "low-power"
+    ],
+    "notes": "Sensirion SCD-40 photoacoustic true CO2 sensor (not eCO2 approximation). Range 400-2000ppm, accuracy \u00b1(50ppm + 5% of reading). Integrated temp/humidity for compensation. I2C address 0x62. STEMMA QT. 17mA at 5s measurement rate, 0.5mA at 5min rate. Fully calibrated and linearized.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1.5
+  },
+  {
+    "id": "adafruit-as7341",
+    "name": "Adafruit AS7341 10-Channel Light / Color Sensor Breakout",
+    "manufacturer": "Adafruit Industries",
+    "category": "sensor",
+    "capabilities": [
+      "10-channel spectral sensing",
+      "8 visible color bands",
+      "near-infrared detection",
+      "flicker detection",
+      "16-bit ADC",
+      "I2C interface",
+      "STEMMA QT / Qwiic"
+    ],
+    "software_stack": [
+      "Arduino library",
+      "CircuitPython library",
+      "Python/Adafruit_Blinka"
+    ],
+    "price_usd_min": 18,
+    "price_usd_max": 19,
+    "vendor_url": "https://www.adafruit.com/product/4698",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPython_AS7341",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "creative-coding"
+    ],
+    "notes": "AMS OSRAM AS7341 multi-channel spectrometer in 3x2mm package. Detects 8 overlapping visible bands plus NIR, white, and flicker channels via SMUX multiplexer. 16-bit 6-channel ADC. Measures spectral composition more accurately than human eye. GPIO and interrupt pins. STEMMA QT. 3.3V/5V compliant.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "adafruit-vl53l4cd",
+    "name": "Adafruit VL53L4CD Time of Flight Distance Sensor",
+    "manufacturer": "Adafruit Industries",
+    "category": "sensor",
+    "capabilities": [
+      "time-of-flight distance 1-1300mm",
+      "invisible Class 1 laser",
+      "I2C interface",
+      "STEMMA QT / Qwiic"
+    ],
+    "software_stack": [
+      "Arduino library",
+      "CircuitPython library",
+      "Python/Adafruit_Blinka",
+      "STM32Cube expansion"
+    ],
+    "price_usd_min": 14,
+    "price_usd_max": 15,
+    "vendor_url": "https://www.adafruit.com/product/5396",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPython_VL53L4CD",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "peripheral"
+    ],
+    "notes": "ST VL53L4CD Time-of-Flight sensor using tiny invisible laser to measure 1-1300mm distance. Detects time light takes to bounce back. Excellent for short-range proximity, object detection, and liquid-level sensing. Not affected by target color. I2C address 0x29. STEMMA QT. 25.5x17.7x4.7mm.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1.5
+  },
+  {
+    "id": "sparkfun-bme680-qwiic",
+    "name": "SparkFun Environmental Sensor Breakout - BME680 (Qwiic)",
+    "manufacturer": "SparkFun Electronics",
+    "category": "sensor",
+    "capabilities": [
+      "temperature \u00b11.0\u00b0C accuracy",
+      "humidity \u00b13% accuracy",
+      "barometric pressure \u00b11 hPa",
+      "VOC gas sensing",
+      "I2C/SPI interface",
+      "Qwiic connector"
+    ],
+    "software_stack": [
+      "Arduino library (SparkFun_BME680_Arduino_Library)",
+      "Python",
+      "BSEC software"
+    ],
+    "price_usd_min": 22,
+    "price_usd_max": 23,
+    "vendor_url": "https://www.sparkfun.com/sparkfun-environmental-sensor-breakout-bme680-qwiic.html",
+    "open_source_repo": "https://github.com/sparkfun/SparkFun_BME680_Arduino_Library",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "low-power"
+    ],
+    "notes": "SparkFun's Qwiic take on the Bosch BME680 4-in-1 environmental sensor. Same specs as Adafruit version: temp (\u00b11\u00b0C), humidity (\u00b13%), pressure (\u00b11 hPa, altimeter-capable), and VOC gas sensing. Standard 1x1 inch Qwiic form factor. I2C broken out to Qwiic connectors and 0.1in headers. 3.3V logic.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "sparkfun-shtc3-qwiic",
+    "name": "SparkFun Humidity Sensor Breakout - SHTC3 (Qwiic)",
+    "manufacturer": "SparkFun Electronics",
+    "category": "sensor",
+    "capabilities": [
+      "temperature \u00b10.2\u00b0C accuracy",
+      "relative humidity \u00b12% accuracy",
+      "I2C interface",
+      "Qwiic connector",
+      "low power 0.2uA sleep"
+    ],
+    "software_stack": [
+      "Arduino library (SparkFun_SHTC3)",
+      "Python"
+    ],
+    "price_usd_min": 13,
+    "price_usd_max": 14,
+    "vendor_url": "https://www.sparkfun.com/sparkfun-humidity-sensor-breakout-shtc3-qwiic.html",
+    "open_source_repo": "https://github.com/sparkfun/SparkFun_SHTC3_Arduino_Library",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "low-power"
+    ],
+    "notes": "Sensirion SHTC3 digital humidity/temperature sensor with \u00b12% RH and \u00b10.2\u00b0C accuracy. Supply voltage 1.62V-3.6V. Very low power: 0.2uA sleep current. I2C address 0x70 (hardware-defined). Standard 1x1 inch Qwiic form factor. Qwiic connectors plus 0.1in breakout pins. Auto-detectable by OpenLog Artemis datalogger.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1
+  },
+  {
+    "id": "seeed-xiao-nrf52840-sense",
+    "name": "Seeed Studio XIAO nRF52840 Sense",
+    "manufacturer": "Seeed Studio",
+    "category": "tool",
+    "capabilities": [
+      "Bluetooth Low Energy 5.4",
+      "NFC connectivity",
+      "6-axis IMU (LSM6DS3TR-C)",
+      "PDM digital microphone",
+      "battery charge management",
+      "21x17.8mm form factor"
+    ],
+    "software_stack": [
+      "Arduino IDE",
+      "CircuitPython",
+      "MicroPython",
+      "Edge Impulse SDK",
+      "TensorFlow Lite Micro"
+    ],
+    "price_usd_min": 15,
+    "price_usd_max": 16,
+    "vendor_url": "https://www.seeedstudio.com/Seeed-XIAO-BLE-Sense-nRF52840-p-5253.html",
+    "open_source_repo": "https://github.com/Seeed-Studio/OSHW-XIAO-Series",
+    "idea_fit_tags": [
+      "iot",
+      "sensor",
+      "wearable",
+      "low-power",
+      "peripheral"
+    ],
+    "notes": "Thumb-sized dev board with Nordic nRF52840 (Cortex-M4, 64MHz, 256KB RAM, 1MB Flash + 2MB onboard). BLE 5.4, NFC. Onboard LSM6DS3TR-C 6-axis IMU (accel + gyro) and PDM microphone. 5uA deep sleep. Battery charging via BQ25101. 11 digital I/O, 6 analog, 1xI2C, 1xUART, 1xSPI. Supports Arduino, CircuitPython, MicroPython. TensorFlow Lite Micro compatible.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "m5stack-atoms3r",
+    "name": "M5Stack AtomS3R Development Kit",
+    "manufacturer": "M5Stack",
+    "category": "tool",
+    "capabilities": [
+      "ESP32-S3 dual-core 240MHz",
+      "Wi-Fi 2.4GHz",
+      "6-axis IMU BMI270",
+      "3-axis magnetometer BMM150",
+      "0.85-inch color IPS display 128x128",
+      "IR transmitter 180\u00b0 FOV"
+    ],
+    "software_stack": [
+      "Arduino",
+      "PlatformIO",
+      "ESP-IDF",
+      "UiFlow2 (MicroPython-based)",
+      "M5Stack library"
+    ],
+    "price_usd_min": 17,
+    "price_usd_max": 18,
+    "vendor_url": "https://shop.m5stack.com/products/atoms3r-dev-kit",
+    "open_source_repo": "https://github.com/m5stack/M5AtomS3",
+    "idea_fit_tags": [
+      "iot",
+      "sensor",
+      "peripheral",
+      "creative-coding"
+    ],
+    "notes": "Tiny 24x24x12.9mm ESP32-S3 dev kit with 8MB Flash, 8MB PSRAM. Features BMI270 6-axis IMU (0.05% accel, 0.05\u00b0/s gyro accuracy) and BMM150 3-axis magnetometer (0.3uT). 0.85-inch 128x128 color IPS display with programmable button. IR TX 12.46m range. HY2.0-4P port + 6 GPIO on bottom. USB Type-C. 3D antenna. Great for motion sensing, tiny UI projects, and IoT sensor nodes.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "coral-usb-accelerator",
+    "name": "Coral USB Accelerator with Edge TPU",
+    "manufacturer": "Google Coral",
+    "category": "tool",
+    "capabilities": [
+      "Edge TPU coprocessor 4 TOPS int8",
+      "USB 3.0 Type-A",
+      "TensorFlow Lite inference",
+      "2 TOPS per watt efficiency",
+      "MobileNet v2 at 400 FPS"
+    ],
+    "software_stack": [
+      "TensorFlow Lite",
+      "PyCoral API",
+      "Edge TPU Compiler",
+      "Debian Linux",
+      "Python"
+    ],
+    "price_usd_min": 59,
+    "price_usd_max": 60,
+    "vendor_url": "https://www.coral.ai/products/accelerator",
+    "open_source_repo": "https://github.com/google-coral/edgetpu",
+    "idea_fit_tags": [
+      "iot",
+      "sensor",
+      "peripheral"
+    ],
+    "notes": "Google Coral USB Accelerator adds an Edge TPU coprocessor via USB 3.0. Edge TPU delivers 4 TOPS (int8) at 2 TOPS/watt. Runs MobileNet v2 at ~400 FPS. Works with Debian Linux, Windows, macOS. Requires compiling TFLite models for Edge TPU. Supports image classification, object detection, pose estimation, semantic segmentation. 65x30mm USB stick form factor. Note: repo archived 2026-04-19 but hardware still sold.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "raspberry-pi-5",
+    "name": "Raspberry Pi 5",
+    "manufacturer": "Raspberry Pi Ltd",
+    "category": "sbc",
+    "capabilities": [
+      "BCM2712 quad-core Cortex-A76 @ 2.4GHz",
+      "1-16GB LPDDR4X SDRAM options",
+      "Dual 4Kp60 HDMI display output",
+      "PCIe 2.0 x1 via FPC connector",
+      "Gigabit Ethernet with PoE+ support",
+      "Dual-band 802.11ac Wi-Fi",
+      "Bluetooth 5.0 / BLE",
+      "2x USB 3.0 + 2x USB 2.0",
+      "40-pin GPIO header",
+      "microSD with SDR104 mode",
+      " onboard RTC + power button"
+    ],
+    "software_stack": [
+      "Raspberry Pi OS",
+      "Ubuntu",
+      "Debian",
+      "Python",
+      "C/C++",
+      "pico-sdk"
+    ],
+    "price_usd_min": 45,
+    "price_usd_max": 125,
+    "vendor_url": "https://www.raspberrypi.com/products/raspberry-pi-5/",
+    "open_source_repo": "https://github.com/raspberrypi/linux",
+    "idea_fit_tags": [
+      "sbc",
+      "mini-pc",
+      "network",
+      "iot",
+      "kiosk"
+    ],
+    "notes": "Latest flagship SBC from Raspberry Pi. 2-3x faster than Pi 4. PCIe 2.0 enables NVMe SSD via M.2 HAT. In production until Jan 2036. All major OSes supported. Broadcom BCM2712 is the first RPi chip with in-house designed silicon (RP1 I/O controller). GPIO compatible with HAT ecosystem. Kernel and firmware fully open source.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "raspberry-pi-zero-2-w",
+    "name": "Raspberry Pi Zero 2 W",
+    "manufacturer": "Raspberry Pi Ltd",
+    "category": "sbc",
+    "capabilities": [
+      "BCM2710A1 quad-core Cortex-A53 @ 1GHz",
+      "512MB LPDDR2 SDRAM",
+      "WiFi 4 (2.4 GHz)",
+      "Bluetooth 4.2 / BLE",
+      "Mini HDMI port (1080p60)",
+      "Micro USB OTG",
+      "Micro USB power",
+      "40-pin GPIO header",
+      "CSI-2 camera connector",
+      "Composite video via GPIO"
+    ],
+    "software_stack": [
+      "Raspberry Pi OS",
+      "Debian",
+      "Python",
+      "MicroPython",
+      "C/C++"
+    ],
+    "price_usd_min": 15,
+    "price_usd_max": 20,
+    "vendor_url": "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/",
+    "open_source_repo": "https://github.com/raspberrypi/linux",
+    "idea_fit_tags": [
+      "sbc",
+      "low-power",
+      "iot",
+      "network"
+    ],
+    "notes": "Tiny SBC in a Raspberry Pi Zero form factor. 5x faster than original Zero. Shares 64-bit Linux ecosystem with full-size Pi boards. Ideal for embedded IoT, headless servers, and portable projects. HAT-compatible with pin header soldered. Widely available from authorized resellers globally.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "pine64-pinephone",
+    "name": "PINE64 PinePhone Beta Edition (Convergence Package)",
+    "manufacturer": "PINE64",
+    "category": "wearable",
+    "capabilities": [
+      "Allwinner A64 quad-core Cortex-A53 @ 1.2GHz",
+      "3GB LPDDR3 RAM",
+      "32GB eMMC + microSD up to 2TB",
+      "5.95-inch 1440x720 IPS LCD",
+      "4G LTE (Quectel EG25-G)",
+      "WiFi 4 + Bluetooth 4.0 + GPS/GNSS",
+      "Hardware kill switches (modem, WiFi/BT, mic, cameras, headphones)",
+      "Removable 3000mAh Samsung J7 battery",
+      "USB-C with DisplayPort",
+      "USB-C dock (Ethernet, 2x USB-A, HDMI)",
+      "5MP rear + 2MP front cameras"
+    ],
+    "software_stack": [
+      "Manjaro ARM",
+      "postmarketOS",
+      "Mobian",
+      "UBports",
+      "Plasma Mobile",
+      "Mainline Linux"
+    ],
+    "price_usd_min": 149,
+    "price_usd_max": 199,
+    "vendor_url": "https://pine64.com/product/pinephone-beta-edition-with-convergence-package/",
+    "open_source_repo": "https://github.com/mobian-project",
+    "idea_fit_tags": [
+      "wearable",
+      "network",
+      "iot",
+      "handheld"
+    ],
+    "notes": "Open-source Linux smartphone with hardware privacy kill switches for modem, WiFi, mic, and cameras. Runs mainline Linux with community distros. Convergence package ($199) includes USB-C dock for desktop use. Original PinePhone still available; Pro model discontinued Aug 2025. Community-driven mobile Linux platform.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "pine64-pinetime",
+    "name": "PINE64 PineTime",
+    "manufacturer": "PINE64",
+    "category": "wearable",
+    "capabilities": [
+      "Nordic nRF52832 64MHz Cortex-M4F",
+      "512KB Flash + 64KB RAM + 4MB SPI NOR",
+      "1.3-inch 240x240 IPS capacitive touchscreen",
+      "Bluetooth 5 including Low Energy",
+      "3-axis accelerometer",
+      "PPG heart rate sensor",
+      "Vibration motor",
+      "170-180mAh LiPo battery",
+      "IP67 water resistance (sealed)",
+      "38g weight, zinc alloy build"
+    ],
+    "software_stack": [
+      "InfiniTime (FreeRTOS/C++)",
+      "Zephyr RTOS",
+      "NimBLE",
+      "LVGL",
+      "MCUBoot"
+    ],
+    "price_usd_min": 25,
+    "price_usd_max": 35,
+    "vendor_url": "https://pine64.com/product/pinetime-smartwatch-sealed/",
+    "open_source_repo": "https://github.com/InfiniTimeOrg/InfiniTime",
+    "idea_fit_tags": [
+      "wearable",
+      "sensor",
+      "low-power"
+    ],
+    "notes": "Fully open-source smartwatch with community-developed InfiniTime firmware pre-installed. Supports OTA updates over BLE. Companion apps: Gadgetbridge (Android), Amazfish (SailfishOS/Linux), InfiniLink (iOS). Hardware schematics available. Sealed units $26.99 community price; dev kit also available for firmware developers.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "pine64-pinetab2",
+    "name": "PINE64 PineTab2",
+    "manufacturer": "PINE64",
+    "category": "computer",
+    "capabilities": [
+      "Rockchip RK3566 quad-core Cortex-A55 @ 1.8GHz",
+      "Mali-G52 MP2 GPU",
+      "4-8GB LPDDR4 RAM",
+      "64-128GB eMMC (removable daughterboard)",
+      "10.1-inch 1280x800 IPS touchscreen",
+      "USB 3.0 Type-C + USB 2.0 Type-C",
+      "Micro HDMI output",
+      "3.5mm audio jack",
+      "MicroSD card reader",
+      "5MP rear + 2MP front cameras",
+      "Detachable backlit keyboard cover",
+      "6000mAh battery"
+    ],
+    "software_stack": [
+      "DanctNix Arch Linux",
+      "KDE Plasma Mobile",
+      "Mainline Linux",
+      "Debian ARM",
+      "Ubuntu ARM"
+    ],
+    "price_usd_min": 159,
+    "price_usd_max": 209,
+    "vendor_url": "https://pine64.com/",
+    "open_source_repo": "https://github.com/torvalds/linux",
+    "idea_fit_tags": [
+      "mini-pc",
+      "network",
+      "iot",
+      "handheld"
+    ],
+    "notes": "Linux tablet with detachable keyboard, mainline RK3566 support, and modular repairable design. Ships with DanctNix Arch Linux + KDE Plasma. Exposed PCIe for hardware hacking. Battery, cameras, display, and eMMC are user-replaceable in ~5 min. Good mainline Linux maturity for RK3566 platform.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "clockworkpi-uconsole",
+    "name": "ClockworkPi uConsole",
+    "manufacturer": "ClockworkPi",
+    "category": "computer",
+    "capabilities": [
+      "5-inch 1280x720 IPS LCD display",
+      "74-key backlit mechanical keyboard",
+      "Mini trackball + gaming buttons",
+      "Modular CPU system (RPi CM4 / A-04 / A-06 / RISC-V R-01)",
+      "WiFi 5 + Bluetooth 5.0",
+      "3x USB Type-A ports",
+      "Micro HDMI output",
+      "3.5mm headphone jack",
+      "18650 battery support (swappable)",
+      "MicroSD card reader",
+      "40-pin GPIO + 52-pin expansion",
+      "Optional 4G LTE cellular module"
+    ],
+    "software_stack": [
+      "Debian",
+      "Ubuntu",
+      "Raspberry Pi OS",
+      "ClockworkOS",
+      "Pico-8 / RetroArch / DOSBox"
+    ],
+    "price_usd_min": 139,
+    "price_usd_max": 249,
+    "vendor_url": "https://www.clockworkpi.com/shop",
+    "open_source_repo": "https://github.com/clockworkpi",
+    "idea_fit_tags": [
+      "mini-pc",
+      "handheld",
+      "creative-coding",
+      "retrogaming"
+    ],
+    "notes": "Pocket-sized modular portable computer with keyboard, trackball, and gaming controls. Accepts Raspberry Pi CM4 or ClockworkPi's own ARM/RISC-V modules. All-metal case with 3D design files on GitHub (GPL). Runs full Linux. Supports retro gaming (Pico-8, RetroArch). Popular for cyberdeck and portable terminal projects.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "flipper-zero",
+    "name": "Flipper Zero",
+    "manufacturer": "Flipper Devices Inc.",
+    "category": "tool",
+    "capabilities": [
+      "STM32WB55RG dual-core (Cortex-M4 64MHz + Cortex-M0+ 32MHz)",
+      "128x64 1.4-inch monochrome LCD with backlight",
+      "NFC 13.56MHz (read/write/emulate)",
+      "RFID 125kHz (read/write/emulate)",
+      "Sub-1GHz 315-900 MHz transceiver",
+      "IR transceiver (learn + emulate remotes)",
+      "iButton 1-Wire (Dallas, CYFRAL)",
+      "Bluetooth Low Energy 5.4",
+      "GPIO expansion header",
+      "MicroSD up to 256GB",
+      "2000mAh LiPo battery (up to 28 days)"
+    ],
+    "software_stack": [
+      "Flipper Firmware (FreeRTOS)",
+      "C",
+      "JavaScript (mjs plugin system)",
+      "Python (UFBT build tool)",
+      "qFlipper desktop app"
+    ],
+    "price_usd_min": 169,
+    "price_usd_max": 199,
+    "vendor_url": "https://flipper.net/products/flipper-zero",
+    "open_source_repo": "https://github.com/flipperdevices/flipperzero-firmware",
+    "idea_fit_tags": [
+      "network",
+      "peripheral",
+      "iot"
+    ],
+    "notes": "Open-source portable multi-tool for pentesters and hardware hackers. Reads/emulates RFID, NFC, sub-GHz remotes, IR devices, and iButton keys. Extensible via GPIO and MicroSD. Active community firmware with apps for BadUSB, WiFi dev board, Sigrok logic analyzer, and more. Fully autonomous operation.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "adafruit-circuit-playground-bluefruit",
+    "name": "Adafruit Circuit Playground Bluefruit",
+    "manufacturer": "Adafruit Industries",
+    "category": "tool",
+    "capabilities": [
+      "nRF52840 Cortex-M4F @ 64MHz with FPU",
+      "256KB RAM + 1MB Flash",
+      "10x NeoPixels (full-color RGB LEDs)",
+      "Motion sensor (9-DoF LIS3DH + STEMMA)",
+      "Temperature sensor",
+      "Light sensor (ALS-PT19)",
+      "Sound sensor (PDM microphone)",
+      "Mini speaker (7.5mm magnetic buzzer)",
+      "Capacitive touch pads (8x)",
+      "2x push buttons + slide switch",
+      "IR receiver + transmitter",
+      "Bluetooth Low Energy + native USB"
+    ],
+    "software_stack": [
+      "CircuitPython",
+      "Arduino",
+      "MakeCode",
+      "C/C++",
+      "Adafruit Bluefruit LE library"
+    ],
+    "price_usd_min": 25,
+    "price_usd_max": 33,
+    "vendor_url": "https://www.adafruit.com/product/4333",
+    "open_source_repo": "https://github.com/adafruit/Adafruit_CircuitPlayground",
+    "idea_fit_tags": [
+      "educational",
+      "sensor",
+      "iot",
+      "peripheral",
+      "creative-coding"
+    ],
+    "notes": "All-in-one educational board with sensors, LEDs, speaker, and BLE. Designed for beginners with no soldering required. Runs CircuitPython out of the box. Ten NeoPixels enable color/light projects. Capacitive touch pads support gesture input. Popular in STEM education and rapid prototyping. nRF52840 provides ample compute for wireless sensor projects.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "bbc-microbit-v2",
+    "name": "BBC micro:bit V2",
+    "manufacturer": "Micro:bit Educational Foundation",
+    "category": "tool",
+    "capabilities": [
+      "nRF52833 Cortex-M4F @ 64MHz with FPU",
+      "128KB RAM + 512KB Flash",
+      "25 LED matrix display",
+      "Built-in speaker + microphone",
+      "Capacitive touch logo sensor",
+      "3-axis accelerometer + magnetometer compass",
+      "Bluetooth 5 LE + 2.4GHz radio",
+      "Temperature sensor",
+      "Light sensor (via LED matrix)",
+      "GPIO edge connector (25 pins)",
+      "USB Micro-B connector",
+      "Power/battery connector"
+    ],
+    "software_stack": [
+      "MicroPython",
+      "MakeCode",
+      "C/C++ (CODAL runtime)",
+      "JavaScript",
+      "Arm Mbed OS"
+    ],
+    "price_usd_min": 18,
+    "price_usd_max": 22,
+    "vendor_url": "https://microbit.org/",
+    "open_source_repo": "https://github.com/lancaster-university/microbit-v2-samples",
+    "idea_fit_tags": [
+      "educational",
+      "sensor",
+      "iot",
+      "creative-coding"
+    ],
+    "notes": "Widely adopted educational microcontroller board used in classrooms worldwide. V2 adds speaker, microphone, and touch sensor over V1. Programs via USB drag-and-drop or wireless BLE. LED matrix doubles as a light sensor and basic display. Edge connector compatible with hundreds of expansion boards. Used by 30+ million students globally. Open-source CODAL runtime maintained by Lancaster University.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "seeed-xiao-rp2040",
+    "name": "Seeed Studio XIAO RP2040",
+    "manufacturer": "Seeed Studio",
+    "category": "sbc",
+    "capabilities": [
+      "RP2040 dual-core Cortex-M0+ @ 133MHz",
+      "264KB SRAM + 2MB QSPI Flash",
+      "USB Type-C connector",
+      "11 GPIOs (4x ADC, 2x I2C, 2x UART, 2x SPI, 1x PWM)",
+      "Breadboard-compatible form factor (21x17.5mm)",
+      "SWD debug pads",
+      "3.3V operating voltage",
+      "Castellated edges for SMT soldering"
+    ],
+    "software_stack": [
+      "MicroPython",
+      "CircuitPython",
+      "Arduino",
+      "C/C++",
+      "Pico SDK",
+      "Rust",
+      "Go"
+    ],
+    "price_usd_min": 3.5,
+    "price_usd_max": 5,
+    "vendor_url": "https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html",
+    "open_source_repo": "https://github.com/micropython/micropython",
+    "idea_fit_tags": [
+      "sbc",
+      "low-power",
+      "iot",
+      "peripheral"
+    ],
+    "notes": "Thumb-sized development board based on Raspberry Pi RP2040. Smallest RP2040 board available. Breadboard-friendly with castellated edges for SMT use. Supports Arduino, MicroPython, CircuitPython, and Rust. USB-C for power and programming. 4x 12-bit ADC channels. Ideal for wearable projects, sensor nodes, and space-constrained designs. Part of the XIAO ecosystem with compatible expansion boards.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "pine64-pinecil",
+    "name": "PINE64 Pinecil",
+    "manufacturer": "PINE64",
+    "category": "tool",
+    "capabilities": [
+      "BL706 RISC-V 32-bit MCU (Pinecil V2)",
+      "USB-C PD 3.0 / QC 3.0 / DC 5525 barrel jack",
+      "USB-PD EPR 28V support (V2)",
+      "100-400C adjustable temperature",
+      "6-second heat-up to operating temp",
+      "0.96-inch OLED display",
+      "Auto-standby with motion detection",
+      "Boost mode for temporary temperature increase",
+      "Bluetooth LE (V2) for wireless control",
+      "Tip sense for auto tip detection",
+      "Custom boot logo support",
+      "31 language localization"
+    ],
+    "software_stack": [
+      "IronOS (FreeRTOS)",
+      "C",
+      "Blisp flasher",
+      "PineFlash GUI updater",
+      "PineSAM BLE web app"
+    ],
+    "price_usd_min": 25,
+    "price_usd_max": 30,
+    "vendor_url": "https://pine64.com/product/pinecil-smart-mini-portable-soldering-iron/",
+    "open_source_repo": "https://github.com/Ralim/IronOS",
+    "idea_fit_tags": [
+      "peripheral",
+      "low-power"
+    ],
+    "notes": "Open-source smart soldering iron running IronOS firmware on a RISC-V MCU. Heats to 400C in 6 seconds. Powers via USB-C PD, QC 3.0, or DC barrel jack. Pinecil V2 adds BLE for wireless control via PineSAM web app and USB-PD EPR 28V support. Unbrickable bootloader in ROM. Firmware updates via USB-C. Widely praised as best budget soldering iron. Compatible with TS100-style and shorter Pine64 custom tips.",
+    "actuation_risk": 1,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   }
 ]

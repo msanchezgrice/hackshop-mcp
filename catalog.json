@@ -691,5 +691,955 @@
     "est_used_price_usd_max": 160,
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
+  },
+  {
+    "id": "valve-steam-link",
+    "name": "Valve Steam Link",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "retrogaming",
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/ValveSoftware/steamlink-sdk",
+      "https://github.com/coolkingcole/Steamlink_hacking"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Discontinued streaming box running custom Linux (kernel 3.8, ARMv7). Valve provides official SDK with OpenGL ES 2.0, Qt 5.14, SDL 2.0. Enable root SSH by placing enable_ssh.txt on USB at /steamlink/config/system/; default password steamlink123. Factory test mode runs arbitrary scripts from /steamlink/factory_test/run.sh at boot. 256MB RAM and 1GB flash limit capability. Community builds Kodi, emulators, and custom launchers.",
+    "est_used_price_usd_min": 25,
+    "est_used_price_usd_max": 50,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "google-pixel-3a",
+    "name": "Google Pixel 3a",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "handheld",
+      "educational"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/LineageOS/android_device_google_sargo",
+      "https://wiki.lineageos.org/devices/sargo/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Official LineageOS support from 17.1 through 22.2 (Android 10-15). Snapdragon 670, 4GB RAM, OLED display. Unlock bootloader with fastboot flashing unlock. Firmware ships in ROM package so no manual firmware updates needed. eSIM enrollment broken if not enrolled before upgrade. Active maintainer (mikeNG), monthly-ish OTAs. Kernel source: github.com/LineageOS/android_kernel_google_msm-4.9. Large XDA community.",
+    "est_used_price_usd_min": 55,
+    "est_used_price_usd_max": 90,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "oneplus-5t",
+    "name": "OnePlus 5T",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "handheld",
+      "educational"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/LineageOS/android_device_oneplus_dumpling",
+      "https://wiki.lineageos.org/devices/dumpling/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Official LineageOS support from 15.1 through 22.2. Snapdragon 835, 6-8GB RAM, AMOLED display. OnePlus devices have unlockable bootloaders via fastboot oem unlock. 25+ contributors to device tree. Supports SELinux enforcing. Active maintainers including bgcngm and codeworkx. Good used condition units still hold 80%+ battery health. Catch: No official water resistance; USB-C is USB 2.0 only; device is from 2017 so battery replacement may be needed; dash charge requires proprietary adapter.",
+    "est_used_price_usd_min": 60,
+    "est_used_price_usd_max": 100,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "samsung-galaxy-s9",
+    "name": "Samsung Galaxy S9 (Exynos)",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "handheld",
+      "educational"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/LineageOS/android_device_samsung_starlte",
+      "https://wiki.lineageos.org/devices/starlte/"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Exynos 9810 variant (starlte) has LineageOS 15.1, 17.1, and 20.0 support. Snapdragon variants have limited or no custom ROM support due to bootloader restrictions. 4GB RAM, 1440p AMOLED, microSD slot. Unlock bootloader via Developer Options -> OEM Unlock. Requires TWRP recovery. Tripping Knox eFuse is irreversible and breaks Samsung Pay/Secure Folder forever. Catch: Snapdragon variants (US carriers) are nearly impossible to unlock; Exynos models only.",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 90,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "anbernic-rg35xx",
+    "name": "Anbernic RG35XX",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "retrogaming",
+      "handheld"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/GarlicOS/buildroot",
+      "https://github.com/GarlicOS/bootloader_anbernic_rg35xxplus"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Budget retro handheld with ARM Cortex-A9 (ATM7039S), 256MB RAM. Stock OS is Linux-based but closed-source. GarlicOS by Black Seraph is the primary open-source CFW - provides RetroArch-based emulation with clean UI, sleep mode, overclocking. Install by formatting SD card exFAT, creating /boot folder, copying init script and rootfs. Supports NES, SNES, GB/GBC/GBA, Genesis, PS1, and more. RG35XX community has active Discord and Reddit. Multiple CFW options: GarlicOS, Koriki, Batocera.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 55,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "kindle-paperwhite-7th-gen-koreader",
+    "name": "Amazon Kindle Paperwhite (7th Generation)",
+    "category": "display",
+    "idea_fit_tags": [
+      "e-ink",
+      "educational",
+      "low-power"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/koreader/koreader"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Jailbreak via WinterBreak (works on any FW), then install KOReader for EPUB, PDF reflow, and deep customization. KOReader supports dictionaries, RSS,Wallabag, and Calibre sync. Risk: jailbreak may be patched by newer Amazon firmware; keep Wi-Fi off post-jailbreak. Used prices trending $30-50 for 7th gen units.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 50,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2.5
+  },
+  {
+    "id": "wyze-cam-v2-dafang-hacks",
+    "name": "Wyze Cam v2",
+    "category": "sensor",
+    "idea_fit_tags": [
+      "iot",
+      "network",
+      "low-power"
+    ],
+    "hack_difficulty": 4,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/EliasKotlyar/Xiaomi-Dafang-Hacks"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Full CFW replacing Wyze's cloud-dependent firmware with local-only RTSP, MQTT motion events, SSH access, and web UI. Requires microSD card flash; newer Wyze firmware must be downgraded first. Audio over RTSP has known issues on latest firmware. Camera becomes fully LAN-local - no cloud dependency.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 30,
+    "est_setup_hours_min": 1.5,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "wyze-cam-v3-wz-mini-hacks",
+    "name": "Wyze Cam v3",
+    "category": "sensor",
+    "idea_fit_tags": [
+      "iot",
+      "network",
+      "low-power"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/gtxaspec/wz_mini_hacks"
+    ],
+    "community_size_bucket": "active",
+    "notes": "wz_mini_hacks enables root shell, SSH, RTSP streaming, and custom kernel on Wyze Cam v3 without fully replacing firmware. Runs alongside stock firmware. Supports V3, Floodlight, Pan v2. Note: firmware newer than 4.36.9.139 has limited libcallback/RTSP support. Full guide in project wiki.",
+    "est_used_price_usd_min": 20,
+    "est_used_price_usd_max": 35,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "philips-hue-a19-diyhue",
+    "name": "Philips Hue White and Color Ambiance A19 (Gen 1/2)",
+    "category": "bulb",
+    "idea_fit_tags": [
+      "color-cycle",
+      "iot",
+      "ambient"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/diyhue/diyHue"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Bulb firmware itself is not replaceable, but diyHue open-source bridge emulator eliminates need for official Hue Bridge. Controls Hue bulbs locally via Zigbee (needs Raspbee/ConBee or similar). Full Hue app compatibility, entertainment zones, Home Assistant integration. Works with Zigbee2MQTT as alternative. No cloud required.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 35,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2.5
+  },
+  {
+    "id": "lifx-a19-aiolifx",
+    "name": "LIFX A19 Color Bulb",
+    "category": "bulb",
+    "idea_fit_tags": [
+      "color-cycle",
+      "iot",
+      "ambient"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/aiolifx/aiolifx"
+    ],
+    "community_size_bucket": "active",
+    "notes": "LIFX bulbs have a well-documented open LAN protocol (no cloud needed for local control). aiolifx is the official Python/asyncio library used by Home Assistant. Enables direct UDP LAN control for power, color, brightness, effects, and HEV clean cycles. Firmware not replaceable, but fully open API makes the bulbs essentially open-source-controllable.",
+    "est_used_price_usd_min": 16,
+    "est_used_price_usd_max": 30,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1.5
+  },
+  {
+    "id": "amazon-echo-dot-2nd-gen-echocli",
+    "name": "Amazon Echo Dot (2nd Generation)",
+    "category": "speaker",
+    "idea_fit_tags": [
+      "voice",
+      "iot",
+      "network"
+    ],
+    "hack_difficulty": 5,
+    "brick_risk": 4,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/Dragon863/EchoCLI"
+    ],
+    "community_size_bucket": "small",
+    "notes": "EchoCLI uses a bootrom exploit (kamakiri2) to root the Echo Dot 2nd gen via USB. Gives rooted ADB shell over USB/Wi-Fi, audio recording capability, and Home Assistant indicator support. TETHERED root - requires booting via mtkclient each time. Project now obsolete in favor of newer documented methods. Block Amazon OTA servers after rooting. mtkclient can unbrick.",
+    "est_used_price_usd_min": 10,
+    "est_used_price_usd_max": 20,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "bose-soundtouch-10-api",
+    "name": "Bose SoundTouch 10",
+    "category": "speaker",
+    "idea_fit_tags": [
+      "audio-out",
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/thlucas1/bosesoundtouchapi"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Bose published the official SoundTouch Web API before EOL (May 2026). bosesoundtouchapi is a Python 3 library wrapping this local API for media control, volume, multiroom zones, source selection. Also supports Home Assistant via soundtouchplus integration. Cloud services ending but local API works indefinitely. AirPlay and Spotify Connect still functional.",
+    "est_used_price_usd_min": 40,
+    "est_used_price_usd_max": 80,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1.5
+  },
+  {
+    "id": "sonos-play-1-soco",
+    "name": "Sonos Play:1",
+    "category": "speaker",
+    "idea_fit_tags": [
+      "audio-out",
+      "network",
+      "voice"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/SoCo/SoCo"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "SoCo is a mature Python library for programmatic Sonos control over local network. Supports playback control, grouping, queue management, music service browsing, and text-to-speech. No firmware modification needed - uses Sonos UPnP/SOAP local protocol. Sonos Play:1 still works with S2 app. Active development with 83 contributors. Home Assistant dependency. Can pair two for stereo.",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 105,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1.5
+  },
+  {
+    "id": "logitech-harmony-hub-aioharmony",
+    "name": "Logitech Harmony Hub",
+    "category": "input",
+    "idea_fit_tags": [
+      "peripheral",
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/Harmony-Libs/aioharmony"
+    ],
+    "community_size_bucket": "active",
+    "notes": "aioharmony is an asyncio Python library for local Harmony Hub control. Used by Home Assistant's official Harmony integration. Supports activity switching, device commands, current activity queries, and hub config retrieval. Uses local XMPP/WebSocket protocol - no cloud needed after initial setup. Harmony Hub discontinued by Logitech but widely available used. Automatic reconnection handling built-in.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 60,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 1.5
+  },
+  {
+    "id": "remarkable-1-toltec",
+    "name": "reMarkable 1",
+    "category": "display",
+    "idea_fit_tags": [
+      "e-ink",
+      "educational",
+      "creative-coding"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-07",
+    "firmware_links": [
+      "https://github.com/toltec-dev/toltec"
+    ],
+    "community_size_bucket": "active",
+    "notes": "reMarkable 1 runs Linux with root SSH access out of the box. Toltec adds a community package manager (opkg) with dozens of packages: KOReader, custom launchers (Oxide, Draft), gesture controls, web serving, and development tools. rm2fb framebuffer compatibility layer enables RM1 software on RM2. No jailbreak needed - just enable developer password and run bootstrap script.",
+    "est_used_price_usd_min": 100,
+    "est_used_price_usd_max": 180,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "tp-link-archer-c7-v5",
+    "name": "TP-Link Archer C7 v5",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://openwrt.org/toh/tp-link/archer_c7",
+      "https://github.com/openwrt/openwrt"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "The quintessential OpenWrt beginner router. QCA9563 750MHz CPU, 16MB flash, 128MB RAM. All v1-v5 versions supported. v5 is the most common and cheapest on used market. Web GUI flash from stock firmware works reliably. 5GHz WiFi works well with ath10k driver. 16MB flash is the main constraint - you'll need extroot for large package sets. Massive forum knowledge base. TFTP recovery works well if something goes wrong. Dual-band AC1750, 5x GbE ports.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 25,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "netgear-r7800",
+    "name": "NETGEAR R7800 Nighthawk X4S",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://openwrt.org/toh/netgear/r7800",
+      "https://github.com/openwrt/openwrt"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Premium OpenWrt router. IPQ8065 dual-core 1.7GHz, 512MB RAM, 128MB NAND flash (80MB free after OpenWrt install). 4x4 MU-MIMO AC2600 with dual QCA9984 radios. Two USB 3.0 ports plus eSATA. Solderless installation via stock web GUI. Excellent for SQM/QoS with cake. Active exploration thread with performance tuning tips. Some units have bad NAND blocks - check with dmesg after install. TFTP recovery available. Best price/performance for high-bandwidth OpenWrt.",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 80,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "linksys-wrt3200acm",
+    "name": "Linksys WRT3200ACM",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 4,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://openwrt.org/toh/linksys/wrt3200acm",
+      "https://github.com/openwrt/openwrt"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Marvell-based AC3200 router with open-source heritage. 1.8GHz dual-core, 512MB RAM, 256MB flash. Three radios (2x PCIe mwlwifi + 1 SDIO). Dual firmware partition design with automatic fallback. WPA3 does NOT work well with mvebu target - stick to WPA2. 802.11ac Wave 2 with 160MHz channel support. USB 3.0 + eSATA. Known issues: mwlwifi driver has stability quirks, SDIO WiFi firmware causes slow boot on newer OpenWrt versions (can blacklist mwifiex_sdio).",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 90,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 5
+  },
+  {
+    "id": "glinet-gl-ar750s-slate",
+    "name": "GL.iNet GL-AR750S Slate",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot",
+      "low-power"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/admonstrator/glinet-toolbox",
+      "https://openwrt.org/toh/gl.inet/gl-ar750s",
+      "https://github.com/gl-inet/openwrt"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Travel router purpose-built for OpenWrt. AR750S has QCA9563 775MHz, 128MB RAM, 16MB flash + 128MB NAND storage. Dual-band AC750, 3x 100Mbps Ethernet (not gigabit). USB 2.0 port, microSD slot. Ships with GL.iNet's OpenWrt fork but easily flashed to vanilla OpenWrt. GL.iNet actively maintains open-source firmware. Toolbox repo provides Tailscale, AdGuard, ACME automation scripts. Small, portable, USB-powered. Perfect for travel VPN routing or as a portable IoT gateway.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 55,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "glinet-gl-mt3000-beryl-ax",
+    "name": "GL.iNet GL-MT3000 Beryl AX",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://openwrt.org/toh/gl.inet/gl-mt3000",
+      "https://github.com/gl-inet/openwrt",
+      "https://github.com/admonstrator/glinet-toolbox"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Wi-Fi 6 travel router with MediaTek Filogic 830 (MT7981B) dual-core 1.3GHz, 512MB RAM, 256MB NAND. AX3000 dual-band with 2x2 MIMO. 2x GbE ports (WAN+LAN), USB 3.0 Type-C power. Fully supported by vanilla OpenWrt 23.05+ (was snapshot-only at launch, now stable). Ships with GL.iNet's forked OpenWrt 21.02-based firmware; upgrading to vanilla loses GL web UI but gains newer kernel and packages. 2.4GHz throughput can be lower on open-source drivers vs proprietary MTK ones.",
+    "est_used_price_usd_min": 70,
+    "est_used_price_usd_max": 105,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "mikrotik-hap-ac2",
+    "name": "MikroTik hAP ac2 (RBD52G-5HacD2HnD-TC)",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 4,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://openwrt.org/toh/mikrotik/hap_ac2",
+      "https://github.com/openwrt/openwrt"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Quad-core IPQ4018 716MHz, 128MB RAM, 16MB flash, 5x GbE ports, dual-band AC1200, USB 2.0. Ships with RouterOS (closed-source). OpenWrt install requires TFTP boot of initramfs image first, then sysupgrade. Do NOT upgrade to RouterOS v7 before installing OpenWrt - its bootloader is incompatible; downgrade to RouterOS v6 first. Early revisions had 256MB RAM but later ones only 128MB. BOOTP required for TFTP (not DHCP). RouterOS license key can be saved before flashing for potential rollback.",
+    "est_used_price_usd_min": 25,
+    "est_used_price_usd_max": 45,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 5
+  },
+  {
+    "id": "tp-link-archer-c2600",
+    "name": "TP-Link Archer C2600",
+    "category": "router",
+    "idea_fit_tags": [
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://openwrt.org/toh/tp-link/archer_c2600_v1",
+      "https://github.com/openwrt/openwrt"
+    ],
+    "community_size_bucket": "active",
+    "notes": "IPQ8064 dual-core 1.7GHz, 512MB RAM, 32MB flash, 4x4 AC2600 with QCA9980 radios. 4x GbE LAN + 1x WAN, 2x USB 3.0. Very similar hardware to R7800 but with half the flash (32MB vs 128MB). Solderless install via stock web GUI. Has known stability issues on OpenWrt 24.10 - some users report WAN connectivity drops and OOPS requiring network restart. Consider staying on 23.05 for now. Less popular than R7800 but significantly cheaper used.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 25,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "sonoff-basic-r2",
+    "name": "SONOFF Basic R2",
+    "category": "other",
+    "idea_fit_tags": [
+      "iot",
+      "sensor"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/arendst/Tasmota",
+      "https://tasmota.github.io/docs/",
+      "https://github.com/arendst/Tasmota-firmware"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "ESP8266-based WiFi relay switch, the gateway drug to Tasmota. 10A relay, 90-250V AC input. Flash Tasmota via serial (TX/RX/GND headers accessible) or OTA if firmware allows. The arendst/Tasmota GitHub has 22K+ stars. Tasmota-firmware repo hosts pre-built binaries. No soldering needed on most units - header pins are exposed. Device is mains-powered - follow safety precautions. GPIO14 available for external sensors (with isolation). Supports MQTT, Home Assistant auto-discovery, web UI.",
+    "est_used_price_usd_min": 5,
+    "est_used_price_usd_max": 10,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "shelly-1",
+    "name": "Shelly 1",
+    "category": "other",
+    "idea_fit_tags": [
+      "iot",
+      "sensor"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/arendst/mgos-to-tasmota",
+      "https://tasmota.github.io/docs/devices/Shelly-1/",
+      "https://esphome.io/devices/shelly_1.html"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP8266 relay switch with dry contact output - can switch low voltage (12V/24V) or mains. 16A relay, very small form factor (42mm). Tasmota supported since v6.2.1.7. Flash via serial (partially exposed programming header) or OTA using mgos-to-tasmota intermediate firmware. Newer Shelly devices (Gen3) use mgos32-to-tasmota32 for OTA conversion. ESPHome also fully supported.",
+    "est_used_price_usd_min": 8,
+    "est_used_price_usd_max": 15,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "sonoff-zbdongle-e",
+    "name": "SONOFF ZBDongle-E",
+    "category": "other",
+    "idea_fit_tags": [
+      "iot",
+      "network"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/itead/Sonoff_Zigbee_Dongle_Firmware",
+      "https://github.com/darkxst/silabs-firmware-builder",
+      "https://sonoff.tech/products/sonoff-zigbee-3-0-usb-dongle-plus-zbdongle-e"
+    ],
+    "community_size_bucket": "active",
+    "notes": "EFR32MG21-based Zigbee 3.0 USB coordinator. Ships pre-flashed with Zigbee coordinator firmware (EZNet 6.10.3). +20dBm output gain, aluminum housing for EMI shielding. Supports flashing to router, Thread border router, or Multi-PAN (Zigbee+Thread simultaneously) firmware via web flasher at dongle.sonoff.tech. Multi-PAN firmware (SSDK12.01) tested with 100 Zigbee + 50 Thread devices running stably for 5 weeks. Compatible with Home Assistant ZHA, Zigbee2MQTT, and OpenThread Border Router.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 25,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "pinetime",
+    "name": "PineTime",
+    "category": "wearable",
+    "idea_fit_tags": [
+      "wearable",
+      "low-power"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 3,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/InfiniTimeOrg/InfiniTime"
+    ],
+    "community_size_bucket": "active",
+    "notes": "InfiniTime is the flagship open-source firmware for PineTime, written in modern C++ on FreeRTOS with NimBLE. Features: multiple watch faces, notifications, music control, heart rate, step counter, weather integration, OTA DFU updates. Companion apps: Gadgetbridge (Android), Amazfish, InfiniLink (iOS). Bootloader is MCUBoot-based with secure DFU. Flash via STLinkV2/SWD or OTA. The PineTime was designed to be hackable from the ground up - no case screws, easy SWD access.",
+    "est_used_price_usd_min": 20,
+    "est_used_price_usd_max": 40,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "banglejs-2",
+    "name": "Bangle.js 2",
+    "category": "wearable",
+    "idea_fit_tags": [
+      "wearable",
+      "educational",
+      "creative-coding"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/espruino/espruino"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Open-source JavaScript smartwatch running the Espruino JS interpreter. Program wirelessly via Web Bluetooth using the Bangle App Loader - no cables or dev tools needed. Features: GPS, heart rate, barometer, magnetometer, 3-axis accelerometer, always-on transflective LCD. 4-week standby battery. Large app library with 100+ community apps. SDK is the JS runtime itself; write code in a browser and push directly. Catch: 176x176 3-color LCD is low-res (intentional for battery life).",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 80,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "amazfit-bip",
+    "name": "Amazfit Bip",
+    "category": "wearable",
+    "idea_fit_tags": [
+      "wearable",
+      "low-power"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 4,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/azagramac/customFirmware-AmazfitBip"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Ultra-low-power transflective LCD smartwatch with 30-day battery. BipOS is a patched firmware enabling custom apps (calculator, calendar, flashlight) via a modified resource file. Flashing requires specific order: firmware.fw -> font.ft -> resource.res. Gadgetbridge provides full notification/music/HRM sync without Xiaomi cloud. Multiple custom firmware variants exist (Mr. Postman, trace mods). Catch: Wrong flash order or mismatched firmware/font versions WILL brick the device.",
+    "est_used_price_usd_min": 12,
+    "est_used_price_usd_max": 35,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "garmin-forerunner-235",
+    "name": "Garmin Forerunner 235",
+    "category": "wearable",
+    "idea_fit_tags": [
+      "wearable",
+      "sensor"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/garmin/connectiq-apps"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Garmin's Connect IQ platform allows full SDK-based app development in Monkey C. The SDK, simulator, and companion phone SDKs are all freely available. Forerunner 235 supports Connect IQ 1.x apps: custom data fields, watch faces, widgets, and device apps. Large ecosystem of open-source apps on GitHub. Monkey C is a C-like OOP language with Garmin-specific APIs for sensors, GPS, and ANT+. The CIQ apps repo includes audio providers, data fields, device apps, watch faces, and barrel libraries.",
+    "est_used_price_usd_min": 40,
+    "est_used_price_usd_max": 80,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "fitbit-versa",
+    "name": "Fitbit Versa (1st Gen)",
+    "category": "wearable",
+    "idea_fit_tags": [
+      "wearable",
+      "sensor"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/Fitbit/fitbit-sdk-toolchain"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Fitbit's SDK toolchain is open source (TypeScript/Node.js) and enables custom clock faces and apps for Versa 1. The SDK includes a CLI, simulator, and build toolchain. Apps written in JavaScript with a custom SVG-based UI framework. APIs include heart rate, accelerometer, GPS (via phone), exercise tracking, and file storage. Fitbit/ossapps repo catalogs 50+ open-source community apps and modules. After Google's Fitbit acquisition, the developer platform has seen reduced investment.",
+    "est_used_price_usd_min": 20,
+    "est_used_price_usd_max": 45,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "gopro-hero4",
+    "name": "GoPro Hero 4 Black/Silver",
+    "category": "other",
+    "idea_fit_tags": [
+      "peripheral",
+      "creative-coding"
+    ],
+    "hack_difficulty": 4,
+    "brick_risk": 4,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/konradit/hero4hack"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Hero 4 does not support autoexec.ash like older GoPros, but custom patched firmware (by evilwombat/Alti Force) enables override.sh execution from SD card at boot. This unlocks the full Linux userspace: busybox, custom scripts, WiFi command injection via gpsend binary. Hero 4 runs a full Linux system - you can execute arbitrary shell scripts, modify camera modes, trigger recording, and stream via WiFi. HTTP API endpoints at 10.5.5.9 provide programmatic control.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 70,
+    "est_setup_hours_min": 3,
+    "est_setup_hours_max": 6
+  },
+  {
+    "id": "gopro-hero567",
+    "name": "GoPro Hero 5/6/7 Black",
+    "category": "other",
+    "idea_fit_tags": [
+      "peripheral",
+      "creative-coding"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/KonradIT/goprowifihack",
+      "https://github.com/gopro/OpenGoPro"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Community-documented unofficial WiFi/BLE API (goprowifihack) plus GoPro's official OpenGoPro spec. Hero 5-7 expose HTTP endpoints over WiFi (10.5.5.9/gp/gpControl) for full remote control: mode switching, recording, settings, live preview, media browsing. BLE commands for wake/pairing/keep-alive. OpenGoPro provides official Python and Kotlin SDKs with examples. Enables automation: multi-camera sync, motion-triggered recording, livestreaming via FFmpeg, drone integration.",
+    "est_used_price_usd_min": 40,
+    "est_used_price_usd_max": 100,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "oculus-quest-1",
+    "name": "Oculus Quest 1",
+    "category": "other",
+    "idea_fit_tags": [
+      "peripheral",
+      "creative-coding"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/SideQuestVR/SideQuest"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Standalone VR headset based on Android. SideQuest (open-source desktop app) enables wireless sideloading of APKs without Oculus Store approval. Full Android app ecosystem available. ADB over WiFi after initial USB setup. Custom home environments, hand tracking experiments, unofficial PCVR via ALVR/Virtual Desktop. Quest 1 has an active modding community: custom Beat Saber songs, texture packs, homebrew games. The headset runs a modified Android 10 and can be accessed via standard ADB.",
+    "est_used_price_usd_min": 60,
+    "est_used_price_usd_max": 120,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "rabbit-r1",
+    "name": "Rabbit R1",
+    "category": "other",
+    "idea_fit_tags": [
+      "voice",
+      "input",
+      "creative-coding"
+    ],
+    "hack_difficulty": 4,
+    "brick_risk": 4,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/TurboTheTurtle/rabbit-r1-firmware"
+    ],
+    "community_size_bucket": "small",
+    "notes": "AI companion device with MediaTek Helio P35, 4GB RAM, 128GB eMMC, 2.88-inch touchscreen, scroll wheel, rotating camera. The rabbit-r1-firmware repo provides complete CipherOS (Android 16) flashing guides, stock firmware restoration, automation scripts, and hardware documentation. Fastboot entry requires mtkbootcmd.py via MediaTek preloader serial (no volume buttons). Community has successfully replaced the stock RabbitOS with full Android, enabling any Android app to run.",
+    "est_used_price_usd_min": 40,
+    "est_used_price_usd_max": 80,
+    "est_setup_hours_min": 4,
+    "est_setup_hours_max": 8
+  },
+  {
+    "id": "chumby",
+    "name": "Chumby / Insignia Infocast",
+    "category": "other",
+    "idea_fit_tags": [
+      "ambient",
+      "display",
+      "creative-coding"
+    ],
+    "hack_difficulty": 4,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/clearwater/chumby-linux",
+      "https://github.com/clearwater/chumby-oe"
+    ],
+    "community_size_bucket": "tiny",
+    "notes": "Classic hackable ambient internet display from 2007-2011. ARM9-based Linux device with 3.5-8 inch touchscreen, WiFi, accelerometer, USB ports. The chumby-linux repo provides a modern kernel fork (2.6.31+) for the Chumby Hackers Board. The chumby-oe repo has OpenEmbedded build tools for custom firmware. Buildroot configs exist for Chumby 8 with working WiFi, PWM backlight, touchscreen, DRM display, and Qt apps.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 40,
+    "est_setup_hours_min": 4,
+    "est_setup_hours_max": 12
+  },
+  {
+    "id": "ricoh-theta-sc",
+    "name": "Ricoh Theta SC",
+    "category": "other",
+    "idea_fit_tags": [
+      "peripheral",
+      "creative-coding"
+    ],
+    "hack_difficulty": 3,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/ricohapi/theta-client",
+      "https://github.com/ricohapi/theta-plugin-sdk"
+    ],
+    "community_size_bucket": "small",
+    "notes": "360-degree camera with official open-source SDK (theta-client, Kotlin, MIT license). theta-client provides full camera control: capture, settings, live preview, media transfer. Theta Plugin SDK allows running Android apps directly on the camera (Theta V/Z1/X). WebAPI v2.1 provides HTTP REST interface for remote control. fake-theta simulator for offline development. Theta SC is the budget model (still image focus, no 4K video) but uses the same API.",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 120,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "google-nexus-5x",
+    "name": "LG Nexus 5X",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "handheld",
+      "educational"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 4,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/LineageOS/android_device_lge_bullhead",
+      "https://wiki.lineageos.org/devices/bullhead/"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Official LineageOS support up to 15.1 (Android 8.1). Snapdragon 808, 2GB RAM, 5.2-inch LCD. Bootloader unlockable via fastboot oem unlock. Factory images available from Google for recovery. Known bootloop issue due to BGA soldering defect on Snapdragon 808/810 (affecting ~30% of units) - this is a hardware failure, not firmware-related. USB HID device support available via kernel patch. NetHunter supported.",
+    "est_used_price_usd_min": 25,
+    "est_used_price_usd_max": 50,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "anbernic-rg353v",
+    "name": "Anbernic RG353V",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "retrogaming",
+      "handheld"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/christianhaitian/arkos",
+      "https://github.com/JustEnoughLinuxOS/distribution"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Handheld with Rockchip RK3566 quad-core ARM, 2GB RAM, 3.5-inch IPS touchscreen, 3200mAh battery, WiFi 5 + Bluetooth. Supports multiple CFW: ArkOS (most popular), JELOS, UnofficialOS, ROCKNIX. RK3566 is well-supported in mainline Linux. Emulation up to PSP/Dreamcast/N64 depending on CFW. HDMI output for TV docking. CFW installation via SD card flash (Rufus/balenaEtcher). Active Reddit community and Discord servers.",
+    "est_used_price_usd_min": 70,
+    "est_used_price_usd_max": 120,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "intel-nuc",
+    "name": "Intel NUC (Older Generations)",
+    "category": "mini-pc",
+    "idea_fit_tags": [
+      "mini-pc",
+      "low-power",
+      "network",
+      "iot"
+    ],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files",
+      "https://www.debian.org/distrib/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "Tiny x86 PCs in various generations (DNxxxx = Celeron/Pentium, NUC5/6/7 = Core i3/i5/i7). Standard x86 architecture means any Linux distro, FreeBSD, or Windows installs out-of-the-box. 4-32GB DDR4/DDR3L SODIMM, M.2 or 2.5-inch SATA storage, Intel UHD/Iris graphics, multiple USB 3.0, HDMI/DP, Gigabit Ethernet. Popular for Home Assistant, Plex, pfSense/OPNsense (with appropriate NIC), and general server duties. Excellent upstream Linux support via Intel.",
+    "est_used_price_usd_min": 40,
+    "est_used_price_usd_max": 150,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "lenovo-thinkcentre-tiny",
+    "name": "Lenovo ThinkCentre Tiny (M Series)",
+    "category": "mini-pc",
+    "idea_fit_tags": [
+      "mini-pc",
+      "low-power",
+      "network",
+      "educational"
+    ],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files",
+      "https://support.lenovo.com/us/en/solutions/ht513293"
+    ],
+    "community_size_bucket": "active",
+    "notes": "1L form factor business mini PCs (M73, M93p, M710q, M720q, M920q). Intel Core i3/i5/i7 (4th-9th gen), DDR3L/DDR4 SODIMM, M.2 + 2.5-inch SATA, Intel graphics, multiple USB, DisplayPort, Gigabit Ethernet. Standard x86 - any Linux/Windows installs directly. Corporate surplus means abundant, cheap used supply. Some models have M.2 WiFi slot, M920q supports PCIe x16 riser for GPU. Popular for Proxmox, OPNsense, NAS (with SATA expansion).",
+    "est_used_price_usd_min": 35,
+    "est_used_price_usd_max": 120,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "odroid-go",
+    "name": "ODROID-GO",
+    "category": "handheld",
+    "idea_fit_tags": [
+      "retrogaming",
+      "handheld",
+      "educational"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 2,
+    "brick_provenance": "community-reported",
+    "last_verified": "2026-05-06",
+    "firmware_links": [
+      "https://github.com/ducalex/retro-go",
+      "https://github.com/ducalex/odroid-go-multi-firmware"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP32-based retro handheld from Hardkernel. 2.4-inch color LCD, 4MB flash, microSD slot, speaker, built-in battery. Primary CFW is Retro-Go by ducalex - supports NES, Game Boy/Color, SNES (slow), SMS/GG, Genesis, PCE, Colecovision, Atari Lynx, DOOM. Multi-firmware bootloader allows switching between apps from SD card. WiFi support for file manager and NTP time sync. GPIO header accessible for hardware mods (external DAC, I2C peripherals). ESP32 dev experience applies.",
+    "est_used_price_usd_min": 35,
+    "est_used_price_usd_max": 55,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   }
 ]
