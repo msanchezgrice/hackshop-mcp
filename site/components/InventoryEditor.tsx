@@ -18,6 +18,9 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
   const [owned, setOwned] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState("");
   const [hydrated, setHydrated] = useState(false);
+  // Track image fetches that 404'd so we never re-render their <img> tags
+  // (avoids iOS Safari's broken-image-icon flash).
+  const [failedImg, setFailedImg] = useState<Set<string>>(new Set());
 
   // Load from localStorage after mount (server render is empty)
   useEffect(() => {
@@ -180,24 +183,29 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
                   color: "var(--muted)",
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/api/img?slug=${d.id}`}
-                  alt=""
-                  width={48}
-                  height={48}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    img.style.display = "none";
-                    const fallback = img.nextElementSibling as HTMLElement | null;
-                    if (fallback) fallback.style.display = "block";
-                  }}
-                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                />
-                <span style={{ display: "none" }}>
-                  {d.category.slice(0, 3).toUpperCase()}
-                </span>
+                {failedImg.has(d.id) ? (
+                  <span style={{ fontSize: 11, color: "var(--muted)" }}>
+                    {d.category.slice(0, 3).toUpperCase()}
+                  </span>
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={`/api/img?slug=${d.id}`}
+                    alt=""
+                    width={48}
+                    height={48}
+                    referrerPolicy="no-referrer"
+                    onError={() => {
+                      setFailedImg((prev) => {
+                        if (prev.has(d.id)) return prev;
+                        const next = new Set(prev);
+                        next.add(d.id);
+                        return next;
+                      });
+                    }}
+                    style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                  />
+                )}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600 }}>{d.name}</div>

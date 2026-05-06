@@ -32,6 +32,16 @@ function DemoFormInner() {
   const [diagramB64, setDiagramB64] = useState<string | null>(null);
   const [diagramLoading, setDiagramLoading] = useState(false);
   const [diagramError, setDiagramError] = useState<string | null>(null);
+  // Track image-fetch failures so we never re-render their <img> tags
+  // (prevents iOS Safari's broken-image flash for slugs without sources).
+  const [failedImg, setFailedImg] = useState<Set<string>>(new Set());
+  const markImgFailed = (slug: string) =>
+    setFailedImg((prev) => {
+      if (prev.has(slug)) return prev;
+      const next = new Set(prev);
+      next.add(slug);
+      return next;
+    });
 
   // Track inventory size; refresh when other tabs/pages change it.
   useEffect(() => {
@@ -327,24 +337,24 @@ function DemoFormInner() {
 
             {result.proposals.map((p) => (
               <article key={p.id} className="proposal">
-                <div style={{ marginBottom: 12 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`/api/img?slug=${p.id}`}
-                    alt={p.name}
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
-                    style={{
-                      maxHeight: 160,
-                      maxWidth: "100%",
-                      borderRadius: 6,
-                      background: "var(--code-bg-2)",
-                    }}
-                    loading="lazy"
-                  />
-                </div>
+                {!failedImg.has(p.id) && (
+                  <div style={{ marginBottom: 12 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/api/img?slug=${p.id}`}
+                      alt={p.name}
+                      referrerPolicy="no-referrer"
+                      onError={() => markImgFailed(p.id)}
+                      style={{
+                        maxHeight: 160,
+                        maxWidth: "100%",
+                        borderRadius: 6,
+                        background: "var(--code-bg-2)",
+                      }}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
                 <div className="proposal-head">
                   <h3>{p.name}</h3>
                   <div className="proposal-meta">
@@ -526,24 +536,24 @@ function DemoFormInner() {
                 </p>
                 {result.premium_proposals.map((p) => (
                   <article key={p.id} className="proposal">
-                    <div style={{ marginBottom: 12 }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={`/api/img?slug=${p.id}`}
-                        alt={p.name}
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = "none";
-                        }}
-                        style={{
-                          maxHeight: 160,
-                          maxWidth: "100%",
-                          borderRadius: 6,
-                          background: "var(--code-bg-2)",
-                        }}
-                        loading="lazy"
-                      />
-                    </div>
+                    {!failedImg.has(p.id) && (
+                      <div style={{ marginBottom: 12 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/api/img?slug=${p.id}`}
+                          alt={p.name}
+                          referrerPolicy="no-referrer"
+                          onError={() => markImgFailed(p.id)}
+                          style={{
+                            maxHeight: 160,
+                            maxWidth: "100%",
+                            borderRadius: 6,
+                            background: "var(--code-bg-2)",
+                          }}
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <div className="proposal-head">
                       <h3>{p.name}</h3>
                       <div className="proposal-meta">
