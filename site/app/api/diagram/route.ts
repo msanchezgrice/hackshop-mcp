@@ -19,7 +19,47 @@ const diagramInput = z.object({
 const cache = new Map<string, { png_b64: string; generated_at: number }>();
 const CACHE_MS = 24 * 60 * 60 * 1000;
 
-const SYSTEM_DIRECTION = `Create a clean, monochrome blueprint-style technical diagram on a dark navy background. White and orange line art only. Show data flow / wiring / step sequence with labeled boxes and arrows. No photo-realism, no decorative elements, no shadows. Architecture-diagram style. Include device names as text labels.`;
+// High-fidelity technical schematic prompt. Tested on gpt-image-2; produces
+// architecture diagram + BOM + setup steps in one canvas with readable text.
+function buildPrompt(idea: string, deviceNames: string[]): string {
+  const titleHint = idea.slice(0, 80);
+  const components =
+    deviceNames.length > 0
+      ? deviceNames.join(", ")
+      : "(let the model pick reasonable components for the project)";
+
+  return [
+    `Create a high-fidelity technical schematic for a DIY maker project. Style: clean flat-design technical drawing inspired by modern Figma whiteboards and architecture diagrams. NO photo-realism, NO gradients, NO drop shadows.`,
+    "",
+    `BACKGROUND: solid dark navy (#0a0a0a). LINE ART: white (#f5f5f5) and accent orange (#f97316) only. Thin crisp lines (1-2px). All text must be sharp and legible.`,
+    "",
+    `LAYOUT — divide the 1024×1024 canvas into four zones:`,
+    "",
+    `1. TOP STRIP (top 8%): project title in clean white sans-serif, centered.`,
+    `   Title text: "${titleHint}"`,
+    "",
+    `2. MAIN AREA (middle 60%): the architecture diagram.`,
+    `   - Each hardware component drawn as a rounded rectangle with the device name inside it.`,
+    `   - Arrows between components showing DATA FLOW direction (input → processing → output).`,
+    `   - Each arrow labeled with the protocol/transport: "USB", "I²C", "GPIO", "Wi-Fi", "BLE", "SPI", "HDMI", "3.5mm aux", etc — pick what fits.`,
+    `   - Each component box has a one-line annotation underneath in smaller text describing its role (e.g. "Pi Zero W — fetches calendar over Wi-Fi, refreshes display once/hour").`,
+    `   - Use simple geometric icons inside each box (rectangle for SBC, circle for sensor, monitor-shape for display) — no photorealistic device renders.`,
+    "",
+    `3. BOTTOM-LEFT QUADRANT (bottom 32%, left half): "BILL OF MATERIALS" header in orange uppercase. Below it, a bulleted list of every part needed with quantities, one per line. Format: "• <part name> ×<qty>". Include cables and adapters, not just the main devices.`,
+    "",
+    `4. BOTTOM-RIGHT QUADRANT (bottom 32%, right half): "SETUP STEPS" header in orange uppercase. Below it, 4-5 numbered steps, each one short imperative sentence. Format: "1. <verb + object>". Examples: "1. Flash Pi OS Lite to SD card", "2. Wire HAT via GPIO ribbon", "3. Run install.sh".`,
+    "",
+    `PROJECT IDEA: "${idea}"`,
+    "",
+    `COMPONENTS TO USE (use these exact names in the diagram): ${components}`,
+    "",
+    `IMPORTANT:`,
+    `- Every label must be readable at full resolution.`,
+    `- Maintain whitespace; don't crowd.`,
+    `- The diagram should TEACH a tinkerer how the build fits together at a glance.`,
+    `- Do NOT add legal disclaimers, watermarks, or signatures.`,
+  ].join("\n");
+}
 
 export async function POST(req: Request): Promise<Response> {
   if (!process.env.OPENAI_API_KEY) {
@@ -61,22 +101,14 @@ export async function POST(req: Request): Promise<Response> {
     });
   }
 
-  const prompt = [
-    SYSTEM_DIRECTION,
-    "",
-    `Project: ${parsed.data.idea}`,
-    named.length > 0
-      ? `Devices to include in the diagram: ${named.join(", ")}.`
-      : "Devices: pick what makes sense for the project.",
-    "Show: input -> processing -> output, with the role of each device labeled.",
-  ].join("\n");
+  const prompt = buildPrompt(parsed.data.idea, named);
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   let png_b64: string;
   try {
     const result = await client.images.generate({
-      model: process.env.HACKSHOP_IMAGE_MODEL ?? "gpt-image-1",
+      model: process.env.HACKSHOP_IMAGE_MODEL ?? "gpt-image-2",
       prompt,
       size: "1024x1024",
       n: 1,
