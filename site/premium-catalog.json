@@ -274,5 +274,355 @@
     "privacy_risk": 4,
     "est_setup_hours_min": 2,
     "est_setup_hours_max": 6
+  },
+  {
+    "id": "irobot-create-3",
+    "name": "iRobot Create 3",
+    "manufacturer": "iRobot Education",
+    "category": "robot",
+    "capabilities": [
+      "ROS 2 Humble preinstalled",
+      "Wi-Fi + USB-C control",
+      "cliff + bump + IR sensors",
+      "Roomba i-series chassis (mobile)",
+      "30+ ROS 2 topics published"
+    ],
+    "software_stack": [
+      "ROS 2 Humble",
+      "Create 3 ROS 2 API (/cmd_vel, /cmd_lightring, /cmd_audio)",
+      "Webots simulation",
+      "Python via rclpy"
+    ],
+    "price_usd_min": 199,
+    "price_usd_max": 299,
+    "vendor_url": "https://edu.irobot.com/what-we-offer/create3",
+    "open_source_repo": "https://github.com/iRobotEducation/create3_examples",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "creative-coding",
+      "low-power"
+    ],
+    "notes": "Mobile robot platform built on Roomba i-series chassis. Subscribe to /odom, publish to /cmd_vel \u2014 drive it. Used widely in education + research. Indoor only.",
+    "actuation_risk": 4,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 4
+  },
+  {
+    "id": "turtlebot-4-lite",
+    "name": "TurtleBot 4 Lite",
+    "manufacturer": "Clearpath Robotics",
+    "category": "robot",
+    "capabilities": [
+      "iRobot Create 3 base",
+      "Raspberry Pi 4B compute (4GB)",
+      "OAK-D-Lite stereo camera",
+      "RPLIDAR A1M8 360\u00b0 lidar",
+      "ROS 2 Humble + nav2 + slam_toolbox preinstalled"
+    ],
+    "software_stack": [
+      "ROS 2 Humble",
+      "nav2 navigation stack",
+      "slam_toolbox SLAM",
+      "Ignition Gazebo simulation"
+    ],
+    "price_usd_min": 1100,
+    "price_usd_max": 1400,
+    "vendor_url": "https://clearpathrobotics.com/turtlebot-4/",
+    "open_source_repo": "https://github.com/turtlebot/turtlebot4",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "creative-coding"
+    ],
+    "notes": "Full ROS 2 mobile robot kit: Create 3 + Pi 4 + lidar + stereo cam. Comes ready for SLAM + autonomous navigation out of the box. Price reflects the full sensor stack.",
+    "actuation_risk": 4,
+    "privacy_risk": 4,
+    "est_setup_hours_min": 2,
+    "est_setup_hours_max": 6
+  },
+  {
+    "id": "lerobot-so-arm100",
+    "name": "LeRobot SO-ARM100",
+    "manufacturer": "TheRobotStudio (LeRobot ecosystem)",
+    "category": "robot",
+    "capabilities": [
+      "5-DoF + gripper open-source robot arm",
+      "STS3215 servos",
+      "USB serial control (no controller box)",
+      "follower or leader mode for teleop",
+      "low-cost BOM (~$200 in parts)"
+    ],
+    "software_stack": [
+      "LeRobot Python SDK (Hugging Face)",
+      "imitation-learning datasets on HF Hub",
+      "PyTorch policies",
+      "MuJoCo simulation"
+    ],
+    "price_usd_min": 200,
+    "price_usd_max": 350,
+    "vendor_url": "https://github.com/TheRobotStudio/SO-ARM100",
+    "open_source_repo": "https://github.com/TheRobotStudio/SO-ARM100",
+    "idea_fit_tags": [
+      "creative-coding",
+      "input"
+    ],
+    "notes": "DIY-buildable open-source robot arm, the canonical LeRobot teaching platform. Sourced as kit/parts from various sellers. Used for imitation learning research with HuggingFace datasets.",
+    "actuation_risk": 3,
+    "privacy_risk": 1,
+    "est_setup_hours_min": 4,
+    "est_setup_hours_max": 12
+  },
+  {
+    "id": "pimoroni-inky-frame-5-7",
+    "name": "Pimoroni Inky Frame 5.7\"",
+    "manufacturer": "Pimoroni",
+    "category": "display",
+    "capabilities": [
+      "Pico W aboard (RP2040 + WiFi)",
+      "5.7\" 7-color e-paper",
+      "battery + USB-C powered",
+      "buttons + LEDs",
+      "Qwiic / STEMMA QT connector"
+    ],
+    "software_stack": [
+      "MicroPython",
+      "C/C++ (Pico SDK)",
+      "Pimoroni MicroPython libraries"
+    ],
+    "price_usd_min": 110,
+    "price_usd_max": 130,
+    "vendor_url": "https://shop.pimoroni.com/products/inky-frame-5-7",
+    "open_source_repo": "https://github.com/pimoroni/inky-frame",
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "low-power",
+      "framed-art",
+      "ambient",
+      "color-cycle"
+    ],
+    "notes": "Self-contained 7-color e-paper picture frame with Pico W aboard \u2014 no separate Pi needed. Pulls images from any URL on a Wi-Fi schedule. The 7.3\" sibling is similar; 5.7\" is the desk-friendly size.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "m5stickc-plus-2",
+    "name": "M5StickC Plus 2",
+    "manufacturer": "M5Stack",
+    "category": "sbc",
+    "capabilities": [
+      "ESP32-PICO-V3-02 dual-core",
+      "1.14\" 135x240 ST7789 LCD",
+      "Wi-Fi + BLE",
+      "IMU (MPU6886)",
+      "200mAh battery + USB-C",
+      "buzzer + IR + 2 buttons"
+    ],
+    "software_stack": [
+      "Arduino IDE",
+      "PlatformIO",
+      "MicroPython",
+      "UIFlow (visual programming)",
+      "ESP-IDF"
+    ],
+    "price_usd_min": 22,
+    "price_usd_max": 32,
+    "vendor_url": "https://shop.m5stack.com/products/m5stickc-plus2-esp32-mini-iot-development-kit",
+    "open_source_repo": "https://github.com/m5stack/M5StickCPlus2",
+    "idea_fit_tags": [
+      "display",
+      "iot",
+      "sensor",
+      "creative-coding",
+      "low-power",
+      "wearable"
+    ],
+    "notes": "Pocket-sized ESP32 with screen + IMU + battery in a finished case. Good for wearable badges, status indicators, motion-triggered devices. Newer V2 fixes the V1 quirks.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "m5stack-cardputer",
+    "name": "M5Stack Cardputer",
+    "manufacturer": "M5Stack",
+    "category": "computer",
+    "capabilities": [
+      "ESP32-S3 dual-core",
+      "1.14\" color LCD",
+      "QWERTY keyboard (56 keys)",
+      "Wi-Fi + BLE",
+      "IR + microphone + speaker",
+      "USB-C + Grove + microSD"
+    ],
+    "software_stack": [
+      "Arduino IDE",
+      "MicroPython",
+      "BadUSB / payload mode for security testing",
+      "M5GFX graphics library"
+    ],
+    "price_usd_min": 35,
+    "price_usd_max": 50,
+    "vendor_url": "https://shop.m5stack.com/products/m5stack-cardputer-kit-w-m5stamps3",
+    "open_source_repo": "https://github.com/m5stack/M5Cardputer",
+    "idea_fit_tags": [
+      "display",
+      "input",
+      "creative-coding",
+      "low-power",
+      "iot"
+    ],
+    "notes": "Credit-card-sized ESP32 with a real keyboard and screen. Used for portable hacking, BadUSB, mini-terminals, ham radio control. The keyboard makes it usable as a standalone device, not just a dev kit.",
+    "actuation_risk": 1,
+    "privacy_risk": 3,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "adafruit-feather-esp32s3-tft",
+    "name": "Adafruit Feather ESP32-S3 Reverse TFT",
+    "manufacturer": "Adafruit",
+    "category": "sbc",
+    "capabilities": [
+      "ESP32-S3 dual-core (240MHz, 4MB flash, 2MB PSRAM)",
+      "240x135 color TFT on the BOTTOM (so it shows on a desk)",
+      "Wi-Fi + BLE",
+      "USB-C + battery charger",
+      "STEMMA QT (I\u00b2C) connector",
+      "compatible with all Feather-form-factor add-on boards"
+    ],
+    "software_stack": [
+      "CircuitPython",
+      "Arduino IDE",
+      "Adafruit IO integration",
+      "MicroPython"
+    ],
+    "price_usd_min": 25,
+    "price_usd_max": 30,
+    "vendor_url": "https://www.adafruit.com/product/5483",
+    "open_source_repo": "https://github.com/adafruit/circuitpython",
+    "idea_fit_tags": [
+      "sbc",
+      "display",
+      "iot",
+      "low-power",
+      "sensor",
+      "creative-coding"
+    ],
+    "notes": "Most popular Adafruit ESP32 dev board. Reverse TFT means the screen faces you when the board sits flat on a desk. Pairs with the entire FeatherWing accessory ecosystem.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
+  },
+  {
+    "id": "pimoroni-enviro-indoor",
+    "name": "Pimoroni Enviro Indoor",
+    "manufacturer": "Pimoroni",
+    "category": "sensor",
+    "capabilities": [
+      "Pico W aboard (RP2040 + Wi-Fi)",
+      "BME688 (temp / humidity / pressure / VOC)",
+      "LTR-559 light + proximity",
+      "PMS5003 PM2.5 / PM10 air-quality (optional add-on)",
+      "battery + USB-C",
+      "0.96\" OLED status display"
+    ],
+    "software_stack": [
+      "MicroPython",
+      "Pimoroni Enviro firmware (community)",
+      "Home Assistant integration",
+      "MQTT publishing"
+    ],
+    "price_usd_min": 60,
+    "price_usd_max": 90,
+    "vendor_url": "https://shop.pimoroni.com/products/enviro-indoor",
+    "open_source_repo": "https://github.com/pimoroni/enviro",
+    "idea_fit_tags": [
+      "sensor",
+      "iot",
+      "low-power",
+      "display"
+    ],
+    "notes": "Battery-powered indoor air-quality sensor with built-in OLED status. Publishes to MQTT, Adafruit IO, or Home Assistant. Configurable wake/sleep cadence to last weeks on a charge.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "openmv-cam-h7-plus",
+    "name": "OpenMV Cam H7 Plus",
+    "manufacturer": "OpenMV",
+    "category": "sensor",
+    "capabilities": [
+      "STM32H7 480MHz Cortex-M7",
+      "OV5640 5MP camera + interchangeable M12 lens",
+      "32MB SDRAM + 32MB external flash",
+      "microSD + USB-C",
+      "shield ecosystem (LCD, FLIR thermal, WiFi, LoRa)"
+    ],
+    "software_stack": [
+      "MicroPython + OpenMV IDE",
+      "TensorFlow Lite for Microcontrollers",
+      "QR / AprilTag / barcode / face / line / blob detection libraries",
+      "Edge Impulse integration"
+    ],
+    "price_usd_min": 99,
+    "price_usd_max": 130,
+    "vendor_url": "https://openmv.io/products/openmv-cam-h7-plus",
+    "open_source_repo": "https://github.com/openmv/openmv",
+    "idea_fit_tags": [
+      "sensor",
+      "creative-coding",
+      "iot",
+      "low-power"
+    ],
+    "notes": "Open-source machine-vision camera. Run image-classification models, AprilTag detection, line-following \u2014 all in MicroPython on the device, no Pi/desktop needed. Battery-friendly.",
+    "actuation_risk": 1,
+    "privacy_risk": 3,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3
+  },
+  {
+    "id": "seeed-xiao-esp32s3",
+    "name": "Seeed Studio XIAO ESP32S3",
+    "manufacturer": "Seeed Studio",
+    "category": "sbc",
+    "capabilities": [
+      "ESP32-S3 dual-core (240MHz, 8MB flash, 8MB PSRAM)",
+      "thumbnail-sized (21x17.5mm) \u2014 fits anywhere",
+      "Wi-Fi + BLE 5",
+      "USB-C + battery solder pads",
+      "Sense variant adds OV2640 camera + microphone"
+    ],
+    "software_stack": [
+      "Arduino IDE",
+      "ESP-IDF",
+      "MicroPython",
+      "CircuitPython"
+    ],
+    "price_usd_min": 7,
+    "price_usd_max": 14,
+    "vendor_url": "https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html",
+    "open_source_repo": "https://github.com/raspberrypi/pico-sdk",
+    "idea_fit_tags": [
+      "sbc",
+      "iot",
+      "low-power",
+      "sensor",
+      "creative-coding",
+      "wearable"
+    ],
+    "notes": "Cheapest credible ESP32-S3 dev board. The Sense variant ($14) adds a camera + mic \u2014 turning it into a $14 vision module. Common in wearable + always-on projects.",
+    "actuation_risk": 1,
+    "privacy_risk": 2,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2
   }
 ]
