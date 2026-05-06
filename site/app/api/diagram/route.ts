@@ -108,7 +108,9 @@ export async function POST(req: Request): Promise<Response> {
   let png_b64: string;
   try {
     const result = await client.images.generate({
-      model: process.env.HACKSHOP_IMAGE_MODEL ?? "gpt-image-2",
+      // .trim() guards against env values pushed via `echo "..." | vercel env add`
+      // which can capture the trailing newline.
+      model: (process.env.HACKSHOP_IMAGE_MODEL ?? "gpt-image-2").trim(),
       prompt,
       size: "1024x1024",
       n: 1,
