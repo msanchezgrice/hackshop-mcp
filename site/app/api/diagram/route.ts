@@ -114,6 +114,9 @@ export async function POST(req: Request): Promise<Response> {
       prompt,
       size: "1024x1024",
       n: 1,
+      // medium quality cuts generation time ~2-3x vs auto/high. Diagrams
+      // are line art with text — they don't need photoreal fidelity.
+      quality: "medium",
     });
     const first = result.data?.[0];
     if (!first?.b64_json) {

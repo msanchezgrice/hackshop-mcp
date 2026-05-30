@@ -15,6 +15,10 @@ import {
   assessHackability,
   assessHackabilityInput,
 } from "./tools/assess_hackability.js";
+import {
+  simulateAssembly,
+  simulateAssemblyInput,
+} from "./tools/simulate_assembly.js";
 
 const NAME = "hackshop-mcp";
 const VERSION = "0.0.3";
@@ -76,6 +80,26 @@ async function main(): Promise<void> {
           required: ["device_name"],
         },
       },
+      {
+        name: "simulate_assembly",
+        description:
+          "Drop a proposed robot Assembly into a MuJoCo physics world and run a bounded navigation rollout. Returns whether it reached the goal plus honest failure telemetry (stuck/tipped/collisions/heading-oscillation), a natural-language post-mortem, and artifact URLs (rendered mp4, scene.xml, control.py, telemetry.json). Today simulates the diff-drive 'navigate' slice; other goal kinds return an honest 'unsupported'. Requires a running sim-worker (SIM_WORKER_URL).",
+        inputSchema: {
+          type: "object",
+          properties: {
+            assembly: {
+              type: "object",
+              description:
+                "Assembly IR: { idea, components[{ref,device_id,name,role}], edges[], goal{kind,spec,success_metric}, world{template,goal_xy?} }. Build it with the site /api/assembly output or by hand.",
+            },
+            duration_s: {
+              type: "number",
+              description: "Optional sim seconds (<=10, bounded). Default 8.",
+            },
+          },
+          required: ["assembly"],
+        },
+      },
     ],
   }));
 
@@ -93,6 +117,14 @@ async function main(): Promise<void> {
     if (name === "assess_hackability") {
       const input = assessHackabilityInput.parse(args);
       const out = assessHackability(input, devices);
+      return {
+        content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
+      };
+    }
+
+    if (name === "simulate_assembly") {
+      const input = simulateAssemblyInput.parse(args);
+      const out = await simulateAssembly(input);
       return {
         content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
       };

@@ -1,9 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import type { ProposeResponse } from "@/lib/types";
+import type { AssemblyResponse } from "@/lib/assembly";
+import { AssemblyPanel } from "./AssemblyPanel";
+import { SimViewer } from "./SimViewer";
 import { loadInventory } from "@/lib/inventory";
 
 const EXAMPLES = [
@@ -32,6 +35,12 @@ function DemoFormInner() {
   const [diagramB64, setDiagramB64] = useState<string | null>(null);
   const [diagramLoading, setDiagramLoading] = useState(false);
   const [diagramError, setDiagramError] = useState<string | null>(null);
+  const [diagramElapsed, setDiagramElapsed] = useState(0);
+  const diagramAbortRef = useRef<AbortController | null>(null);
+  // Assembly + feasibility (build plan / "could this work?") state.
+  const [assembly, setAssembly] = useState<AssemblyResponse | null>(null);
+  const [assemblyLoading, setAssemblyLoading] = useState(false);
+  const [assemblyError, setAssemblyError] = useState<string | null>(null);
   // Track image-fetch failures so we never re-render their <img> tags
   // (prevents iOS Safari's broken-image flash for slugs without sources).
   const [failedImg, setFailedImg] = useState<Set<string>>(new Set());
@@ -77,6 +86,8 @@ function DemoFormInner() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setAssembly(null);
+    setAssemblyError(null);
     try {
       const body: Record<string, unknown> = { idea: idea.trim() };
       const b = parseFloat(budget);
@@ -258,18 +269,37 @@ function DemoFormInner() {
               </div>
             )}
 
+            {!result.degraded && result.software_guide_md && (
+              <div className="reasoning" style={{ borderLeftColor: "var(--accent)" }}>
+                <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  Software architecture
+                </div>
+                <div className="md">
+                  <ReactMarkdown>{result.software_guide_md}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+
             {!result.degraded && result.proposals.length > 0 && (
               <div style={{ marginBottom: 16 }}>
                 {!diagramB64 && !diagramLoading && (
                   <button
                     type="button"
                     onClick={async () => {
+                      const ac = new AbortController();
+                      diagramAbortRef.current = ac;
                       setDiagramLoading(true);
                       setDiagramError(null);
+                      setDiagramElapsed(0);
+                      const startedAt = Date.now();
+                      const tick = setInterval(() => {
+                        setDiagramElapsed(Math.floor((Date.now() - startedAt) / 1000));
+                      }, 1000);
                       try {
                         const res = await fetch("/api/diagram", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
+                          signal: ac.signal,
                           body: JSON.stringify({
                             idea: idea.trim(),
                             device_ids: result.proposals.map((p) => p.id),
@@ -299,8 +329,13 @@ function DemoFormInner() {
                           setDiagramB64(data.image_b64);
                         }
                       } catch (e) {
-                        setDiagramError((e as Error).message);
+                        const err = e as Error;
+                        if (err.name !== "AbortError") {
+                          setDiagramError(err.message);
+                        }
                       } finally {
+                        clearInterval(tick);
+                        diagramAbortRef.current = null;
                         setDiagramLoading(false);
                       }
                     }}
@@ -319,8 +354,39 @@ function DemoFormInner() {
                   </button>
                 )}
                 {diagramLoading && (
-                  <div className="reasoning" style={{ borderLeftColor: "var(--accent)" }}>
-                    <span className="spinner" /> Generating diagram via gpt-image-1 (~10-30s)…
+                  <div
+                    className="reasoning"
+                    style={{
+                      borderLeftColor: "var(--accent)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span className="spinner" />
+                    <span>
+                      Drawing schematic with gpt-image-2… <strong>{diagramElapsed}s</strong> elapsed
+                      <span style={{ color: "var(--muted)" }}>
+                        {" "}(typically 60–180s — line-art schematics with text take longer than photos)
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => diagramAbortRef.current?.abort()}
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: 12,
+                        padding: "4px 10px",
+                        borderRadius: 4,
+                        background: "transparent",
+                        color: "var(--muted)",
+                        border: "1px solid var(--border)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 )}
                 {diagramError && <div className="error">{diagramError}</div>}
@@ -340,6 +406,67 @@ function DemoFormInner() {
                       }}
                     />
                   </div>
+                )}
+              </div>
+            )}
+
+            {!result.degraded && result.proposals.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                {!assembly && (
+                  <button
+                    type="button"
+                    disabled={assemblyLoading}
+                    onClick={async () => {
+                      setAssemblyLoading(true);
+                      setAssemblyError(null);
+                      try {
+                        const res = await fetch("/api/assembly", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            idea: idea.trim(),
+                            device_ids: result.proposals.map((p) => p.id),
+                          }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                          setAssemblyError(data.error ?? `Server returned ${res.status}`);
+                        } else {
+                          setAssembly(data as AssemblyResponse);
+                        }
+                      } catch (e) {
+                        setAssemblyError((e as Error).message);
+                      } finally {
+                        setAssemblyLoading(false);
+                      }
+                    }}
+                    style={{
+                      fontSize: 13,
+                      padding: "8px 14px",
+                      borderRadius: 6,
+                      background: "var(--code-bg)",
+                      color: "var(--fg)",
+                      border: "1px solid var(--accent)",
+                      cursor: assemblyLoading ? "default" : "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {assemblyLoading ? (
+                      <>
+                        <span className="spinner" /> Planning build &amp; checking feasibility…
+                      </>
+                    ) : (
+                      "Plan build & check feasibility →"
+                    )}
+                  </button>
+                )}
+                {assemblyError && <div className="error">{assemblyError}</div>}
+                {assembly && <AssemblyPanel data={assembly} />}
+                {assembly && (
+                  <SimViewer
+                    assembly={assembly.assembly}
+                    buildPlan={assembly.build_plan}
+                  />
                 )}
               </div>
             )}

@@ -45,6 +45,14 @@ export const PremiumDevice = z.object({
   image_url: z.string().url().optional(),
   est_setup_hours_min: z.number().nonnegative().optional(),
   est_setup_hours_max: z.number().nonnegative().optional(),
+  // ── Simulation/feasibility capability fields (V2). All optional. See
+  // DeviceEntry for semantics. When `interfaces` is absent the capability
+  // index derives transports heuristically from capabilities/software_stack.
+  interfaces: z.array(z.string().min(1)).optional(),
+  power_draw_w: z.number().nonnegative().optional(),
+  power_supply_w: z.number().nonnegative().optional(),
+  mass_kg: z.number().positive().optional(),
+  payload_kg: z.number().nonnegative().optional(),
 });
 
 export type PremiumDevice = z.infer<typeof PremiumDevice>;

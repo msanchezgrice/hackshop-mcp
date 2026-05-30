@@ -1,0 +1,9 @@
+.venv/
+runs/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.git/
+tests/
+*.mp4
+*.png

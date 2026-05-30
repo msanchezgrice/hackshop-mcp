@@ -18,15 +18,31 @@ Return JSON only (no surrounding fence), with this shape:
   "picks": [
     { "id": "<device id>", "why_this_fits": "<one tight sentence, mentions user's idea>" }
   ],
-  "rationale_md": "<MARKDOWN — see formatting rules>",
-  "next_steps_md": "<MARKDOWN — bulleted ordered actions>"
+  "rationale_md": "<MARKDOWN — short, bullet-list, see rules below>",
+  "next_steps_md": "<MARKDOWN — bulleted concrete actions>",
+  "software_guide_md": "<MARKDOWN — operational architecture, see rules below>"
 }
 
-FORMATTING (rationale_md, next_steps_md):
+FORMATTING — rationale_md and next_steps_md:
 - Use markdown. Encouraged: bullet lists ('- '), bold (**word**), inline code (\`token\`), short headers ('## Heading').
 - rationale_md: lead with **one bold one-liner** summarizing the recommended path. Then a 3-5 bullet list of reasons / tradeoffs / constraints. Keep under 8 lines.
 - next_steps_md: 3-5 bulleted concrete actions, each starting with a verb ("Order...", "Flash...", "Wire..."), each one short sentence.
-- Reference real project names (MagInkCal, Luma3DS, openmiko, Rebble, KOReader, Tronbyt, ESPHome, Home Assistant, Frigate, etc.) — the frontend renders them so the user can recognize.
+
+FORMATTING — software_guide_md (NEW, operational architecture):
+- This is the deeper "how does the system actually work" section, ~12-20 lines.
+- Use this exact structure with these four headers, in order:
+  ## Interface
+  How does the user actually interact with this? (web UI on port 8080? REST API? Native mobile app? SSH terminal? Bluetooth pairing via a phone app? ROS topic publish? Voice command via Home Assistant?). Name the specific port / endpoint / app where applicable. 2-4 lines.
+  ## Deploy
+  Where does the software run, how is it powered, what does it depend on? (e.g. "Pi Zero W boots from microSD running Raspberry Pi OS Lite, draws ~1.5W from a 5V/2A USB power supply, requires only Wi-Fi for outbound HTTPS to Google Calendar; LAN-only otherwise"). Mention firmware / OS specifically. 2-4 lines.
+  ## Maintain
+  What breaks, how often, what to expect. Cover firmware update cadence, common failure modes, what's recoverable. (e.g. "Firmware updates rare; main breakage is the Wi-Fi credential expiry — re-flash the SD card in 5 min if it fails"). 2-4 lines.
+  ## Always-on?
+  Is this device always running, event-triggered, or manually launched? Battery vs mains, wake/sleep behavior, idle power draw, expected uptime between restarts. (e.g. "Always-on, plugged in 24/7. Pi Zero idle draw ~0.4W; e-paper refreshes once an hour via cron"). 1-3 lines.
+
+GENERAL FORMATTING:
+- Reference real project names (MagInkCal, Luma3DS, openmiko, Rebble, KOReader, Tronbyt, ESPHome, Home Assistant, Frigate, ntfy.sh, Mosquitto, etc.). The frontend renders these so users can recognize.
+- Inline-code (\`backticks\`) for commands, ports, file paths, config keys.
 - Do NOT invent URLs you're unsure about; project names alone are enough.
 
 GENERAL:
@@ -41,6 +57,7 @@ interface SamplerPick {
   picks: Array<{ id: string; why_this_fits: string }>;
   rationale_md: string;
   next_steps_md: string;
+  software_guide_md?: string;
 }
 
 function candidateContext(catalog: DeviceEntry[]): string {
@@ -230,6 +247,7 @@ export async function propose(
 
   const rationale_md = sampled.rationale_md ?? "";
   const next_steps_md = sampled.next_steps_md ?? "";
+  const software_guide_md = sampled.software_guide_md ?? "";
   const reasoning = stripMd(rationale_md) || "No catalog match for this idea.";
 
   if (proposals.length === 0) {
@@ -238,6 +256,7 @@ export async function propose(
       reasoning,
       rationale_md,
       next_steps_md,
+      software_guide_md,
       degraded: false,
       message:
         "No catalog devices fit this idea well. Try a more concrete description, or open a catalog PR.",
@@ -249,6 +268,7 @@ export async function propose(
     reasoning,
     rationale_md,
     next_steps_md,
+    software_guide_md,
     degraded: false,
   };
 }

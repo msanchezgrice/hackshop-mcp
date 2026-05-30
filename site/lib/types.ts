@@ -44,6 +44,17 @@ export const DeviceEntry = z.object({
   // assembly + firmware flash + software config. Conservative.
   est_setup_hours_min: z.number().nonnegative().optional(),
   est_setup_hours_max: z.number().nonnegative().optional(),
+  // ── Simulation/feasibility capability fields (V2). All optional: absent =
+  // "unknown", which the feasibility DRC treats honestly (never a fake pass).
+  // Populated incrementally, only for devices in the active simulation slice.
+  // `interfaces` uses Transport tokens (usb/i2c/spi/gpio/uart/wifi/ble/ros2/
+  // hdmi/aux/power). power_draw_w = typical consumption; power_supply_w = what
+  // a battery/PSU/host can provide; payload_kg = rated load for actuators/arms.
+  interfaces: z.array(z.string().min(1)).optional(),
+  power_draw_w: z.number().nonnegative().optional(),
+  power_supply_w: z.number().nonnegative().optional(),
+  mass_kg: z.number().positive().optional(),
+  payload_kg: z.number().nonnegative().optional(),
 });
 
 export type DeviceEntry = z.infer<typeof DeviceEntry>;
@@ -116,6 +127,7 @@ export interface ProposeResponse {
   reasoning: string;          // legacy plain-text fallback
   rationale_md?: string;      // structured markdown — lead bold line + bullets
   next_steps_md?: string;     // structured markdown — concrete actions
+  software_guide_md?: string; // structured markdown — Interface / Deploy / Maintain / Always-on?
   degraded: boolean;
   message?: string;
   premium_proposals?: PremiumProposal[];
