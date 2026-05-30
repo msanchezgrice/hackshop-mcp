@@ -22,10 +22,23 @@ primary_region = "iad"
   PYOPENGL_PLATFORM = "osmesa"
   HACKSHOP_RUNS_DIR = "/app/runs"
 
+# Artifacts (videos, summaries, renders) are written to /app/runs. Without a
+# persistent volume they live in the ephemeral container fs and vanish on every
+# machine stop/restart -> /artifacts/... returns 404. The volume keeps them.
+#
+# IMPORTANT: a Fly volume is bound to ONE machine. Run exactly one machine for
+# this app (`fly scale count 1`), otherwise a request can land on a machine that
+# doesn't have the artifact. For multi-machine scale-out, move artifacts to
+# object storage (Tigris/S3) instead of a volume.
+[mounts]
+  source = "runs"
+  destination = "/app/runs"
+
 [http_service]
   internal_port = 8000
   force_https = true
   # Scale to zero between demos to keep cost ~$0; first request pays a cold start.
+  # The volume persists across stop/start so artifacts survive.
   auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
