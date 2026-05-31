@@ -77,7 +77,19 @@ export function SimViewer({
   const [elapsed, setElapsed] = useState(0);
   const [useAgent, setUseAgent] = useState(false);
   const [world, setWorld] = useState<string>("obstacle-course");
+  const [usedBase, setUsedBase] = useState(false);
   const stopRef = useRef(false);
+
+  // The diff-drive slice needs something to drive. A mobile goal (navigate /
+  // locomote) with no chassis or actuator returns "unsupported" — a dead end.
+  // We offer to drop the build's electronics onto a generic mobile base so the
+  // user can still watch it navigate (labelled honestly in the result).
+  const goalKind = assembly.goal.kind;
+  const isMobileGoal = goalKind === "navigate" || goalKind === "locomote";
+  const hasMobileBase = assembly.components.some(
+    (c) => c.role === "chassis" || c.role === "actuator",
+  );
+  const needsBase = isMobileGoal && !hasMobileBase;
 
   useEffect(() => {
     return () => {
@@ -85,12 +97,13 @@ export function SimViewer({
     };
   }, []);
 
-  async function run() {
+  async function run(injectBase = false) {
     stopRef.current = false;
     setPhase("kicking");
     setError(null);
     setResult(null);
     setElapsed(0);
+    setUsedBase(injectBase);
     const startedAt = Date.now();
     const tick = setInterval(
       () => setElapsed(Math.floor((Date.now() - startedAt) / 1000)),
@@ -101,8 +114,22 @@ export function SimViewer({
       // switched templates; if they picked a different world, drop the override so
       // that template's own default goal applies (a goal_xy from another world
       // could land out of bounds).
+      // When the build has no drivable base, drop its electronics onto a generic
+      // diff-drive base so a mobile goal is simulatable instead of a dead end.
+      const components = injectBase
+        ? [
+            ...assembly.components,
+            {
+              ref: "sim-base",
+              device_id: "generic-diff-drive",
+              name: "Generic mobile base",
+              role: "chassis" as const,
+            },
+          ]
+        : assembly.components;
       const simAssembly = {
         ...assembly,
+        components,
         world: {
           template: world,
           goal_xy:
@@ -252,9 +279,16 @@ export function SimViewer({
               controller (LLM; slower). Off = deterministic scripted baseline.
             </span>
           </label>
+          {needsBase && (
+            <div className="degraded" style={{ marginTop: 0, marginBottom: 10 }}>
+              This build has no drivable base, so there&apos;s nothing to navigate
+              yet. You can still preview it on a <strong>generic mobile base</strong>{" "}
+              — we&apos;ll mount the electronics on a diff-drive chassis.
+            </div>
+          )}
           <button
             type="button"
-            onClick={run}
+            onClick={() => run(needsBase)}
             style={{
               fontSize: 13,
               padding: "8px 14px",
@@ -266,7 +300,9 @@ export function SimViewer({
               fontWeight: 600,
             }}
           >
-            Simulate in physics world →
+            {needsBase
+              ? "Add a generic mobile base & simulate →"
+              : "Simulate in physics world →"}
           </button>
         </div>
       )}
@@ -327,6 +363,26 @@ export function SimViewer({
           This assembly isn&apos;t simulatable yet: {result.reason}. The diff-drive
           navigation slice is what ships today; other goal kinds are honest
           &quot;not yet&quot; rather than a fake pass.
+          {needsBase && (
+            <div style={{ marginTop: 10 }}>
+              <button
+                type="button"
+                onClick={() => run(true)}
+                style={{
+                  fontSize: 13,
+                  padding: "7px 13px",
+                  borderRadius: 6,
+                  background: "var(--accent)",
+                  color: "#fff",
+                  border: 0,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                Add a generic mobile base &amp; simulate →
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -363,6 +419,18 @@ export function SimViewer({
                 : ""}
             </span>
           </div>
+
+          {usedBase && (
+            <div
+              className="proposal-disclaimer"
+              style={{ marginTop: 0, marginBottom: 10 }}
+            >
+              Previewed on a generic diff-drive base we added for this run — your
+              build doesn&apos;t include a drivable base. Add a wheeled base (e.g. a
+              Roomba, iRobot Create 3, or TurtleBot) to your idea to simulate the
+              real chassis.
+            </div>
+          )}
 
           {result.robot && result.robot.mounted_parts.length > 0 && (
             <div
@@ -545,7 +613,7 @@ export function SimViewer({
 
           <button
             type="button"
-            onClick={run}
+            onClick={() => run(usedBase)}
             disabled={busy}
             style={{
               marginTop: 12,

@@ -108,6 +108,16 @@ export function AssemblyPanel({ data }: { data: AssemblyResponse }) {
   const v = VERDICT_STYLE[data.feasibility.verdict];
   const { assembly, build_plan, feasibility } = data;
 
+  // A mobile goal with no drivable base is the common dead end: the build can't
+  // navigate and the physics sim returns "unsupported". Surface a way forward.
+  const isMobileGoal =
+    assembly.goal.kind === "navigate" || assembly.goal.kind === "locomote";
+  const missingBase =
+    isMobileGoal &&
+    !assembly.components.some(
+      (c) => c.role === "chassis" || c.role === "actuator",
+    );
+
   return (
     <div style={{ marginTop: 16 }}>
       <div
@@ -168,6 +178,24 @@ export function AssemblyPanel({ data }: { data: AssemblyResponse }) {
             <CheckRow key={c.id} check={c} />
           ))}
         </ul>
+        {missingBase && (
+          <div
+            style={{
+              marginTop: 10,
+              paddingTop: 10,
+              borderTop: "1px solid var(--border)",
+              fontSize: 13,
+              lineHeight: 1.5,
+            }}
+          >
+            <strong style={{ color: "var(--fg)" }}>How to fix:</strong> this build
+            has no drivable base, so it can&apos;t navigate. Add a wheeled base to
+            your idea — e.g. &quot;on an old Roomba&quot;, an iRobot Create 3, or a
+            TurtleBot — and re-propose. Or use{" "}
+            <em>Add a generic mobile base &amp; simulate</em> in the physics
+            simulation below to preview it on a proxy chassis right now.
+          </div>
+        )}
       </div>
 
       {/* Build plan */}
