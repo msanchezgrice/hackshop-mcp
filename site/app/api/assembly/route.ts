@@ -13,10 +13,21 @@ const SKIP = process.env.SKIP_RATE_LIMIT === "true";
 const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_HOUR ?? "200", 10);
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 const buckets = new Map<string, { count: number; resetAt: number }>();
+// Opportunistic eviction: bound the per-IP bucket map so it can't leak one
+// entry per distinct IP forever. Prune expired buckets past this threshold.
+const MAX_BUCKETS = 10_000;
+
+function pruneExpiredBuckets(now: number): void {
+  if (buckets.size < MAX_BUCKETS) return;
+  for (const [ip, b] of buckets) {
+    if (b.resetAt < now) buckets.delete(ip);
+  }
+}
 
 function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
   if (SKIP) return { ok: true };
   const now = Date.now();
+  pruneExpiredBuckets(now);
   const b = buckets.get(ip);
   if (!b || b.resetAt < now) {
     buckets.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });

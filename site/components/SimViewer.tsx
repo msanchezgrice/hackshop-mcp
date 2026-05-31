@@ -14,8 +14,11 @@ type Phase = "idle" | "kicking" | "running" | "done" | "error" | "unsupported";
 const POLL_MS = 1500;
 const MAX_POLLS = 120; // ~3 min ceiling
 
-// Worlds the diff-drive slice can actually run today. obstacle-course is the
-// default because that's where the stumbles/wedges/wobble show up.
+// The canonical WorldTemplate enum has six values (empty-room, obstacle-course,
+// ramp, tabletop, stairs, outdoor-flat). Only the four below are something the
+// diff-drive slice can *honestly* run today, so we only surface those — offering
+// stairs/outdoor-flat here would imply a capability we don't have. obstacle-
+// course is the default because that's where the stumbles/wedges/wobble show up.
 const WORLDS: { value: string; label: string }[] = [
   { value: "obstacle-course", label: "Obstacle course (default)" },
   { value: "empty-room", label: "Empty room" },
@@ -94,11 +97,19 @@ export function SimViewer({
       1000,
     );
     try {
-      // Run in the chosen world; clear any goal override so the template's own
-      // default goal applies.
+      // Run in the chosen world. Keep the LLM-chosen goal_xy when the user hasn't
+      // switched templates; if they picked a different world, drop the override so
+      // that template's own default goal applies (a goal_xy from another world
+      // could land out of bounds).
       const simAssembly = {
         ...assembly,
-        world: { template: world },
+        world: {
+          template: world,
+          goal_xy:
+            assembly.world.template === world
+              ? assembly.world.goal_xy
+              : undefined,
+        },
       };
       // Resolve component photos (device_id -> upstream URL) so the worker can
       // bake them into the shareable summary carousel server-side.
@@ -190,6 +201,7 @@ export function SimViewer({
             the run video) linked from the result.
           </div>
           <label
+            htmlFor="sim-world"
             style={{
               display: "flex",
               alignItems: "center",
@@ -199,6 +211,7 @@ export function SimViewer({
           >
             <span style={{ fontSize: 13 }}>World:</span>
             <select
+              id="sim-world"
               value={world}
               onChange={(e) => setWorld(e.target.value)}
               style={{
@@ -279,9 +292,31 @@ export function SimViewer({
             <strong>{elapsed}s</strong> elapsed
             <span style={{ color: "var(--muted)" }}>
               {" "}
-              (rollout + offscreen render typically 5–30s)
+              {elapsed < 10
+                ? "(warming up the simulator…)"
+                : "(the first run after idle can take ~60s while the simulator warms up; warm runs are 5–30s)"}
             </span>
           </span>
+          <button
+            type="button"
+            onClick={() => {
+              stopRef.current = true;
+              setPhase("idle");
+              setError(null);
+            }}
+            style={{
+              marginLeft: "auto",
+              fontSize: 12,
+              padding: "4px 10px",
+              borderRadius: 4,
+              background: "transparent",
+              color: "var(--muted)",
+              border: "1px solid var(--border)",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
         </div>
       )}
 
@@ -298,7 +333,7 @@ export function SimViewer({
       {phase === "done" && result && (
         <div
           style={{
-            border: `1px solid ${result.success ? "var(--ok)" : "#ef4444"}`,
+            border: `1px solid ${result.success ? "var(--ok)" : "var(--danger, #ef4444)"}`,
             borderRadius: 8,
             padding: 14,
             background: result.success
@@ -309,7 +344,7 @@ export function SimViewer({
           <div
             style={{
               fontWeight: 700,
-              color: result.success ? "var(--ok)" : "#dc2626",
+              color: result.success ? "var(--ok)" : "var(--fail, #ef4444)",
               marginBottom: 8,
             }}
           >

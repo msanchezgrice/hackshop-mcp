@@ -122,22 +122,46 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
         </div>
       )}
 
-      <input
-        type="text"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        placeholder="Filter devices…"
+      <div
         style={{
-          width: "100%",
-          background: "var(--code-bg-2)",
-          color: "var(--fg)",
-          border: "1px solid var(--border)",
-          borderRadius: 6,
-          padding: "10px 12px",
-          fontSize: 15,
-          marginBottom: 16,
+          position: "sticky",
+          top: 0,
+          zIndex: 2,
+          background: "var(--bg)",
+          paddingBottom: 8,
+          marginBottom: 8,
         }}
-      />
+      >
+        <label htmlFor="device-filter" className="sr-only">
+          Filter devices
+        </label>
+        <input
+          id="device-filter"
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Filter devices…"
+          style={{
+            width: "100%",
+            background: "var(--code-bg-2)",
+            color: "var(--fg)",
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            padding: "10px 12px",
+            fontSize: 15,
+          }}
+        />
+        <div
+          aria-live="polite"
+          style={{
+            fontSize: 12,
+            color: "var(--muted)",
+            marginTop: 6,
+          }}
+        >
+          {visible.length} of {devices.length} devices
+        </div>
+      </div>
 
       <div
         style={{

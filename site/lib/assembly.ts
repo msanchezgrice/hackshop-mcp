@@ -84,14 +84,16 @@ export const AssemblyGoal = z.object({
 });
 export type AssemblyGoal = z.infer<typeof AssemblyGoal>;
 
+// Canonical WorldTemplate enum — must stay in sync across the site schema, the
+// MCP server (src/tools/simulate_assembly.ts), and the Python worker.
 export const WorldSpec = z.object({
   template: z.enum([
     "empty-room",
     "obstacle-course",
     "ramp",
+    "tabletop",
     "stairs",
     "outdoor-flat",
-    "tabletop",
   ]),
   goal_xy: z.tuple([z.number(), z.number()]).optional(),
 });

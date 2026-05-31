@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/api/:path*",
+      "has": [{ "type": "host", "value": "hackshop.dev" }],
+      "destination": "https://www.hackshop.dev/api/:path*",
+      "statusCode": 308
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "hackshop.dev" }],
+      "destination": "https://www.hackshop.dev/:path*",
+      "statusCode": 308
+    }
+  ]
+}

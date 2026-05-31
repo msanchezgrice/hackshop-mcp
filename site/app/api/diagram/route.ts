@@ -16,8 +16,24 @@ const diagramInput = z.object({
 // Per-process cache. Same idea+devices -> same image. Lost on cold start
 // (acceptable; restarts are rare and image gen is the cheapest part of the
 // flow when amortized across a CDN-cached <img> request).
+//
+// Each entry holds a full base64 PNG (~1-2 MB), so an unbounded Map would balloon
+// process memory. Cap at MAX_CACHE_ENTRIES with simple LRU eviction (Map keeps
+// insertion order; re-inserting on hit moves a key to the most-recent position).
 const cache = new Map<string, { png_b64: string; generated_at: number }>();
 const CACHE_MS = 24 * 60 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 50;
+
+function cacheSet(key: string, png_b64: string): void {
+  // Refresh position by deleting first so re-inserts become most-recent.
+  cache.delete(key);
+  cache.set(key, { png_b64, generated_at: Date.now() });
+  while (cache.size > MAX_CACHE_ENTRIES) {
+    const oldest = cache.keys().next().value;
+    if (oldest === undefined) break;
+    cache.delete(oldest);
+  }
+}
 
 // High-fidelity technical schematic prompt. Tested on gpt-image-2; produces
 // architecture diagram + BOM + setup steps in one canvas with readable text.
@@ -94,16 +110,30 @@ export async function POST(req: Request): Promise<Response> {
 
   const cacheKey = `${parsed.data.idea}::${named.join(",")}`;
   const hit = cache.get(cacheKey);
-  if (hit && Date.now() - hit.generated_at < CACHE_MS) {
-    return NextResponse.json({
-      image_b64: hit.png_b64,
-      cached: true,
-    });
+  if (hit) {
+    if (Date.now() - hit.generated_at < CACHE_MS) {
+      // Refresh LRU position on hit.
+      cache.delete(cacheKey);
+      cache.set(cacheKey, hit);
+      return NextResponse.json({
+        image_b64: hit.png_b64,
+        cached: true,
+      });
+    }
+    // Stale: drop it so it can't keep occupying a slot / hold a large PNG.
+    cache.delete(cacheKey);
   }
 
   const prompt = buildPrompt(parsed.data.idea, named);
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  // Bound the OpenAI call well below the 300s function ceiling so a stuck
+  // generation fails fast (and surfaces a clean 502) instead of pinning the
+  // function until Vercel kills it.
+  const client = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    timeout: 120_000,
+    maxRetries: 1,
+  });
 
   let png_b64: string;
   try {
@@ -133,7 +163,7 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  cache.set(cacheKey, { png_b64, generated_at: Date.now() });
+  cacheSet(cacheKey, png_b64);
 
   return NextResponse.json({
     image_b64: png_b64,

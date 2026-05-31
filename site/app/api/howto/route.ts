@@ -14,9 +14,21 @@ const howtoInput = z.object({
 });
 
 // Tiny in-memory cache: per device + idea bucket. Cuts repeat-query cost by
-// ~10x; lost on cold start, which is fine for V0.
+// ~10x; lost on cold start, which is fine for V0. Bounded with LRU eviction so
+// distinct (device, idea) pairs can't grow the map without limit.
 const cache = new Map<string, { generated_at: number; markdown: string }>();
 const CACHE_MS = 24 * 60 * 60 * 1000; // 1 day
+const MAX_CACHE_ENTRIES = 200;
+
+function cacheSet(key: string, markdown: string): void {
+  cache.delete(key);
+  cache.set(key, { generated_at: Date.now(), markdown });
+  while (cache.size > MAX_CACHE_ENTRIES) {
+    const oldest = cache.keys().next().value;
+    if (oldest === undefined) break;
+    cache.delete(oldest);
+  }
+}
 
 const SYSTEM_PROMPT = `You are a hardware-literate guide for tinkerers. Given a device and (optionally) a project idea, write a 5-10 step walkthrough to get from "have the device" to "running the project."
 
@@ -91,13 +103,20 @@ export async function POST(req: Request): Promise<Response> {
 
   const cacheKey = `${parsed.data.device_id}::${parsed.data.idea ?? ""}`;
   const hit = cache.get(cacheKey);
-  if (hit && Date.now() - hit.generated_at < CACHE_MS) {
-    return NextResponse.json({
-      device_id: device.id,
-      device_name: device.name,
-      markdown: hit.markdown,
-      cached: true,
-    });
+  if (hit) {
+    if (Date.now() - hit.generated_at < CACHE_MS) {
+      // Refresh LRU position on hit.
+      cache.delete(cacheKey);
+      cache.set(cacheKey, hit);
+      return NextResponse.json({
+        device_id: device.id,
+        device_name: device.name,
+        markdown: hit.markdown,
+        cached: true,
+      });
+    }
+    // Stale: evict on read so it doesn't keep occupying a slot.
+    cache.delete(cacheKey);
   }
 
   const userPrompt = [
@@ -129,7 +148,7 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  cache.set(cacheKey, { generated_at: Date.now(), markdown });
+  cacheSet(cacheKey, markdown);
 
   return NextResponse.json({
     device_id: device.id,

@@ -135,18 +135,16 @@ export async function proposePremium(
 
   const modelId = process.env.HACKSHOP_MODEL ?? "claude-haiku-4-5-20251001";
 
-  let raw: string;
-  try {
-    const result = await generateText({
-      model: anthropic(modelId),
-      system: SYSTEM_PROMPT,
-      prompt: userPrompt,
-      temperature: 0.4,
-    });
-    raw = result.text;
-  } catch {
-    return [];
-  }
+  // Let a real model/transport failure propagate so the caller can tell a
+  // genuine "no good fit" (returns []) apart from "the lookup broke" (throws)
+  // and surface the right message. An empty result is an answer; an error is not.
+  const result = await generateText({
+    model: anthropic(modelId),
+    system: SYSTEM_PROMPT,
+    prompt: userPrompt,
+    temperature: 0.4,
+  });
+  const raw = result.text;
 
   const sampled = parseLoose<SamplerPick>(raw);
   if (!sampled || !Array.isArray(sampled.picks)) return [];

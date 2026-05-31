@@ -3,9 +3,25 @@
 import type {
   AssemblyResponse,
   FeasibilityCheck,
+  FeasibilityProvenance,
   FeasibilityStatus,
   FeasibilityVerdict,
 } from "@/lib/assembly";
+
+// Map raw enum values to human-readable labels so we never leak tokens like
+// "warn" or "derived" straight into the UI.
+const STATUS_LABEL: Record<FeasibilityStatus, string> = {
+  pass: "Pass",
+  warn: "Warning",
+  fail: "Fail",
+  unknown: "Unknown",
+};
+
+const PROVENANCE_LABEL: Record<FeasibilityProvenance, string> = {
+  spec: "from spec",
+  derived: "inferred",
+  unknown: "unverified",
+};
 
 // Presentational only — the parent fetches /api/assembly and passes the result.
 // Renders the feasibility verdict (the "could this actually work?" answer) and
@@ -24,14 +40,14 @@ const VERDICT_STYLE: Record<
   "feasible-with-warnings": {
     label: "Feasible — with warnings",
     bg: "rgba(234,179,8,0.12)",
-    fg: "var(--warn, #b45309)",
-    border: "var(--warn, #eab308)",
+    fg: "var(--warn, #facc15)",
+    border: "var(--warn, #facc15)",
   },
   infeasible: {
     label: "Infeasible as specified",
     bg: "rgba(239,68,68,0.12)",
-    fg: "#dc2626",
-    border: "#ef4444",
+    fg: "var(--fail, #ef4444)",
+    border: "var(--danger, #ef4444)",
   },
   unknown: {
     label: "Not enough data",
@@ -51,13 +67,15 @@ function CheckRow({ check }: { check: FeasibilityCheck }) {
   return (
     <li style={{ marginBottom: 10, listStyle: "none" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <span className={statusPillClass(check.status)}>{check.status}</span>
+        <span className={statusPillClass(check.status)}>
+          {STATUS_LABEL[check.status]}
+        </span>
         <strong style={{ fontSize: 14 }}>{check.label}</strong>
         <span
           style={{ fontSize: 11, color: "var(--muted)" }}
           title="Confidence in this check's inputs"
         >
-          ({check.provenance})
+          ({PROVENANCE_LABEL[check.provenance]})
         </span>
       </div>
       <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 2 }}>

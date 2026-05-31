@@ -131,4 +131,10 @@ export interface ProposeResponse {
   degraded: boolean;
   message?: string;
   premium_proposals?: PremiumProposal[];
+  // Set only when include_premium was requested, so the UI can explain an
+  // empty premium section instead of silently rendering nothing:
+  //   ok    -> at least one premium pick
+  //   empty -> the sampler ran but found no good fit
+  //   error -> the premium lookup itself failed (used picks unaffected)
+  premium_status?: "ok" | "empty" | "error";
 }

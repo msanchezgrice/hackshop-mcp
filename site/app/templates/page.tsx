@@ -3,13 +3,15 @@ import type { Metadata } from "next";
 import {
   TEMPLATES,
   TEMPLATE_CATEGORIES,
+  TEMPLATE_COUNT,
+  VERIFIED_TEMPLATE_COUNT,
   type Template,
 } from "@/lib/templates";
 
 export const metadata: Metadata = {
   title: "Project templates · hackshop-mcp",
   description:
-    "23 verified project templates: idea + recommended hardware + viability assessment. Repurpose old phones, e-readers, Roombas, and DSLRs into useful new things.",
+    "Verified project templates: idea + recommended hardware + viability assessment. Repurpose old phones, e-readers, Roombas, and DSLRs into useful new things.",
 };
 
 const VIABILITY_LABEL: Record<Template["viability"], string> = {
@@ -115,7 +117,8 @@ export default function TemplatesPage() {
       <header>
         <h1>Project templates</h1>
         <p className="tagline">
-          23 verified project templates. Each one is a real path —{" "}
+          {TEMPLATE_COUNT} project templates, {VERIFIED_TEMPLATE_COUNT}{" "}
+          verified. Each one is a real path —{" "}
           <span style={{ color: "var(--ok)" }}>verified</span> means the hack is
           documented and reproducible;{" "}
           <span style={{ color: "var(--warn)" }}>iffy</span> works with caveats
@@ -129,10 +132,8 @@ export default function TemplatesPage() {
           <a className="badge" href="https://github.com/msanchezgrice/hackshop-mcp">
             GitHub
           </a>
-          <span className="badge">{TEMPLATES.length} templates</span>
-          <span className="badge">
-            {TEMPLATES.filter((t) => t.viability === "verified").length} verified
-          </span>
+          <span className="badge">{TEMPLATE_COUNT} templates</span>
+          <span className="badge">{VERIFIED_TEMPLATE_COUNT} verified</span>
         </div>
       </header>
 

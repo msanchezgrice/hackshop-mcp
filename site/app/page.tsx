@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DemoForm } from "@/components/DemoForm";
+import { TEMPLATE_COUNT } from "@/lib/templates";
 
 export default function Home() {
   return (
@@ -17,7 +18,7 @@ export default function Home() {
         </p>
         <div className="badges">
           <Link className="badge" href="/templates">
-            23 templates
+            {TEMPLATE_COUNT} templates
           </Link>
           <Link className="badge" href="/inventory">
             Your inventory
@@ -32,7 +33,7 @@ export default function Home() {
       <p style={{ fontSize: 14, color: "var(--muted)", marginTop: -4 }}>
         Need inspiration?{" "}
         <Link href="/templates">
-          Browse 23 verified project templates →
+          Browse {TEMPLATE_COUNT} project templates →
         </Link>{" "}
         (old phone as a clock, e-paper calendar, Roomba as a robot, etc.)
       </p>
@@ -41,15 +42,43 @@ export default function Home() {
       <h2>What you get</h2>
       <div className="grid">
         <div className="feature">
-          <span className="num">3-5</span>
+          <span className="icon" aria-hidden="true">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+              <path d="M4 9h16M9 9v11" />
+            </svg>
+          </span>
           <div className="title">Hardware candidates</div>
           <p className="desc">
-            Each with hack difficulty, brick risk, community size, used-market
-            price range, and an estimated setup time.
+            3-5 options, each with hack difficulty, brick risk, community size,
+            used-market price range, and an estimated setup time.
           </p>
         </div>
         <div className="feature">
-          <span className="num">→</span>
+          <span className="icon" aria-hidden="true">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07l-1.41 1.41" />
+              <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.41-1.41" />
+            </svg>
+          </span>
           <div className="title">Live links</div>
           <p className="desc">
             Click straight through to current eBay listings, Hackaday articles,
@@ -57,7 +86,21 @@ export default function Home() {
           </p>
         </div>
         <div className="feature">
-          <span className="num">📋</span>
+          <span className="icon" aria-hidden="true">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6M8 13h8M8 17h5" />
+            </svg>
+          </span>
           <div className="title">How-to guides</div>
           <p className="desc">
             One click generates a step-by-step walkthrough customized to your

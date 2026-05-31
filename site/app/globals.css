@@ -9,11 +9,20 @@
   --border: #232323;
   --ok: #4ade80;
   --warn: #facc15;
+  /* Failure / danger. --fail is the readable text hue, --danger the border hue.
+     Kept as named tokens so component styles can drop hardcoded hex. */
+  --fail: #f87171;
+  --danger: #ef4444;
   --max: 760px;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* Keyboard-visible focus ring for every interactive element. Mouse clicks
+   (which match :focus but not :focus-visible) stay clean; keyboard/AT users
+   get a clear accent outline. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 body {
   margin: 0;
   background: var(--bg);
@@ -24,6 +33,12 @@ body {
 }
 
 main { max-width: var(--max); margin: 0 auto; padding: 64px 24px 96px; }
+
+/* Visually-hidden but accessible to screen readers. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 header { padding-bottom: 40px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
 
 h1 { font-size: 40px; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; font-weight: 700; }
@@ -58,6 +73,8 @@ pre code { background: transparent; padding: 0; border: 0; }
 @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } h1 { font-size: 32px; } }
 .feature { background: var(--code-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border); }
 .feature .num { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 22px; display: block; margin-bottom: 4px; }
+.feature .icon { color: var(--accent); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.feature .icon svg { display: block; }
 .feature .title { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
 .feature .desc { font-size: 14px; color: var(--muted); margin: 0; }
 
@@ -83,13 +100,20 @@ li { margin-bottom: 6px; }
   resize: vertical;
 }
 .demo-form textarea { min-height: 84px; line-height: 1.4; }
-.demo-form textarea:focus, .demo-form input:focus { outline: none; border-color: var(--accent); }
+/* Drop the default outline only for pointer focus; keyboard focus keeps the
+   global :focus-visible ring. Either way the accent border highlights the field. */
+.demo-form textarea:focus, .demo-form input:focus { border-color: var(--accent); }
+.demo-form textarea:focus:not(:focus-visible),
+.demo-form input:focus:not(:focus-visible) { outline: none; }
 .demo-form .row { display: grid; grid-template-columns: 160px 1fr; gap: 12px; }
 @media (max-width: 600px) { .demo-form .row { grid-template-columns: 1fr; } }
 .demo-form button {
   margin-top: 16px; padding: 10px 18px; font: inherit; font-size: 15px; font-weight: 600;
   background: var(--accent); color: #fff; border: 0; border-radius: 6px; cursor: pointer;
   transition: background 0.15s;
+  /* Reserve width so swapping label ↔ spinner doesn't reflow the layout. */
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 0; min-width: 180px;
 }
 .demo-form button:hover:not(:disabled) { background: var(--accent-dim); }
 .demo-form button:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -155,9 +179,35 @@ li { margin-bottom: 6px; }
   border-bottom-color: transparent; border-radius: 50%; vertical-align: middle;
   margin-right: 8px; animation: spin 0.7s linear infinite;
 }
+/* Explicit spinner hues so contrast doesn't depend on the button's inherited
+   text color. --on-accent for white-on-orange buttons, --on-dark for the
+   light-bordered buttons sitting on the dark card background. */
+.spinner.on-accent { border-color: #fff; border-bottom-color: transparent; }
+.spinner.on-dark { border-color: var(--accent); border-bottom-color: transparent; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .install-note { color: var(--muted); font-size: 13px; margin-top: -16px; margin-bottom: 24px; }
+
+/* Suspense skeleton for the demo form — matches the real field shapes so the
+   hero CTA doesn't collapse/shift while the client component hydrates. */
+.skeleton {
+  background: var(--code-bg-2);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: "";
+  position: absolute; inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  animation: skeleton-shimmer 1.4s infinite;
+}
+.skeleton-label { width: 90px; height: 13px; margin-bottom: 10px; }
+.skeleton-textarea { width: 100%; height: 84px; margin-bottom: 16px; }
+.skeleton-button { width: 180px; height: 42px; }
+@keyframes skeleton-shimmer { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
 
 /* Markdown rendering (LLM-emitted in rationale_md / next_steps_md) */
 .md p { margin: 0 0 8px; }

@@ -4,7 +4,9 @@ import { generateText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import {
   Assembly,
+  BuildAction,
   BuildPlan,
+  ComponentRole,
   Transport,
   type AssemblyComponent,
   type BuildStep,
@@ -291,7 +293,7 @@ Return JSON only (no markdown) with this exact shape:
   "roles":  [{ "ref": "c1", "role": "compute|actuator|sensor|display|power|chassis|peripheral" }],
   "edges":  [{ "from": "c1", "to": "c2", "transport": "usb|i2c|spi|gpio|uart|wifi|ble|ros2|hdmi|aux|power", "payload": "optional, e.g. /cmd_vel" }],
   "goal":   { "kind": "navigate|locomote|manipulate|sense-act|display-loop", "spec": "one sentence", "success_metric": "measurable" },
-  "world":  { "template": "empty-room|obstacle-course|ramp|stairs|outdoor-flat|tabletop", "goal_xy": [x, y] },
+  "world":  { "template": "empty-room|obstacle-course|ramp|tabletop|stairs|outdoor-flat", "goal_xy": [x, y] },
   "steps":  [{ "action": "solder|flash|glue|connect|crimp|mount|print_3d|calibrate|test", "parts": ["device_id or consumable"], "tools": ["tool"], "detail": "imperative sentence", "est_minutes": 10, "depends_on": [step numbers, 1-based] }]
 }
 
@@ -339,24 +341,37 @@ function composeFromLlm(
   parsed: z.infer<typeof llmResponse>,
   brickNotes: Map<string, string | null>,
 ): GenerateResult {
+  // Coerce a loose role string to the ComponentRole enum, falling back to the
+  // catalog-suggested role on any invalid token (one bad role no longer breaks
+  // the whole parse).
   const roleByRef = new Map(parsed.roles.map((r) => [r.ref, r.role]));
-  const components: AssemblyComponent[] = metas.map((m, i) => ({
-    ref: refFor(i),
-    device_id: m.id,
-    name: m.name,
-    // role validated by Assembly.parse below; fall back to suggested role.
-    role: (roleByRef.get(refFor(i)) ?? m.defaultRole) as never,
-  }));
+  const components: AssemblyComponent[] = metas.map((m, i) => {
+    const rawRole = roleByRef.get(refFor(i));
+    const role = ComponentRole.safeParse(rawRole);
+    return {
+      ref: refFor(i),
+      device_id: m.id,
+      name: m.name,
+      role: role.success ? role.data : m.defaultRole,
+    };
+  });
 
   const refSet = new Set(components.map((c) => c.ref));
+  // Pre-filter edges: drop ones referencing unknown refs OR carrying an invalid
+  // transport token. A single bad edge drops only itself, not the whole plan.
   const edges = parsed.edges
     .filter((e) => refSet.has(e.from) && refSet.has(e.to))
-    .map((e) => ({
-      from: e.from,
-      to: e.to,
-      transport: e.transport as never,
-      payload: e.payload,
-    }));
+    .map((e) => {
+      const transport = Transport.safeParse(e.transport);
+      if (!transport.success) return null;
+      return {
+        from: e.from,
+        to: e.to,
+        transport: transport.data,
+        payload: e.payload,
+      };
+    })
+    .filter((e): e is NonNullable<typeof e> => e !== null);
 
   const assembly = Assembly.parse({
     idea,
@@ -370,19 +385,44 @@ function composeFromLlm(
   const computeIds = new Set(
     components.filter((c) => c.role === "compute").map((c) => c.device_id),
   );
-  const steps = parsed.steps.map((s, idx) => ({
+  // Pre-filter steps: drop any with an invalid action token rather than letting
+  // one bad step collapse the entire build plan to the deterministic fallback.
+  // Re-number the survivors so `order` stays a dense 1-based sequence and
+  // depends_on references remain valid.
+  type ParsedStep = (typeof parsed.steps)[number];
+  const validStepEntries = parsed.steps
+    .map((s, originalIdx) => {
+      const action = BuildAction.safeParse(s.action);
+      return action.success
+        ? { s, action: action.data, originalOrder: originalIdx + 1 }
+        : null;
+    })
+    .filter(
+      (e): e is { s: ParsedStep; action: BuildAction; originalOrder: number } =>
+        e !== null,
+    );
+
+  // Map original 1-based order -> new dense 1-based order for depends_on remap.
+  const orderRemap = new Map<number, number>();
+  validStepEntries.forEach((entry, idx) => {
+    orderRemap.set(entry.originalOrder, idx + 1);
+  });
+
+  const steps: BuildStep[] = validStepEntries.map((entry, idx) => ({
     order: idx + 1,
-    action: s.action as never,
-    parts: s.parts.map((p) => idByRef.get(p) ?? p),
-    tools: s.tools,
-    detail: s.detail,
-    est_minutes: Math.max(1, Math.round(s.est_minutes)),
+    action: entry.action,
+    parts: entry.s.parts.map((p) => idByRef.get(p) ?? p),
+    tools: entry.s.tools,
+    detail: entry.s.detail,
+    est_minutes: Math.max(1, Math.round(entry.s.est_minutes)),
     risk_note:
-      s.action === "flash"
+      entry.action === "flash"
         ? // attach the brick disclaimer for any compute device flashed here
-          firstBrickNote(s.parts, idByRef, computeIds, brickNotes)
+          firstBrickNote(entry.s.parts, idByRef, computeIds, brickNotes)
         : null,
-    depends_on: s.depends_on.filter((d) => Number.isInteger(d) && d >= 1),
+    depends_on: entry.s.depends_on
+      .map((d) => orderRemap.get(d))
+      .filter((d): d is number => d !== undefined && d >= 1),
   }));
 
   const build_plan = BuildPlan.parse({

@@ -220,7 +220,7 @@ function DemoFormInner() {
         <button type="submit" disabled={loading || !idea.trim()}>
           {loading ? (
             <>
-              <span className="spinner" />
+              <span className="spinner on-accent" />
               Thinking…
             </>
           ) : (
@@ -449,11 +449,16 @@ function DemoFormInner() {
                       border: "1px solid var(--accent)",
                       cursor: assemblyLoading ? "default" : "pointer",
                       fontWeight: 600,
+                      // Reserve width so the spinner swap doesn't reflow.
+                      minWidth: 300,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
                     {assemblyLoading ? (
                       <>
-                        <span className="spinner" /> Planning build &amp; checking feasibility…
+                        <span className="spinner on-dark" /> Planning build &amp; checking feasibility…
                       </>
                     ) : (
                       "Plan build & check feasibility →"
@@ -618,14 +623,9 @@ function DemoFormInner() {
                         <span className="spinner" /> Generating walkthrough…
                       </div>
                     ) : (
-                      <pre style={{
-                        background: "transparent",
-                        border: 0,
-                        padding: 0,
-                        whiteSpace: "pre-wrap",
-                        fontFamily: "inherit",
-                        margin: 0,
-                      }}>{howtoMd}</pre>
+                      <div className="md">
+                        <ReactMarkdown>{howtoMd ?? ""}</ReactMarkdown>
+                      </div>
                     )}
                     <button
                       type="button"
@@ -651,7 +651,7 @@ function DemoFormInner() {
               </article>
             ))}
 
-            {result.premium_proposals && result.premium_proposals.length > 0 && (
+            {result.premium_status && (
               <>
                 <h3
                   style={{
@@ -662,6 +662,8 @@ function DemoFormInner() {
                 >
                   Premium open-source hardware (buy new)
                 </h3>
+                {result.premium_status === "ok" && result.premium_proposals ? (
+                  <>
                 <p
                   style={{
                     fontSize: 13,
@@ -672,7 +674,9 @@ function DemoFormInner() {
                 >
                   These are open-source NEW products from Pollen Robotics,
                   Bitcraze, Adafruit, Pimoroni, Pine64, etc. Premium price; full
-                  capability sets out of the box.
+                  capability sets out of the box — they ship ready to run, so
+                  there&apos;s no firmware-flashing how-to like the used picks
+                  above.
                 </p>
                 {result.premium_proposals.map((p) => (
                   <article key={p.id} className="proposal">
@@ -750,6 +754,19 @@ function DemoFormInner() {
                     </div>
                   </article>
                 ))}
+                  </>
+                ) : result.premium_status === "empty" ? (
+                  <p className="degraded" style={{ marginTop: 0 }}>
+                    No premium open-source hardware matched this idea — the
+                    used-hardware picks above are the recommendation.
+                  </p>
+                ) : (
+                  <p className="degraded" style={{ marginTop: 0 }}>
+                    Premium lookup is temporarily unavailable. The used-hardware
+                    picks above are unaffected — try again to see premium
+                    options.
+                  </p>
+                )}
               </>
             )}
           </>
@@ -759,11 +776,23 @@ function DemoFormInner() {
   );
 }
 
+// Skeleton mirroring the real form's shape (label + textarea + submit button)
+// so the Suspense fallback doesn't collapse the hero CTA and shift layout.
+function DemoFormSkeleton() {
+  return (
+    <div className="demo-form" aria-hidden="true">
+      <div className="skeleton skeleton-label" />
+      <div className="skeleton skeleton-textarea" />
+      <div className="skeleton skeleton-button" />
+    </div>
+  );
+}
+
 // Wrapped in Suspense because useSearchParams() requires a Suspense boundary
 // during static rendering. Next.js 16 throws a build error otherwise.
 export function DemoForm() {
   return (
-    <Suspense fallback={<div className="demo-form">Loading…</div>}>
+    <Suspense fallback={<DemoFormSkeleton />}>
       <DemoFormInner />
     </Suspense>
   );

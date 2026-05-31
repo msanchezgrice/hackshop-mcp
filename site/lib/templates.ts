@@ -1,4 +1,4 @@
-// 23 project templates that prime the propose_hardware tool.
+// Project templates that prime the propose_hardware tool.
 //
 // Each entry includes a `viability` field documenting whether the underlying
 // hack is real (community-verified path), iffy (works but with caveats), or
@@ -391,6 +391,13 @@ export const TEMPLATES: Template[] = [
     category: "compute",
   },
 ];
+
+// Single source of truth for the counts surfaced across the marketing pages.
+// Derived from TEMPLATES so the prose, badges, and footers can never drift.
+export const TEMPLATE_COUNT = TEMPLATES.length;
+export const VERIFIED_TEMPLATE_COUNT = TEMPLATES.filter(
+  (t) => t.viability === "verified",
+).length;
 
 export const TEMPLATE_CATEGORIES: Record<Template["category"], string> = {
   display: "Display & Ambient",

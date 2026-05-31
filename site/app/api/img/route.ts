@@ -26,6 +26,13 @@ const CACHE_HEADERS: HeadersInit = {
     "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800, immutable",
 };
 
+// Bound the upstream fetch so a slow/hung CDN can't pin the function until its
+// maxDuration ceiling. Device thumbnails are small; 8s is generous.
+const UPSTREAM_TIMEOUT_MS = 8_000;
+// Reject oversized payloads (defends the function from buffering a huge file
+// and from being used as a generic proxy). 10 MB is far above any device photo.
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
 export async function GET(req: Request): Promise<Response> {
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get("slug");
@@ -49,10 +56,18 @@ export async function GET(req: Request): Promise<Response> {
       headers: FETCH_HEADERS,
       // Follow Wikipedia's Special:FilePath redirect chain.
       redirect: "follow",
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
   } catch (err) {
+    const aborted =
+      err instanceof Error &&
+      (err.name === "AbortError" || err.name === "TimeoutError");
     return NextResponse.json(
-      { error: `upstream fetch failed: ${(err as Error).message}` },
+      {
+        error: aborted
+          ? `upstream image fetch timed out after ${UPSTREAM_TIMEOUT_MS / 1000}s`
+          : `upstream fetch failed: ${(err as Error).message}`,
+      },
       { status: 502 },
     );
   }
@@ -69,12 +84,39 @@ export async function GET(req: Request): Promise<Response> {
     );
   }
 
+  // Reject anything that declares itself too large before we buffer it.
+  const declaredLength = Number(upstream.headers.get("Content-Length") ?? "");
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_IMAGE_BYTES) {
+    return NextResponse.json(
+      { error: `upstream image too large (${declaredLength} bytes > ${MAX_IMAGE_BYTES})` },
+      { status: 502 },
+    );
+  }
+
+  const passthroughHeaders: HeadersInit = {
+    "Content-Type": contentType,
+    ...CACHE_HEADERS,
+  };
+
+  // Prefer streaming the upstream body straight through (no buffering) when the
+  // platform gives us a readable stream. Only fall back to buffering when the
+  // upstream omitted Content-Length, so we can enforce the size cap ourselves.
+  if (upstream.body && declaredLength) {
+    return new Response(upstream.body, {
+      status: 200,
+      headers: { ...passthroughHeaders, "Content-Length": String(declaredLength) },
+    });
+  }
+
   const bytes = await upstream.arrayBuffer();
+  if (bytes.byteLength > MAX_IMAGE_BYTES) {
+    return NextResponse.json(
+      { error: `upstream image too large (${bytes.byteLength} bytes > ${MAX_IMAGE_BYTES})` },
+      { status: 502 },
+    );
+  }
   return new Response(bytes, {
     status: 200,
-    headers: {
-      "Content-Type": contentType,
-      ...CACHE_HEADERS,
-    },
+    headers: passthroughHeaders,
   });
 }

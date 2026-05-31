@@ -24,10 +24,21 @@ const SKIP = process.env.SKIP_RATE_LIMIT === "true";
 const RATE_LIMIT = parseInt(process.env.RATE_LIMIT_PER_HOUR ?? "200", 10);
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 const buckets = new Map<string, { count: number; resetAt: number }>();
+// Opportunistic eviction: an unbounded map leaks one entry per distinct IP
+// forever. When it grows past this many entries, drop expired buckets.
+const MAX_BUCKETS = 10_000;
+
+function pruneExpiredBuckets(now: number): void {
+  if (buckets.size < MAX_BUCKETS) return;
+  for (const [ip, b] of buckets) {
+    if (b.resetAt < now) buckets.delete(ip);
+  }
+}
 
 function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
   if (SKIP) return { ok: true };
   const now = Date.now();
+  pruneExpiredBuckets(now);
   const b = buckets.get(ip);
   if (!b || b.resetAt < now) {
     buckets.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
@@ -81,15 +92,26 @@ export async function POST(req: Request): Promise<Response> {
 
   // Run primary (used hardware) and premium (open-source new) in parallel
   // when include_premium is set. Used hardware is the lead path either way.
-  const [result, premiumProposals] = await Promise.all([
+  // Wrap premium in a settled result so a premium failure never sinks the
+  // primary proposal, but we still distinguish empty (no fit) from error.
+  const [result, premiumOutcome] = await Promise.all([
     propose(parsed.data, devices),
     parsed.data.include_premium
-      ? proposePremium(parsed.data.idea, loadPremiumCatalog()).catch(() => [])
-      : Promise.resolve([]),
+      ? proposePremium(parsed.data.idea, loadPremiumCatalog()).then(
+          (proposals) => ({ ok: true as const, proposals }),
+          (err: unknown) => ({ ok: false as const, err }),
+        )
+      : Promise.resolve(null),
   ]);
 
-  if (parsed.data.include_premium) {
-    result.premium_proposals = premiumProposals;
+  if (premiumOutcome) {
+    if (premiumOutcome.ok) {
+      result.premium_proposals = premiumOutcome.proposals;
+      result.premium_status = premiumOutcome.proposals.length ? "ok" : "empty";
+    } else {
+      result.premium_proposals = [];
+      result.premium_status = "error";
+    }
   }
 
   return NextResponse.json(result);
