@@ -28,6 +28,10 @@ class WorldBuild:
     goal_radius: float
     # Names of obstacle/wall geoms, so the runtime can classify collisions.
     obstacle_geoms: list[str]
+    # When a requested template isn't modelled distinctly yet (stairs,
+    # outdoor-flat) we approximate it with another layout. This carries an
+    # honest note so telemetry/summary never silently mislabel the geometry.
+    approximated_as: Optional[str] = None
 
 
 def _walls(half: float, h: float = 0.25, t: float = 0.05) -> tuple[str, list[str]]:
@@ -62,6 +66,16 @@ def _cyl(name: str, x: float, y: float, r: float, h: float) -> str:
     )
 
 
+def _clamp_arena(
+    gx: float, gy: float, half: float, margin: float = 0.4
+) -> Tuple[float, float]:
+    """Keep a goal inside the walled arena. An LLM-supplied goal_xy is unreliable
+    and can land on/outside a wall (e.g. (3,4) in a half=3 arena), which is
+    unreachable and makes the run burn its full duration. Clamp to the interior."""
+    lim = max(0.0, half - margin)
+    return (max(-lim, min(lim, gx)), max(-lim, min(lim, gy)))
+
+
 def _pull_in(
     start: Tuple[float, float],
     goal: Tuple[float, float],
@@ -81,6 +95,92 @@ def _pull_in(
     return (round(sx + dx * k, 4), round(sy + dy * k, 4))
 
 
+# Obstacle layout for the obstacle-course / stairs / outdoor-flat templates.
+# (name, kind, x, y, ...): kind="cyl" -> (r, h); kind="box" -> (sx, sy, h).
+#
+# A navigable SLALOM between start(-2.3,-2.3) and goal(2.3,2.3): convex pillars
+# offset alternately from the diagonal with ~0.9m+ gaps, plus side boxes for
+# visual interest. There is always a passable channel toward the goal (no
+# concave dead-end pocket), so the reactive baseline weaves through — visible
+# struggle and bumps — and reaches the goal rather than wedging forever. The
+# ramp world remains the genuine-stall failure-theatre showcase.
+_OBSTACLE_LAYOUT = [
+    ("pillar_a", "cyl", -1.45, -0.65, 0.22, 0.4),
+    ("pillar_b", "cyl", -0.55, -1.35, 0.22, 0.4),
+    ("pillar_c", "cyl", 0.15, -0.15, 0.24, 0.4),
+    ("pillar_d", "cyl", 1.15, 0.55, 0.22, 0.4),
+    ("box_a", "box", -1.75, 0.7, 0.45, 0.12, 0.35),
+    ("box_b", "box", 1.85, -0.6, 0.12, 0.5, 0.35),
+    ("box_c", "box", 0.55, 1.75, 0.5, 0.12, 0.35),
+]
+
+
+def _obstacle_clearance(px: float, py: float, half: float) -> float:
+    """Distance from (px,py) to the nearest obstacle/wall edge (negative inside)."""
+    best = float("inf")
+    for entry in _OBSTACLE_LAYOUT:
+        kind = entry[1]
+        if kind == "cyl":
+            _, _, x, y, rr, _ = entry
+            best = min(best, math.hypot(px - x, py - y) - rr)
+        else:
+            _, _, x, y, sx, sy, _ = entry
+            dx = max(abs(px - x) - sx, 0.0)
+            dy = max(abs(py - y) - sy, 0.0)
+            best = min(best, math.hypot(dx, dy))
+    best = min(best, half - abs(px), half - abs(py))
+    return best
+
+
+def _pull_in_clear(
+    start: Tuple[float, float],
+    goal: Tuple[float, float],
+    override: Optional[Tuple[float, float]],
+    bounded: bool,
+    half: float = 3.0,
+    min_clearance: float = 0.35,
+) -> Tuple[float, float]:
+    """Bounded pull-in for the cluttered obstacle course.
+
+    Plain diagonal pull-in lands the goal right on pillar_a/pillar_b. So pull to
+    the bounded reach distance, then if the point sits in/near an obstacle, scan
+    along the start->goal ray (and small perpendicular offsets) for the nearest
+    point with real clearance. Explicit overrides + non-bounded runs untouched.
+    """
+    if not bounded or override is not None:
+        return goal
+    sx, sy = start
+    gx, gy = goal
+    dx, dy = gx - sx, gy - sy
+    dist = math.hypot(dx, dy)
+    if dist == 0.0:
+        return goal
+    ux, uy = dx / dist, dy / dist  # unit start->goal
+    px, py = -uy, ux  # unit perpendicular
+    target = min(_BOUNDED_REACH_M, dist)
+    base = (round(sx + ux * target, 4), round(sy + uy * target, 4))
+    if _obstacle_clearance(*base, half) >= min_clearance:
+        return base
+    # Search: vary distance around the target and a small perpendicular offset,
+    # prefer points close to the desired bounded reach.
+    best_pt = base
+    best_score = -1.0
+    for along in [target, target - 0.4, target + 0.4, target - 0.8, target + 0.8]:
+        if along <= 0.3 or along > dist:
+            continue
+        for off in (0.0, -0.55, 0.55, -0.9, 0.9):
+            cx = round(sx + ux * along + px * off, 4)
+            cy = round(sy + uy * along + py * off, 4)
+            clr = _obstacle_clearance(cx, cy, half)
+            if clr < min_clearance:
+                continue
+            # Reward clearance + proximity to the desired bounded reach distance.
+            score = clr - 0.5 * abs(along - target) - 0.3 * abs(off)
+            if score > best_score:
+                best_score, best_pt = score, (cx, cy)
+    return best_pt
+
+
 def build(
     template: str,
     goal_override: Optional[Tuple[float, float]],
@@ -90,7 +190,9 @@ def build(
         half = 3.0
         walls_xml, wall_names = _walls(half)
         start = (-2.2, -2.2)
-        gx, gy = _pull_in(start, goal_override or (2.2, 2.2), goal_override, bounded)
+        # Open room: any in-arena point is reachable, so honor a (clamped) override.
+        raw = _clamp_arena(*(goal_override or (2.2, 2.2)), half)
+        gx, gy = _pull_in(start, raw, goal_override, bounded)
         r = 0.3
         xml = walls_xml + _goal_site(gx, gy, r)
         return WorldBuild(xml, start, 45.0, (gx, gy), r, wall_names)
@@ -100,22 +202,21 @@ def build(
         # the slice still runs honestly (labelled in telemetry by template name).
         half = 3.0
         walls_xml, wall_names = _walls(half)
-        gx, gy = goal_override or (2.3, 2.3)
+        start = (-2.3, -2.3)
+        # The fixed slalom is verified-reachable to its NE corner only. An
+        # LLM-supplied goal_xy is unreliable (it has landed at (3,4), outside the
+        # walls -> unreachable -> the run burns its full duration and the headline
+        # demo always "times out"). So for this cluttered world we navigate to our
+        # OWN known-reachable goal regardless of the override: pulled into a clear
+        # pocket for bounded runs, the full NE corner (2.3,2.3) for async — both
+        # verified to reach. Open worlds above honor a clamped override.
+        gx, gy = _pull_in_clear(start, (2.3, 2.3), None, bounded)
         r = 0.3
         obs = ""
         names = list(wall_names)
         # A slalom of pillars + boxes between start(-2.3,-2.3) and goal, with a
         # concave "trap" pocket near (0.4,1.4) where a naive controller wedges.
-        layout = [
-            ("pillar_a", "cyl", -0.9, -0.6, 0.22, 0.4),
-            ("pillar_b", "cyl", 0.2, 0.1, 0.25, 0.4),
-            ("pillar_c", "cyl", 1.3, 1.0, 0.22, 0.4),
-            ("box_a", "box", -0.2, -1.6, 0.5, 0.12, 0.35),
-            ("box_b", "box", 1.6, -0.2, 0.12, 0.6, 0.35),
-            ("trap_l", "box", 0.0, 1.4, 0.12, 0.5, 0.35),
-            ("trap_b", "box", 0.4, 1.0, 0.5, 0.12, 0.35),
-        ]
-        for entry in layout:
+        for entry in _OBSTACLE_LAYOUT:
             name, kind = entry[0], entry[1]
             if kind == "cyl":
                 _, _, x, y, rr, hh = entry
@@ -125,12 +226,16 @@ def build(
                 obs += _box(name, x, y, sx, sy, hh)
             names.append(name)
         xml = walls_xml + obs + _goal_site(gx, gy, r)
-        return WorldBuild(xml, (-2.3, -2.3), 45.0, (gx, gy), r, names)
+        # stairs / outdoor-flat aren't modelled distinctly yet -> honestly flag
+        # that the geometry is approximated by the obstacle-course layout.
+        approx = "obstacle-course" if template in ("stairs", "outdoor-flat") else None
+        return WorldBuild(xml, start, 45.0, (gx, gy), r, names, approximated_as=approx)
 
     if template == "ramp":
         half = 3.0
         walls_xml, wall_names = _walls(half)
-        gx, gy = _pull_in((-2.3, 0.0), goal_override or (2.3, 0.0), goal_override, bounded)
+        raw = _clamp_arena(*(goal_override or (2.3, 0.0)), half)
+        gx, gy = _pull_in((-2.3, 0.0), raw, goal_override, bounded)
         r = 0.3
         # An inclined slab in the middle the base must climb. Often stalls ->
         # exactly the "stumble/stuck" theatre requested.
@@ -148,7 +253,7 @@ def build(
         # Small bounded surface; treat like a tiny empty room.
         half = 1.2
         walls_xml, wall_names = _walls(half, h=0.12)
-        gx, gy = goal_override or (0.7, 0.7)
+        gx, gy = _clamp_arena(*(goal_override or (0.7, 0.7)), half)
         r = 0.2
         xml = walls_xml + _goal_site(gx, gy, r)
         return WorldBuild(xml, (-0.7, -0.7), 45.0, (gx, gy), r, wall_names)
@@ -157,5 +262,6 @@ def build(
     half = 3.0
     walls_xml, wall_names = _walls(half)
     start = (-2.2, -2.2)
-    gx, gy = _pull_in(start, goal_override or (2.2, 2.2), goal_override, bounded)
+    raw = _clamp_arena(*(goal_override or (2.2, 2.2)), half)
+    gx, gy = _pull_in(start, raw, goal_override, bounded)
     return WorldBuild(walls_xml + _goal_site(gx, gy, 0.3), start, 45.0, (gx, gy), 0.3, wall_names)

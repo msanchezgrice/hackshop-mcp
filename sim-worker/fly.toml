@@ -37,11 +37,14 @@ primary_region = "iad"
 [http_service]
   internal_port = 8000
   force_https = true
-  # Scale to zero between demos to keep cost ~$0; first request pays a cold start.
-  # The volume persists across stop/start so artifacts survive.
+  # Keep one machine warm so the first request doesn't pay a ~7.6s cold start
+  # (MuJoCo + OSMesa import). Staying up also means far fewer restarts, so the
+  # in-process job dict survives most of the time (jobs.py reconstructs from disk
+  # for the rest). auto_start still recovers from a crash. The single warm
+  # machine keeps the volume single-tenant (one machine binds the volume).
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [[http_service.checks]]
     method = "GET"

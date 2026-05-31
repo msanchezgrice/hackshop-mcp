@@ -25,13 +25,28 @@ class AgentOutcome:
     post_mortem: str = ""
 
 
+def _collision_phrase(t: dict) -> Optional[str]:
+    """Honest collision wording from the corrected (discrete-event) metric."""
+    events = t.get("collisions") or 0
+    secs = t.get("contact_seconds")
+    if not events:
+        return None
+    base = f"bumped obstacles {events} time{'s' if events != 1 else ''}"
+    if isinstance(secs, (int, float)) and secs > 0:
+        base += f" ({secs:.1f}s in contact)"
+    return base
+
+
 def _post_mortem(r: RunResult, authored_by: str, iters: int) -> str:
     t = r.telemetry
     who = "The builder agent" if authored_by == "llm" else "The scripted controller"
     if r.success:
         base = f"{who} reached the goal (final distance {t['final_dist']}m)"
-        if t["collisions"]:
-            base += f", but grazed obstacles {t['collisions']} times along the way"
+        if t.get("stuck_recovered"):
+            base += f", recovering after briefly wedging at {t.get('stuck_xy')}"
+        cp = _collision_phrase(t)
+        if cp:
+            base += f", and {cp} along the way"
         if authored_by == "llm" and iters > 1:
             base += f", after {iters} revision(s)"
         return base + "."
@@ -40,10 +55,19 @@ def _post_mortem(r: RunResult, authored_by: str, iters: int) -> str:
         why.append(f"the base tipped over at t={t['tipped_t']:.1f}s")
     if t["stuck"]:
         why.append(f"it wedged at {t['stuck_xy']} and stopped making progress")
-    if t["collisions"] > 20:
-        why.append(f"it kept colliding ({t['collisions']} contacts)")
+    # >5 discrete collision events is a real thrashing signal (the old metric
+    # summed contact-pairs per step and tripped at noise levels).
+    if (t.get("collisions") or 0) > 5:
+        why.append(f"it kept colliding ({t['collisions']} bumps)")
     if not why:
-        why.append(f"it stalled {t['final_dist']}m short of the goal")
+        if t.get("timed_out_approaching"):
+            # Distinguish an honest out-of-time miss from a stall.
+            why.append(
+                f"it ran out of time still approaching, {t['final_dist']}m out "
+                "(it was still closing the gap when the clock stopped)"
+            )
+        else:
+            why.append(f"it stalled {t['final_dist']}m short of the goal")
     detail = "; ".join(why)
     return f"{who} did not reach the goal: {detail}. (got within {t['min_dist']}m at closest)"
 

@@ -8,7 +8,7 @@ classification).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from ..assets.resolve import RobotSpec
 from ..ir import Assembly
@@ -31,6 +31,9 @@ class SceneBuild:
     template: str
     mounted: List[dict]
     total_mass_kg: float
+    # Non-None when `template` is approximated by another layout (e.g. stairs ->
+    # obstacle-course). Surfaced honestly in telemetry/summary, never hidden.
+    approximated_as: Optional[str] = None
 
 
 _ASSETS = """
@@ -160,4 +163,5 @@ def compile_scene(
         template=assembly.world.template,
         mounted=rb.mounted,
         total_mass_kg=rb.total_mass_kg,
+        approximated_as=w.approximated_as,
     )

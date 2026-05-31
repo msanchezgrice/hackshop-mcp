@@ -264,13 +264,21 @@ def build_summary_html(
     # ── telemetry highlights ─────────────────────────────────────────────────
     fd = _telem_num(telemetry, "final_dist")
     md = _telem_num(telemetry, "min_dist")
+    # `collisions` is now discrete collision events (rising edges), not the old
+    # inflated contact-pairs-per-step sum.
     col = _telem_num(telemetry, "collisions")
+    csec = _telem_num(telemetry, "contact_seconds")
     osc = _telem_num(telemetry, "heading_osc_deg")
     dur = _telem_num(telemetry, "duration_s")
+    contact_label = "—"
+    if col is not None:
+        contact_label = f"{int(col)}"
+        if csec is not None and csec > 0:
+            contact_label += f" · {csec:.1f}s"
     stats = [
         ("Final distance", f"{fd:.2f} m" if fd is not None else "—"),
         ("Closest approach", f"{md:.2f} m" if md is not None else "—"),
-        ("Collisions", f"{int(col)}" if col is not None else "—"),
+        ("Collision events", contact_label),
         ("Heading wobble", f"±{osc / 2:.0f}°" if osc is not None else "—"),
         ("Rollout", f"{dur:.0f} s" if dur is not None else "—"),
     ]
@@ -285,10 +293,28 @@ def build_summary_html(
         badges += '<span class="badge warn">tipped over</span>'
     if telemetry.get("stuck"):
         badges += '<span class="badge warn">got stuck</span>'
+    elif telemetry.get("stuck_recovered"):
+        badges += '<span class="badge ok">recovered from wedge</span>'
+    if telemetry.get("timed_out_approaching"):
+        badges += '<span class="badge warn">ran out of time (still approaching)</span>'
     if col and col > 0:
-        badges += f'<span class="badge warn">{int(col)} collisions</span>'
+        plural = "s" if int(col) != 1 else ""
+        label = f"{int(col)} collision event{plural}"
+        if csec and csec > 0:
+            label += f" · {csec:.1f}s contact"
+        badges += f'<span class="badge warn">{label}</span>'
     if osc and osc > 25:
         badges += f'<span class="badge warn">heading wobble ±{osc / 2:.0f}°</span>'
+
+    # Honest note when the requested world geometry is only approximated.
+    approx = telemetry.get("template_approximated_as")
+    world_note = (
+        f'<br/><span class="muted" style="color:#f8b36b">'
+        f"⚠ geometry approximated as {_esc(approx)} "
+        f"(this template isn't modelled distinctly yet)</span>"
+        if approx
+        else ""
+    )
 
     links = []
     if video_file:
@@ -414,6 +440,8 @@ def build_summary_html(
   .badge {{ font-size:12px; padding:3px 9px; border-radius:999px; }}
   .badge.warn {{ background:rgba(239,68,68,.14); color:#f87171;
     border:1px solid rgba(239,68,68,.35); }}
+  .badge.ok {{ background:rgba(52,199,89,.14); color:#34c759;
+    border:1px solid rgba(52,199,89,.35); }}
   .post {{ margin-top:14px; font-size:14px; line-height:1.6; }}
   .links {{ margin-top:14px; font-size:12.5px; }}
   .links a {{ color:var(--accent); text-decoration:none; }}
@@ -441,7 +469,7 @@ def build_summary_html(
     {edges_html}
     <h2 style="margin-top:18px">Goal</h2>
     <p style="margin:0">{_esc(assembly.goal.spec)}<br/>
-      <span class="muted">Success: {_esc(assembly.goal.success_metric)} · world: {_esc(assembly.world.template)}</span></p>
+      <span class="muted">Success: {_esc(assembly.goal.success_metric)} · world: {_esc(assembly.world.template)}</span>{world_note}</p>
   </section>
 
   {build_plan_section}

@@ -1,4 +1,18 @@
+import pytest
+
 from hackshop_sim.ir import Assembly
+
+
+@pytest.fixture(autouse=True)
+def _scripted_by_default(monkeypatch):
+    """Keep the default-on builder agent OFF for tests unless a test opts in.
+
+    The pipeline now enables the agent by default for async jobs when an
+    ANTHROPIC_API_KEY is present (P1-24). On a dev/CI box that happens to have a
+    key set, that would make every pipeline test hit the network. Force it off
+    here; agent tests explicitly re-enable + mock the LLM.
+    """
+    monkeypatch.setenv("HACKSHOP_SIM_AGENT", "0")
 
 
 def nav_assembly(template: str = "obstacle-course") -> Assembly:

@@ -4,7 +4,11 @@ rollout -> render -> artifacts on disk. Returns a JSON-able result dict.
 
 from __future__ import annotations
 
+import contextlib
 import json
+import os
+import tempfile
+import threading
 from pathlib import Path
 from typing import List, Optional
 
@@ -14,9 +18,74 @@ from .ir import Assembly, BuildPlanIR, ComponentMedia, SimulateOptions
 from .media import download_component_images
 from .report import build_summary_html
 from .runtime.render import render_studio, render_video
-from .runtime.run import run_rollout
+from .runtime.run import parse_success_metric, run_rollout
 from .scene.compile import STUDIO_CAMERAS, compile_scene, compile_studio_scene
 from .scene.schematic import build_schematic_svg
+
+# Templates whose layout is cluttered enough to need a longer rollout than an
+# open room; they get a default duration with margin so an honest success isn't
+# masked by the clock. The navigable slalom reaches in ~21s, so 30s leaves ample
+# margin while keeping the rendered clip under the frame cap (≈900 frames @28fps),
+# so reaching clips render at full fps AND fast enough for the web poll window.
+_CLUTTERED_TEMPLATES = {"obstacle-course", "stairs", "outdoor-flat"}
+_CLUTTERED_DEFAULT_DURATION_S = 30.0
+# Bounded/MCP cap: the pulled-in clear-pocket goal is reachable in ~10s; 12s
+# gives margin for the success dwell while staying inside one tool call.
+_BOUNDED_DURATION_CAP_S = 12.0
+
+
+# A single machine can't safely run two OSMesa renders at once (shared GL
+# context). Serialize the render-heavy section so concurrent /simulate calls
+# don't corrupt each other's frames. Set HACKSHOP_SIM_RENDER_PARALLEL=1 to
+# disable (e.g. if you ever move to per-process GL).
+_RENDER_LOCK = threading.Lock()
+_NULL_CTX = contextlib.nullcontext()
+
+
+def _render_serialized() -> bool:
+    return os.environ.get("HACKSHOP_SIM_RENDER_PARALLEL") not in ("1", "true", "True")
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write text to a temp file in the same dir, then atomically rename.
+
+    A reader either sees the old file or the fully-written new one — never a
+    half-written artifact. Same-directory temp guarantees rename() is atomic.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+
+
+def _atomic_finalize(tmp: Path, final: Path) -> bool:
+    """Atomically move a fully-rendered temp artifact into place. Returns True
+    if `final` exists afterward (the temp was produced)."""
+    if tmp.exists():
+        os.replace(tmp, final)
+        return True
+    return final.exists()
+
+
+def _default_agent_enabled() -> bool:
+    """Enable the builder agent by default on async jobs when a key is present.
+
+    Evaluated at call time (not import) so tests/env changes take effect. Opt
+    out with HACKSHOP_SIM_AGENT=0. The agent loop itself falls back to the
+    scripted controller when the SDK/key is missing, so this is safe to leave on.
+    """
+    flag = os.environ.get("HACKSHOP_SIM_AGENT")
+    if flag is not None:
+        return flag not in ("0", "false", "False", "")
+    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+
 
 ARTIFACT_FILES = {
     "video": "run.mp4",
@@ -58,37 +127,63 @@ def run_pipeline(
             "world_desc": f"template='{assembly.world.template}', goal kind='{assembly.goal.kind}'",
             "artifacts": {},
         }
-        (run_dir / ARTIFACT_FILES["result"]).write_text(json.dumps(out, indent=2))
+        _atomic_write_text(run_dir / ARTIFACT_FILES["result"], json.dumps(out, indent=2))
         return out
 
     robot = res.robot
     scene = compile_scene(assembly, robot, bounded=options.bounded)
-    (run_dir / ARTIFACT_FILES["scene"]).write_text(scene.xml)
+    _atomic_write_text(run_dir / ARTIFACT_FILES["scene"], scene.xml)
 
-    # Bounded mode (MCP): cap duration, no agent, smaller render.
+    # Cluttered worlds need a lot more wall-clock to clear the slalom than an
+    # open room. The scripted controller needs ~44s to thread the obstacle
+    # course; at the old 20s default every default run timed out short (a false
+    # negative). Give cluttered templates a generous default so an honest
+    # success isn't masked by the clock. Explicit larger durations are honored.
     duration = options.duration_s
+    if not options.bounded and assembly.world.template in _CLUTTERED_TEMPLATES:
+        duration = max(duration, _CLUTTERED_DEFAULT_DURATION_S)
     render_fps = 30.0
     width, height = 640, 480
     use_agent = options.agent
+    if not options.bounded:
+        # Builder agent self-corrects on async (non-bounded) jobs by default, so
+        # an out-of-the-box run can improve a failing controller on its own
+        # (Phase 2 acceptance). Env/key-gated: the loop falls back to scripted
+        # gracefully when no ANTHROPIC_API_KEY/SDK is present. Callers can still
+        # force it off with options.agent=False only if they set it explicitly;
+        # absent that we opt in.
+        use_agent = options.agent or _default_agent_enabled()
     if options.bounded:
-        # Cap generously enough for the pulled-in bounded goal (~2.4m at proxy
-        # speed) plus the 1s dwell, but still small enough for one tool call.
-        duration = min(duration, 10.0)
+        # Cap generously enough for the pulled-in bounded goal (clear pocket
+        # ~2.4m at proxy speed) plus the dwell, but still small enough for one
+        # tool call. Bounded stays scripted-only for latency.
+        duration = min(duration, _BOUNDED_DURATION_CAP_S)
         use_agent = False
         render_fps = 25.0
         width, height = 480, 360
 
     world_desc = _world_desc(assembly, scene.goal_xy, scene.goal_radius)
 
+    # Per-proposal success criteria from the free-text success_metric (e.g.
+    # "within 0.3m for >2s"); run_rollout falls back to world radius / 1.0s dwell
+    # for whichever part is unspecified.
+    reach_radius, dwell_s = parse_success_metric(assembly.goal.success_metric)
+
     def runner(act):
-        return run_rollout(scene, act, duration_s=duration, render_fps=render_fps)
+        return run_rollout(
+            scene, act, duration_s=duration, render_fps=render_fps,
+            reach_radius=reach_radius, dwell_s=dwell_s,
+        )
 
     outcome = agent_loop.build(world_desc, runner, use_agent, options.agent_max_iters)
     result = outcome.result
 
-    # persist control + telemetry + trajectory
-    (run_dir / ARTIFACT_FILES["control"]).write_text(outcome.control_source)
-    (run_dir / ARTIFACT_FILES["telemetry"]).write_text(json.dumps(result.telemetry, indent=2))
+    # persist control + telemetry + trajectory (atomic temp+rename so a reader
+    # never sees a half-written file, and a crash leaves no partial artifact).
+    _atomic_write_text(run_dir / ARTIFACT_FILES["control"], outcome.control_source)
+    _atomic_write_text(
+        run_dir / ARTIFACT_FILES["telemetry"], json.dumps(result.telemetry, indent=2)
+    )
     trajectory = {
         "fps": result.fps,
         "meta": {
@@ -100,7 +195,7 @@ def run_pipeline(
         "poses": result.poses,
         "qpos": result.frame_qpos,
     }
-    (run_dir / ARTIFACT_FILES["trajectory"]).write_text(json.dumps(trajectory))
+    _atomic_write_text(run_dir / ARTIFACT_FILES["trajectory"], json.dumps(trajectory))
 
     artifacts = {
         "telemetry": ARTIFACT_FILES["telemetry"],
@@ -112,16 +207,25 @@ def run_pipeline(
     video_rel = None
     poster_rel = None
     if options.render:
+        # Render to temp files, then atomically rename into place so a concurrent
+        # GET never serves a half-muxed run.mp4 / missing poster. Serialize the
+        # OSMesa render so two concurrent sims don't share/corrupt the GL context.
+        lock = _RENDER_LOCK if _render_serialized() else _NULL_CTX
         try:
-            video_path = render_video(
-                scene.xml, result.frame_qpos, result.fps,
-                str(run_dir / ARTIFACT_FILES["video"]), width=width, height=height,
-                poster_path=str(run_dir / ARTIFACT_FILES["poster"]),
-            )
-            if video_path:
+            with lock:
+                # Keep the real extension (.mp4/.png) so imageio infers the
+                # right backend; just prefix with a dot to mark it temp.
+                tmp_video = run_dir / (".tmp_" + ARTIFACT_FILES["video"])
+                tmp_poster = run_dir / (".tmp_" + ARTIFACT_FILES["poster"])
+                video_path = render_video(
+                    scene.xml, result.frame_qpos, result.fps,
+                    str(tmp_video), width=width, height=height,
+                    poster_path=str(tmp_poster),
+                )
+            if video_path and _atomic_finalize(tmp_video, run_dir / ARTIFACT_FILES["video"]):
                 video_rel = ARTIFACT_FILES["video"]
                 artifacts["video"] = video_rel
-                if (run_dir / ARTIFACT_FILES["poster"]).exists():
+                if _atomic_finalize(tmp_poster, run_dir / ARTIFACT_FILES["poster"]):
                     poster_rel = ARTIFACT_FILES["poster"]
                     artifacts["poster"] = poster_rel
         except Exception as e:  # pragma: no cover - render is best-effort
@@ -131,11 +235,16 @@ def run_pipeline(
     # angles). Skipped in bounded/MCP mode to keep that path snappy.
     studio_renders: dict = {}
     if options.render and not options.bounded:
+        lock = _RENDER_LOCK if _render_serialized() else _NULL_CTX
         try:
             studio_xml = compile_studio_scene(assembly, robot)
-            studio_renders = render_studio(
-                studio_xml, STUDIO_CAMERAS, str(run_dir), prefix="render"
-            )
+            with lock:
+                # render_studio writes each PNG with imageio.imwrite (single
+                # write, effectively atomic at PNG sizes); the lock keeps the
+                # OSMesa context single-tenant.
+                studio_renders = render_studio(
+                    studio_xml, STUDIO_CAMERAS, str(run_dir), prefix="render"
+                )
             if studio_renders.get("hero"):
                 artifacts["hero"] = studio_renders["hero"]
         except Exception as e:  # pragma: no cover - studio render is best-effort
@@ -153,7 +262,7 @@ def run_pipeline(
     schematic_svg = None
     try:
         schematic_svg = build_schematic_svg(assembly)
-        (run_dir / ARTIFACT_FILES["schematic"]).write_text(schematic_svg)
+        _atomic_write_text(run_dir / ARTIFACT_FILES["schematic"], schematic_svg)
         artifacts["schematic"] = ARTIFACT_FILES["schematic"]
     except Exception as e:  # pragma: no cover - schematic is best-effort
         print(f"[pipeline] schematic build failed: {e}")
@@ -179,7 +288,7 @@ def run_pipeline(
             schematic_svg=schematic_svg,
             studio_renders=studio_renders,
         )
-        (run_dir / ARTIFACT_FILES["summary"]).write_text(summary_html)
+        _atomic_write_text(run_dir / ARTIFACT_FILES["summary"], summary_html)
         artifacts["summary"] = ARTIFACT_FILES["summary"]
     except Exception as e:  # pragma: no cover - summary is best-effort
         print(f"[pipeline] summary build failed: {e}")
@@ -207,5 +316,8 @@ def run_pipeline(
         "artifacts": artifacts,
         "video_available": video_rel is not None,
     }
-    (run_dir / ARTIFACT_FILES["result"]).write_text(json.dumps(out, indent=2))
+    # result.json is written LAST and atomically: its presence is the signal that
+    # every other artifact for this job has been finalized on disk. The job store
+    # uses it to reconstruct a terminal 'done' status after a restart.
+    _atomic_write_text(run_dir / ARTIFACT_FILES["result"], json.dumps(out, indent=2))
     return out
