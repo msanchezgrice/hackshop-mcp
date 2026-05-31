@@ -8,11 +8,11 @@ You describe a project. The agent surfaces 3-5 hackable hardware options you wou
 
 A tinkerer has an idea. The idea would be cooler with the right piece of hardware attached: an old screen, an abandoned smart speaker, a bricked frame, a hackable handheld. The tinkerer doesn't know what hardware exists, what's hackable, or what would creatively *fit* the idea. So the idea stays purely software, or gets paired with a Raspberry Pi.
 
-This is a hardware-knowledge layer on top of LLMs. Two tools, 27 hand-vetted devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable.
+This is a hardware-knowledge layer on top of LLMs. Three tools, 68 hand-vetted devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable. The third tool — `simulate_assembly` — drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
 
 ## Status
 
-V0.0.2 — published on npm. Install with `npx hackshop-mcp` or add to your MCP client config.
+v0.0.3 — published on npm. Install with `npx hackshop-mcp` or add to your MCP client config. Three tools (`propose_hardware`, `assess_hackability`, `simulate_assembly`), 68 hand-vetted devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
 
 ## Install in 30 seconds
 
@@ -53,11 +53,33 @@ Returns 3-5 hardware proposals, each with:
 
 Lookup by id, exact name, or substring. Returns the same shape as a single proposal. Use when you have a device in mind and want to verify hackability before searching for one to buy.
 
+### `simulate_assembly(assembly)`
+
+Takes an **Assembly IR** — `{ idea, components[{ref,device_id,name,role}], edges[], goal{kind,spec,success_metric}, world{template,goal_xy?} }` (build it from the site's assembly output or by hand) — drops it into a MuJoCo physics world, and runs a **bounded, synchronous** rollout (`duration_s` ≤ 10, default 8) on the sim-worker. It returns:
+
+- `success` — did the robot actually reach its goal under the stated success metric
+- `summary` / `post_mortem` — natural-language verdict plus honest failure theatre (stuck / tipped / collisions / heading-oscillation)
+- `artifacts` — hosted URLs for the rendered `video`, `scene` (MJCF), `control` (control.py), and `telemetry.json`
+- `metric_value`, `telemetry`, `authored_by`, `world_desc`
+
+Today it simulates the diff-drive **`navigate`** slice; other goal kinds return an honest `unsupported` rather than faking a pass. Set `SIM_WORKER_URL` to point at a running sim-worker (defaults to `http://127.0.0.1:8000`). The bounded rollout here is intentionally small so it fits in a single tool call; the **rich, longer, agent-driven runs happen via the web app** at [hackshop.dev](https://hackshop.dev), backed by the worker at [hackshop-sim.fly.dev](https://hackshop-sim.fly.dev).
+
+## Simulation (v2)
+
+The site turns a proposal into a watchable robot: **proposal → build plan + feasibility check → watch the assembled robot navigate an obstacle world in MuJoCo**, with a shareable summary page you can link to. Honest by design — a robot that gets stuck on a ramp gets a post-mortem, not a green checkmark.
+
+- **Live:** [https://hackshop.dev](https://hackshop.dev)
+- **Worker:** [https://hackshop-sim.fly.dev](https://hackshop-sim.fly.dev)
+- **Design doc:** [`docs/v2-simulation-plan.md`](docs/v2-simulation-plan.md)
+
+The `simulate_assembly` MCP tool above is the bounded, single-call entry point into this same physics worker.
+
 ## Architecture
 
 - TypeScript + `@modelcontextprotocol/sdk`
-- LLM reasoning delegated to the host via `sampling/createMessage` (no Anthropic SDK bundled, no BYO key)
-- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 27 devices in V0.0.2 — growing)
+- LLM reasoning delegated to the host via `sampling/createMessage` first; falls back to a direct Anthropic API call (`@anthropic-ai/sdk`) when `ANTHROPIC_API_KEY` is set and the host lacks sampling
+- `simulate_assembly` calls out to a separate Python MuJoCo **sim-worker** over HTTP (`SIM_WORKER_URL`); the worker isn't bundled in the npm package
+- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 68 devices in v0.0.3 — growing)
 - Tag vocabulary in `tags.md`, validated at boot — server refuses to start on tag drift
 - eBay integration is **not** in this server. Compose with [`ebay-mcp`](https://github.com/YosefHayim/ebay-mcp) at the host level.
 
@@ -72,9 +94,9 @@ npm test           # safety + schema + lookup tests
 npm run build      # tsc -> dist/
 ```
 
-## Day-0 Smoke Test (REQUIRED before scaffolding more)
+## Troubleshooting: verify sampling support
 
-This server depends on `sampling/createMessage`. Some MCP hosts don't support it. Verify yours does first.
+`propose_hardware` reasons via `sampling/createMessage`. Some MCP hosts don't support it (and without an `ANTHROPIC_API_KEY` fallback you'll get degraded, raw-catalog responses). If proposals come back without reasoning, verify your host supports sampling with this quick smoke check.
 
 ```bash
 npm install
@@ -93,11 +115,11 @@ Add this to your Claude Desktop config (`~/Library/Application Support/Claude/cl
 }
 ```
 
-Restart Claude Desktop. Ask Claude to call the `smoke_check` tool. If it returns "Smoke OK," your architecture works. If it fails, stop here — `hackshop-mcp` won't work in this host.
+Restart Claude Desktop. Ask Claude to call the `smoke_check` tool. If it returns "Smoke OK," sampling works in your host. If it fails, set an `ANTHROPIC_API_KEY` (see install above) or expect degraded responses from `propose_hardware`.
 
-## Install (target host)
+## Install (local build → host)
 
-After dev is done and smoke passes, add to your MCP client config:
+To run a locally built copy instead of `npx`, add to your MCP client config:
 
 ```json
 {

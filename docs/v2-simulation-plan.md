@@ -94,7 +94,8 @@ export const AssemblyGoal = z.object({
 });
 
 export const WorldSpec = z.object({
-  template: z.enum(["empty-room","obstacle-course","ramp","stairs","outdoor-flat"]),
+  // "tabletop" was added during implementation (6 templates total).
+  template: z.enum(["empty-room","obstacle-course","ramp","tabletop","stairs","outdoor-flat"]),
   goal_xy: z.tuple([z.number(), z.number()]).optional(),
 });
 
