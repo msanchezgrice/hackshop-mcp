@@ -40,8 +40,10 @@ const Assembly = z.object({
     success_metric: z.string().min(1),
   }),
   world: z.object({
+    // Canonical WorldTemplate enum — keep in sync with site/lib/assembly.ts
+    // WorldSpec and the Python worker.
     template: z.enum([
-      "empty-room", "obstacle-course", "ramp", "stairs", "outdoor-flat", "tabletop",
+      "empty-room", "obstacle-course", "ramp", "tabletop", "stairs", "outdoor-flat",
     ]),
     goal_xy: z.tuple([z.number(), z.number()]).optional(),
   }),
@@ -92,6 +94,11 @@ function workerBase(): string {
   return (process.env.SIM_WORKER_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
 }
 
+// Bounded sync simulation can take a while (cold MuJoCo + render) but must not
+// hang a tool call indefinitely. Cap the client-side wait well under any host
+// tool-call ceiling.
+const SYNC_TIMEOUT_MS = 90_000;
+
 export async function simulateAssembly(
   input: SimulateAssemblyInput,
 ): Promise<SimulateAssemblyOutput> {
@@ -112,6 +119,7 @@ export async function simulateAssembly(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(SYNC_TIMEOUT_MS),
     });
     if (!res.ok) {
       return {
@@ -121,11 +129,16 @@ export async function simulateAssembly(
     }
     job = (await res.json()) as WorkerJob;
   } catch (err) {
+    const aborted =
+      err instanceof Error &&
+      (err.name === "AbortError" || err.name === "TimeoutError");
     return {
       status: "unavailable",
-      message:
-        "Could not reach the simulation worker. Set SIM_WORKER_URL and ensure the " +
-        `sim-worker is running. (${err instanceof Error ? err.message : "fetch failed"})`,
+      message: aborted
+        ? `Simulation worker did not respond within ${SYNC_TIMEOUT_MS / 1000}s; treating it as unavailable. ` +
+          "Set SIM_WORKER_URL and ensure the sim-worker is running and reachable."
+        : "Could not reach the simulation worker. Set SIM_WORKER_URL and ensure the " +
+          `sim-worker is running. (${err instanceof Error ? err.message : "fetch failed"})`,
     };
   }
 

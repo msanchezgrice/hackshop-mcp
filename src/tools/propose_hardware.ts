@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import type { DeviceEntry } from "../catalog/schema.js";
 import { applyBrickRiskSafety } from "../safety.js";
-import { sampleJson } from "../sampling.js";
+import { sampleJson, type SamplingDiagnostics } from "../sampling.js";
 import { buildLinks, type DeviceLinks } from "../links.js";
 
 export const proposeHardwareInput = z.object({
@@ -146,11 +146,13 @@ export async function proposeHardware(
     .filter(Boolean)
     .join("\n");
 
+  const diagnostics: SamplingDiagnostics = {};
   const sampled = await sampleJson<SamplerPick>({
     server,
     systemPrompt: SYSTEM_PROMPT,
     userPrompt,
     maxTokens: 1500,
+    diagnostics,
   });
 
   // Degraded path: every reasoning attempt failed (host sampling + retry +
@@ -161,11 +163,19 @@ export async function proposeHardware(
     const fallback = shortlisted.slice(0, 5).map((d) =>
       buildProposal(d, "Reasoning unavailable; matched against catalog tags only."),
     );
+    // If a key WAS present but the API fallback threw (e.g. retired model id),
+    // surface that specific reason instead of the misleading "no fallback was
+    // configured" message — otherwise the failure is invisible (stderr only).
+    const reasoning = diagnostics.apiFallbackError
+      ? `Reasoning unavailable. ${diagnostics.apiFallbackError} Returning catalog matches by tag overlap.`
+      : "Reasoning unavailable. The host LLM failed and no Anthropic API fallback was configured. Returning catalog matches by tag overlap. Set ANTHROPIC_API_KEY in the MCP server's env config to enable reasoning even on hosts without sampling/createMessage support.";
     return {
       proposals: fallback,
-      reasoning:
-        "Reasoning unavailable. The host LLM failed and no Anthropic API fallback was configured. Returning catalog matches by tag overlap. Set ANTHROPIC_API_KEY in the MCP server's env config to enable reasoning even on hosts without sampling/createMessage support.",
+      reasoning,
       degraded: true,
+      ...(diagnostics.apiFallbackError
+        ? { message: diagnostics.apiFallbackError }
+        : {}),
     };
   }
 

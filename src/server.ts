@@ -136,21 +136,25 @@ async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  // Probe sampling support after connect. Logs to stderr; never fatal.
-  // Some hosts (Claude Desktop, Claude Code) support sampling/createMessage;
-  // some clients don't. If unsupported, propose_hardware degrades gracefully.
-  void probeSamplingSupport(server).then((ok) => {
-    if (!ok) {
-      process.stderr.write(
-        "[hackshop-mcp] Warning: this MCP host does not appear to support " +
-          "sampling/createMessage. The propose_hardware tool will return " +
-          "degraded responses (raw catalog matches without reasoning). " +
-          "Hosts known to support sampling: Claude Desktop, Claude Code.\n",
-      );
-    } else {
-      process.stderr.write("[hackshop-mcp] Sampling probe OK.\n");
-    }
-  });
+  // Probe sampling support after connect — but ONLY when explicitly opted in
+  // via HACKSHOP_PROBE_SAMPLING=1. Previously this fired a real createMessage on
+  // every boot just to log "Sampling probe OK", spending tokens on every start.
+  // propose_hardware already degrades gracefully when sampling is unsupported,
+  // so the probe is purely informational. Logs to stderr; never fatal.
+  if (process.env.HACKSHOP_PROBE_SAMPLING === "1") {
+    void probeSamplingSupport(server).then((ok) => {
+      if (!ok) {
+        process.stderr.write(
+          "[hackshop-mcp] Warning: this MCP host does not appear to support " +
+            "sampling/createMessage. The propose_hardware tool will return " +
+            "degraded responses (raw catalog matches without reasoning). " +
+            "Hosts known to support sampling: Claude Desktop, Claude Code.\n",
+        );
+      } else {
+        process.stderr.write("[hackshop-mcp] Sampling probe OK.\n");
+      }
+    });
+  }
 
   process.stderr.write(`[hackshop-mcp] ${NAME} v${VERSION} ready.\n`);
 }

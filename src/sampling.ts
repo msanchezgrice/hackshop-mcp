@@ -16,13 +16,23 @@ import Anthropic from "@anthropic-ai/sdk";
 // Cursor / Cowork / other clients may not. Setting ANTHROPIC_API_KEY in your
 // MCP client config (under "env") gives the user reasoning even on hosts
 // without sampling.
+// Optional out-channel so callers can surface WHY sampling degraded in a
+// user-visible message (not just stderr). Populated only on the failure paths.
+export interface SamplingDiagnostics {
+  // Set when an ANTHROPIC_API_KEY was present but the direct-API fallback threw
+  // (e.g. retired model id, auth error). Caller should include this hint in its
+  // degraded response so the failure is visible, not silent.
+  apiFallbackError?: string;
+}
+
 export async function sampleJson<T>(opts: {
   server: Server;
   systemPrompt: string;
   userPrompt: string;
   maxTokens?: number;
+  diagnostics?: SamplingDiagnostics;
 }): Promise<T | null> {
-  const { server, systemPrompt, userPrompt, maxTokens = 1500 } = opts;
+  const { server, systemPrompt, userPrompt, maxTokens = 1500, diagnostics } = opts;
 
   const tryHostSampling = async (): Promise<T | null> => {
     try {
@@ -56,13 +66,18 @@ export async function sampleJson<T>(opts: {
   const second = await tryHostSampling();
   if (second !== null) return second;
 
-  // Attempt 3: direct Anthropic API fallback (env-gated)
+  // Attempt 3: direct Anthropic API fallback (env-gated). Default model id kept
+  // current ('claude-sonnet-4-6'); override via HACKSHOP_MODEL. If this throws
+  // WHILE a key was present (e.g. the default model was retired), we record the
+  // error in `diagnostics` so the caller can make the failure user-visible
+  // instead of degrading silently to stderr only.
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (apiKey) {
+    const fallbackModel = process.env.HACKSHOP_MODEL ?? "claude-sonnet-4-6";
     try {
       const client = new Anthropic({ apiKey });
       const response = await client.messages.create({
-        model: process.env.HACKSHOP_MODEL ?? "claude-sonnet-4-6",
+        model: fallbackModel,
         max_tokens: maxTokens,
         system: systemPrompt,
         messages: [{ role: "user", content: userPrompt }],
@@ -77,10 +92,18 @@ export async function sampleJson<T>(opts: {
           return parsed;
         }
       }
+      // Key present, call succeeded, but content was unusable — note it.
+      if (diagnostics) {
+        diagnostics.apiFallbackError = `Anthropic API fallback (model "${fallbackModel}") returned no usable JSON.`;
+      }
     } catch (err) {
+      const msg = (err as Error).message;
       process.stderr.write(
-        `[hackshop-mcp] Anthropic fallback failed: ${(err as Error).message}\n`,
+        `[hackshop-mcp] Anthropic fallback failed: ${msg}\n`,
       );
+      if (diagnostics) {
+        diagnostics.apiFallbackError = `Anthropic API fallback failed (model "${fallbackModel}"): ${msg}. If the model id was retired, set HACKSHOP_MODEL to a current model.`;
+      }
     }
   }
 

@@ -40,10 +40,32 @@ export function assessHackability(
 ): AssessOutput {
   const target = norm(input.device_name);
 
-  // Exact match by id, then by normalized name, then substring.
+  // Exact match by id, then by normalized name.
   let match: DeviceEntry | undefined = catalog.find((d) => d.id === input.device_name);
   if (!match) match = catalog.find((d) => norm(d.name) === target);
-  if (!match) match = catalog.find((d) => norm(d.name).includes(target) || target.includes(norm(d.name)));
+
+  // Substring match: only the catalog-name-contains-query direction (e.g.
+  // "psp" -> "Sony PSP-1000"). The reverse direction (query contains a catalog
+  // name) over-matched short names. We collect ALL substring candidates and
+  // pick the MOST SPECIFIC one (closest normalized-length to the query) instead
+  // of returning the first array match, which was order-dependent.
+  if (!match && target.length > 0) {
+    const candidates = catalog.filter((d) => norm(d.name).includes(target));
+    if (candidates.length === 1) {
+      match = candidates[0];
+    } else if (candidates.length > 1) {
+      // Most-specific = smallest name (tightest fit around the query). Ties
+      // resolve deterministically by name then id so results are stable.
+      const sorted = [...candidates].sort((a, b) => {
+        const la = norm(a.name).length;
+        const lb = norm(b.name).length;
+        if (la !== lb) return la - lb;
+        if (a.name !== b.name) return a.name.localeCompare(b.name);
+        return a.id.localeCompare(b.id);
+      });
+      match = sorted[0];
+    }
+  }
 
   if (!match) {
     return {
@@ -55,13 +77,18 @@ export function assessHackability(
   const safety = applyBrickRiskSafety(match);
   const links = buildLinks(match);
 
+  // Derive hackability from a real signal rather than hardcoding true: a device
+  // is "hackable" if it has firmware/community resources OR its difficulty is
+  // moderate-or-lower (<=4 of 5). Presence in the catalog alone isn't proof.
+  const hackable = match.firmware_links.length > 0 || match.hack_difficulty <= 4;
+
   return {
     found: true,
     device: {
       id: match.id,
       name: match.name,
       category: match.category,
-      hackable: true, // presence in catalog implies hackable
+      hackable,
       hack_difficulty: match.hack_difficulty,
       brick_risk: safety.brick_risk,
       brick_risk_label: safety.brick_risk_label,
