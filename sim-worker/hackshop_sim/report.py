@@ -183,6 +183,7 @@ def build_summary_html(
     poster_file: Optional[str],
     scene_file: Optional[str],
     telemetry_file: Optional[str],
+    trajectory_file: Optional[str] = None,
     build_plan: Optional[BuildPlanIR] = None,
     component_images: Optional[Dict[str, str]] = None,
     schematic_svg: Optional[str] = None,
@@ -191,7 +192,9 @@ def build_summary_html(
     component_images = component_images or {}
     studio_renders = studio_renders or {}
     idea = _esc(assembly.idea)
-    verdict = "Reached the goal" if success else "Did not reach the goal"
+    verdict = (
+        "Passed acceptance criteria" if success else "Failed acceptance criteria"
+    )
     verdict_color = "#34c759" if success else "#ef4444"
 
     # ── components ───────────────────────────────────────────────────────────
@@ -323,6 +326,8 @@ def build_summary_html(
         links.append(f'<a href="{_esc(scene_file)}">scene.xml</a>')
     if telemetry_file:
         links.append(f'<a href="{_esc(telemetry_file)}">telemetry.json</a>')
+    if trajectory_file:
+        links.append(f'<a href="{_esc(trajectory_file)}">trajectory.json</a>')
     links_html = " · ".join(links)
 
     # ── composed optional sections ───────────────────────────────────────────

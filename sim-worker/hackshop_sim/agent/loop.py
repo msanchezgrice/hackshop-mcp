@@ -50,6 +50,23 @@ def _post_mortem(r: RunResult, authored_by: str, iters: int) -> str:
         if authored_by == "llm" and iters > 1:
             base += f", after {iters} revision(s)"
         return base + "."
+    if t.get("reached"):
+        checks = t.get("criteria_checks") or {}
+        failed = [
+            str(name).replace("_", " ")
+            for name, passed in checks.items()
+            if passed is False
+        ]
+        failed_label = ", ".join(failed) or "one or more checks"
+        base = (
+            f"{who} reached the goal position (final distance "
+            f"{t['final_dist']}m) but failed the acceptance criteria: "
+            f"{failed_label}"
+        )
+        cp = _collision_phrase(t)
+        if cp:
+            base += f"; it {cp}"
+        return base + "."
     why = []
     if t["tipped"]:
         why.append(f"the base tipped over at t={t['tipped_t']:.1f}s")

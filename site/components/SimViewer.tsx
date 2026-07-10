@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Assembly, BuildPlan } from "@/lib/assembly";
+import type { Assembly, BuildPlan, WorldSpec } from "@/lib/assembly";
 import { IMAGE_SOURCES } from "@/lib/image-sources";
 import type { SimJob, SimResult } from "@/lib/sim-client";
+import {
+  acceptanceStatusLabel,
+  SIMULATION_FALLBACK_COMPONENTS,
+  SIMULATION_WORLD_OPTIONS,
+  simulationWorldFor,
+} from "@/lib/simulation-ui";
+import { InteractiveSimViewer } from "./InteractiveSimViewer";
 
 // Drives the physics sim: kick a job, poll until done, play the mp4 the worker
 // rendered, and surface the *failure theatre* (stuck / tipped / collisions /
@@ -13,18 +20,6 @@ type Phase = "idle" | "kicking" | "running" | "done" | "error" | "unsupported";
 
 const POLL_MS = 1500;
 const MAX_POLLS = 120; // ~3 min ceiling
-
-// The canonical WorldTemplate enum has six values (empty-room, obstacle-course,
-// ramp, tabletop, stairs, outdoor-flat). Only the four below are something the
-// diff-drive slice can *honestly* run today, so we only surface those — offering
-// stairs/outdoor-flat here would imply a capability we don't have. obstacle-
-// course is the default because that's where the stumbles/wedges/wobble show up.
-const WORLDS: { value: string; label: string }[] = [
-  { value: "obstacle-course", label: "Obstacle course (default)" },
-  { value: "empty-room", label: "Empty room" },
-  { value: "ramp", label: "Ramp" },
-  { value: "tabletop", label: "Tabletop" },
-];
 
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -64,6 +59,24 @@ function FailureBadges({ telemetry }: { telemetry?: Record<string, unknown> }) {
   );
 }
 
+function CriteriaChecks({ telemetry }: { telemetry?: Record<string, unknown> }) {
+  const raw = telemetry?.criteria_checks;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const checks = Object.entries(raw).filter(
+    (entry): entry is [string, boolean] => typeof entry[1] === "boolean",
+  );
+  if (checks.length === 0) return null;
+  return (
+    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+      {checks.map(([name, passed]) => (
+        <span key={name} className={`pill ${passed ? "ok" : "warn"}`}>
+          {name.replaceAll("_", " ")}: {passed ? "pass" : "fail"}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function SimViewer({
   assembly,
   buildPlan,
@@ -76,7 +89,9 @@ export function SimViewer({
   const [result, setResult] = useState<SimResult | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [useAgent, setUseAgent] = useState(false);
-  const [world, setWorld] = useState<string>("obstacle-course");
+  const [world, setWorld] = useState<WorldSpec["template"]>(
+    simulationWorldFor(assembly.world.template),
+  );
   const [usedBase, setUsedBase] = useState(false);
   const stopRef = useRef(false);
 
@@ -96,6 +111,10 @@ export function SimViewer({
       stopRef.current = true;
     };
   }, []);
+
+  useEffect(() => {
+    setWorld(simulationWorldFor(assembly.world.template));
+  }, [assembly.world.template]);
 
   async function run(injectBase = false) {
     stopRef.current = false;
@@ -119,12 +138,7 @@ export function SimViewer({
       const components = injectBase
         ? [
             ...assembly.components,
-            {
-              ref: "sim-base",
-              device_id: "generic-diff-drive",
-              name: "Generic mobile base",
-              role: "chassis" as const,
-            },
+            ...SIMULATION_FALLBACK_COMPONENTS,
           ]
         : assembly.components;
       const simAssembly = {
@@ -223,9 +237,10 @@ export function SimViewer({
           <div style={{ fontSize: 13, marginBottom: 10 }}>
             Drop this assembly into a MuJoCo world and watch it try to reach the
             goal — including the stumbles, wedges, and wobble when it can&apos;t.
-            You&apos;ll get a <strong>shareable summary page</strong> (product,
-            components, high-fidelity renders, wiring schematic, build plan, and
-            the run video) linked from the result.
+            You&apos;ll get an interactive replay here plus a{" "}
+            <strong>shareable static summary page</strong> with the product,
+            components, dimensioned proxy renders, wiring schematic, build plan,
+            and run video.
           </div>
           <label
             htmlFor="sim-world"
@@ -240,7 +255,9 @@ export function SimViewer({
             <select
               id="sim-world"
               value={world}
-              onChange={(e) => setWorld(e.target.value)}
+              onChange={(e) =>
+                setWorld(e.target.value as WorldSpec["template"])
+              }
               style={{
                 fontSize: 13,
                 padding: "4px 8px",
@@ -252,13 +269,21 @@ export function SimViewer({
                 margin: 0,
               }}
             >
-              {WORLDS.map((w) => (
+              {SIMULATION_WORLD_OPTIONS.map((w) => (
                 <option key={w.value} value={w.value}>
                   {w.label}
                 </option>
               ))}
             </select>
           </label>
+          {simulationWorldFor(assembly.world.template) !==
+            assembly.world.template && (
+            <div className="degraded" style={{ marginTop: 0, marginBottom: 10 }}>
+              {assembly.world.template} does not have distinct geometry yet, so
+              this web run defaults to the obstacle course instead of labelling
+              an approximation as the requested world.
+            </div>
+          )}
           <label
             style={{
               display: "flex",
@@ -281,9 +306,9 @@ export function SimViewer({
           </label>
           {needsBase && (
             <div className="degraded" style={{ marginTop: 0, marginBottom: 10 }}>
-              This build has no drivable base, so there&apos;s nothing to navigate
-              yet. You can still preview it on a <strong>generic mobile base</strong>{" "}
-              — we&apos;ll mount the electronics on a diff-drive chassis.
+              This build has no drivable base or navigation sensor. You can still
+              preview it on a <strong>generic mobile base + 2D lidar</strong> —
+              both additions will be labelled as simulation-only.
             </div>
           )}
           <button
@@ -301,7 +326,7 @@ export function SimViewer({
             }}
           >
             {needsBase
-              ? "Add a generic mobile base & simulate →"
+              ? "Add a generic base + lidar & simulate →"
               : "Simulate in physics world →"}
           </button>
         </div>
@@ -358,6 +383,28 @@ export function SimViewer({
 
       {error && <div className="error">{error}</div>}
 
+      {phase === "error" && (
+        <button
+          type="button"
+          onClick={() => {
+            setPhase("idle");
+            setError(null);
+          }}
+          style={{
+            marginTop: 8,
+            fontSize: 12,
+            padding: "6px 10px",
+            borderRadius: 6,
+            background: "transparent",
+            color: "var(--fg)",
+            border: "1px solid var(--border)",
+            cursor: "pointer",
+          }}
+        >
+          Back to controls and retry
+        </button>
+      )}
+
       {phase === "unsupported" && result && (
         <div className="degraded" style={{ marginTop: 4 }}>
           This assembly isn&apos;t simulatable yet: {result.reason}. The diff-drive
@@ -379,7 +426,7 @@ export function SimViewer({
                   fontWeight: 600,
                 }}
               >
-                Add a generic mobile base &amp; simulate →
+                Add a generic base + lidar &amp; simulate →
               </button>
             </div>
           )}
@@ -404,7 +451,7 @@ export function SimViewer({
               marginBottom: 8,
             }}
           >
-            {result.success ? "Reached the goal" : "Did not reach the goal"}
+            {acceptanceStatusLabel(Boolean(result.success))}
             <span
               style={{
                 fontSize: 11,
@@ -425,10 +472,9 @@ export function SimViewer({
               className="proposal-disclaimer"
               style={{ marginTop: 0, marginBottom: 10 }}
             >
-              Previewed on a generic diff-drive base we added for this run — your
-              build doesn&apos;t include a drivable base. Add a wheeled base (e.g. a
-              Roomba, iRobot Create 3, or TurtleBot) to your idea to simulate the
-              real chassis.
+              Previewed on a generic diff-drive base and 2D lidar added only for
+              this run — your build includes neither. Add a real mobile base and
+              matching navigation sensor to simulate the actual product.
             </div>
           )}
 
@@ -460,6 +506,26 @@ export function SimViewer({
             </div>
           )}
 
+          {result.artifacts.trajectory && (
+            <div style={{ marginBottom: 12 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "var(--muted)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  marginBottom: 6,
+                }}
+              >
+                Interactive 3D replay
+              </div>
+              <InteractiveSimViewer
+                trajectoryUrl={result.artifacts.trajectory}
+                robot={result.robot}
+              />
+            </div>
+          )}
+
           {result.artifacts.hero && (
             <div style={{ marginBottom: 10 }}>
               <div
@@ -471,7 +537,7 @@ export function SimViewer({
                   marginBottom: 6,
                 }}
               >
-                High-fidelity render
+                Studio proxy render
               </div>
               <img
                 src={result.artifacts.hero}
@@ -509,6 +575,7 @@ export function SimViewer({
           )}
 
           <FailureBadges telemetry={result.telemetry} />
+          <CriteriaChecks telemetry={result.telemetry} />
 
           {result.post_mortem && (
             <div style={{ fontSize: 14, marginTop: 10, lineHeight: 1.5 }}>

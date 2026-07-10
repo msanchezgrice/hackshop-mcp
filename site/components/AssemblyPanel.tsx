@@ -149,6 +149,15 @@ export function AssemblyPanel({ data }: { data: AssemblyResponse }) {
         <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 4 }}>
           Success: {assembly.goal.success_metric}
         </div>
+        {assembly.goal.criteria && (
+          <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>
+            Enforced scoring: within {assembly.goal.criteria.position_tolerance_m} m
+            for {assembly.goal.criteria.dwell_s}s · at most{" "}
+            {assembly.goal.criteria.max_collision_events} collision event
+            {assembly.goal.criteria.max_collision_events === 1 ? "" : "s"}
+            {assembly.goal.criteria.require_upright ? " · must remain upright" : ""}
+          </div>
+        )}
         <div style={{ fontSize: 13, color: "var(--muted)", marginTop: 4 }}>
           World: {assembly.world.template}
           {assembly.world.goal_xy

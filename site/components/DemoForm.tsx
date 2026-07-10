@@ -8,8 +8,13 @@ import type { AssemblyResponse } from "@/lib/assembly";
 import { AssemblyPanel } from "./AssemblyPanel";
 import { SimViewer } from "./SimViewer";
 import { loadInventory } from "@/lib/inventory";
+import {
+  assemblyInputForCandidate,
+  assemblyInputForSelectedDevice,
+} from "@/lib/build-candidates";
 
 const EXAMPLES = [
+  "Autonomous office delivery rover that avoids shelves and people",
   "Always-on family calendar in the kitchen, light colors, no animation, e-paper preferred",
   "Wall-mounted digital art frame, sub-$300, supports custom firmware",
   "Ambient bedroom meditation peripheral, no screen, breathing-rhythm light",
@@ -41,6 +46,7 @@ function DemoFormInner() {
   const [assembly, setAssembly] = useState<AssemblyResponse | null>(null);
   const [assemblyLoading, setAssemblyLoading] = useState(false);
   const [assemblyError, setAssemblyError] = useState<string | null>(null);
+  const [planDeviceId, setPlanDeviceId] = useState("");
   // Track image-fetch failures so we never re-render their <img> tags
   // (prevents iOS Safari's broken-image flash for slugs without sources).
   const [failedImg, setFailedImg] = useState<Set<string>>(new Set());
@@ -88,6 +94,7 @@ function DemoFormInner() {
     setResult(null);
     setAssembly(null);
     setAssemblyError(null);
+    setPlanDeviceId("");
     try {
       const body: Record<string, unknown> = { idea: idea.trim() };
       const b = parseFloat(budget);
@@ -109,12 +116,37 @@ function DemoFormInner() {
       if (!res.ok) {
         setError(data.error ?? `Server returned ${res.status}`);
       } else {
-        setResult(data as ProposeResponse);
+        const next = data as ProposeResponse;
+        setResult(next);
+        setPlanDeviceId(next.proposals[0]?.id ?? "");
       }
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function planAssembly(input: { idea: string; device_ids: string[] }) {
+    setAssemblyLoading(true);
+    setAssemblyError(null);
+    setAssembly(null);
+    try {
+      const res = await fetch("/api/assembly", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAssemblyError(data.error ?? `Server returned ${res.status}`);
+      } else {
+        setAssembly(data as AssemblyResponse);
+      }
+    } catch (e) {
+      setAssemblyError((e as Error).message);
+    } finally {
+      setAssemblyLoading(false);
     }
   }
 
@@ -410,63 +442,190 @@ function DemoFormInner() {
               </div>
             )}
 
-            {!result.degraded && result.proposals.length > 0 && (
+            {((result.build_candidates?.length ?? 0) > 0 ||
+              result.proposals.length > 0) && (
               <div style={{ marginBottom: 16 }}>
                 {!assembly && (
-                  <button
-                    type="button"
-                    disabled={assemblyLoading}
-                    onClick={async () => {
-                      setAssemblyLoading(true);
-                      setAssemblyError(null);
-                      try {
-                        const res = await fetch("/api/assembly", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            idea: idea.trim(),
-                            device_ids: result.proposals.map((p) => p.id),
-                          }),
-                        });
-                        const data = await res.json();
-                        if (!res.ok) {
-                          setAssemblyError(data.error ?? `Server returned ${res.status}`);
-                        } else {
-                          setAssembly(data as AssemblyResponse);
-                        }
-                      } catch (e) {
-                        setAssemblyError((e as Error).message);
-                      } finally {
-                        setAssemblyLoading(false);
-                      }
-                    }}
-                    style={{
-                      fontSize: 13,
-                      padding: "8px 14px",
-                      borderRadius: 6,
-                      background: "var(--code-bg)",
-                      color: "var(--fg)",
-                      border: "1px solid var(--accent)",
-                      cursor: assemblyLoading ? "default" : "pointer",
-                      fontWeight: 600,
-                      // Reserve width so the spinner swap doesn't reflow.
-                      minWidth: 300,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {assemblyLoading ? (
-                      <>
-                        <span className="spinner on-dark" /> Planning build &amp; checking feasibility…
-                      </>
-                    ) : (
-                      "Plan build & check feasibility →"
+                  <>
+                    {(result.build_candidates?.length ?? 0) > 0 && (
+                      <div style={{ marginBottom: 16 }}>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: "var(--muted)",
+                            marginBottom: 8,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.04em",
+                          }}
+                        >
+                          Physics-ready build concepts
+                        </div>
+                        <p style={{ margin: "0 0 10px", fontSize: 13, color: "var(--muted)" }}>
+                          These are complete, separate bills of materials with
+                          versioned, dimensioned simulation assets. Pick one to
+                          evaluate—alternatives are never merged together.
+                        </p>
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              "repeat(auto-fit, minmax(250px, 1fr))",
+                            gap: 10,
+                          }}
+                        >
+                          {result.build_candidates?.map((candidate) => (
+                            <div
+                              key={candidate.id}
+                              style={{
+                                border: "1px solid var(--accent)",
+                                borderRadius: 8,
+                                padding: 12,
+                                background: "var(--code-bg-2)",
+                              }}
+                            >
+                              <strong style={{ fontSize: 14 }}>{candidate.name}</strong>
+                              <div
+                                style={{
+                                  margin: "7px 0 10px",
+                                  fontSize: 12,
+                                  color: "var(--muted)",
+                                  lineHeight: 1.5,
+                                }}
+                              >
+                                {candidate.assembly.components
+                                  .map((component) => component.name)
+                                  .join(" + ")}
+                              </div>
+                              {candidate.included_hardware.length > 0 && (
+                                <div
+                                  style={{
+                                    margin: "-5px 0 10px",
+                                    fontSize: 12,
+                                    color: "var(--muted)",
+                                    lineHeight: 1.5,
+                                  }}
+                                >
+                                  Includes: {candidate.included_hardware.join(", ")}
+                                </div>
+                              )}
+                              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                                <span className="pill warn">
+                                  premium · ${candidate.estimated_price_usd.min}–$
+                                  {candidate.estimated_price_usd.max}
+                                </span>
+                                <span className="pill">2D lidar observations</span>
+                                <span className="pill">dimensioned proxy</span>
+                                <span className="pill ok">typed scoring</span>
+                              </div>
+                              <button
+                                type="button"
+                                disabled={assemblyLoading}
+                                onClick={() =>
+                                  void planAssembly(
+                                    assemblyInputForCandidate(candidate),
+                                  )
+                                }
+                                style={{
+                                  fontSize: 13,
+                                  padding: "7px 11px",
+                                  borderRadius: 6,
+                                  background: "var(--accent)",
+                                  color: "#fff",
+                                  border: 0,
+                                  cursor: assemblyLoading ? "default" : "pointer",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Build &amp; simulate this concept →
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </button>
+
+                    {result.proposals.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <label htmlFor="plan-device" style={{ fontSize: 13 }}>
+                          Plan one recommendation:
+                        </label>
+                        <select
+                          id="plan-device"
+                          value={planDeviceId}
+                          onChange={(event) => setPlanDeviceId(event.target.value)}
+                          style={{ width: "auto", minWidth: 220, margin: 0 }}
+                        >
+                          {result.proposals.map((proposal) => (
+                            <option key={proposal.id} value={proposal.id}>
+                              {proposal.name}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          disabled={assemblyLoading || !planDeviceId}
+                          onClick={() =>
+                            void planAssembly(
+                              assemblyInputForSelectedDevice(
+                                idea.trim(),
+                                planDeviceId,
+                              ),
+                            )
+                          }
+                          style={{
+                            fontSize: 13,
+                            padding: "8px 14px",
+                            borderRadius: 6,
+                            background: "var(--code-bg)",
+                            color: "var(--fg)",
+                            border: "1px solid var(--accent)",
+                            cursor: assemblyLoading ? "default" : "pointer",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Plan selected device →
+                        </button>
+                      </div>
+                    )}
+
+                    {assemblyLoading && (
+                      <div style={{ marginTop: 10, fontSize: 13 }}>
+                        <span className="spinner" /> Planning build &amp; checking
+                        feasibility…
+                      </div>
+                    )}
+                  </>
                 )}
                 {assemblyError && <div className="error">{assemblyError}</div>}
                 {assembly && <AssemblyPanel data={assembly} />}
+                {assembly && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAssembly(null);
+                      setAssemblyError(null);
+                    }}
+                    style={{
+                      marginTop: 10,
+                      fontSize: 12,
+                      padding: "6px 10px",
+                      borderRadius: 6,
+                      background: "transparent",
+                      color: "var(--muted)",
+                      border: "1px solid var(--border)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Choose or compare another build
+                  </button>
+                )}
                 {assembly && (
                   <SimViewer
                     assembly={assembly.assembly}

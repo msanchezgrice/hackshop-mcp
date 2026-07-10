@@ -34,6 +34,11 @@ def test_pipeline_empty_room_reaches_goal(tmp_path):
     assert (tmp_path / "trajectory.json").exists()
     traj = json.loads((tmp_path / "trajectory.json").read_text())
     assert len(traj["poses"]) > 10
+    assert "events" in traj
+    assert all("collided" in pose for pose in traj["poses"])
+    summary_html = (tmp_path / "summary.html").read_text()
+    assert "Passed acceptance criteria" in summary_html
+    assert 'href="trajectory.json"' in summary_html
 
 
 def test_pipeline_renders_mp4(tmp_path):

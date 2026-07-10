@@ -87,6 +87,20 @@ def _default_agent_enabled() -> bool:
     return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
+def resolve_agent_enabled(options: SimulateOptions) -> bool:
+    """Resolve the agent toggle without losing an explicit ``false``.
+
+    Pydantic tracks which fields were supplied by the caller. That lets the web
+    checkbox override the environment default while omitted values still opt in
+    when the worker has a configured model key.
+    """
+    if options.bounded:
+        return False
+    if "agent" in options.model_fields_set:
+        return bool(options.agent)
+    return _default_agent_enabled()
+
+
 ARTIFACT_FILES = {
     "video": "run.mp4",
     "poster": "poster.png",
@@ -144,35 +158,28 @@ def run_pipeline(
         duration = max(duration, _CLUTTERED_DEFAULT_DURATION_S)
     render_fps = 30.0
     width, height = 640, 480
-    use_agent = options.agent
-    if not options.bounded:
-        # Builder agent self-corrects on async (non-bounded) jobs by default, so
-        # an out-of-the-box run can improve a failing controller on its own
-        # (Phase 2 acceptance). Env/key-gated: the loop falls back to scripted
-        # gracefully when no ANTHROPIC_API_KEY/SDK is present. Callers can still
-        # force it off with options.agent=False only if they set it explicitly;
-        # absent that we opt in.
-        use_agent = options.agent or _default_agent_enabled()
+    use_agent = resolve_agent_enabled(options)
     if options.bounded:
         # Cap generously enough for the pulled-in bounded goal (clear pocket
         # ~2.4m at proxy speed) plus the dwell, but still small enough for one
         # tool call. Bounded stays scripted-only for latency.
         duration = min(duration, _BOUNDED_DURATION_CAP_S)
-        use_agent = False
         render_fps = 25.0
         width, height = 480, 360
 
     world_desc = _world_desc(assembly, scene.goal_xy, scene.goal_radius)
 
-    # Per-proposal success criteria from the free-text success_metric (e.g.
-    # "within 0.3m for >2s"); run_rollout falls back to world radius / 1.0s dwell
-    # for whichever part is unspecified.
-    reach_radius, dwell_s = parse_success_metric(assembly.goal.success_metric)
+    # Typed criteria are authoritative when present. Legacy assemblies continue
+    # through the free-text parser for backwards compatibility.
+    reach_radius, dwell_s = (None, None)
+    if assembly.goal.criteria is None:
+        reach_radius, dwell_s = parse_success_metric(assembly.goal.success_metric)
 
     def runner(act):
         return run_rollout(
             scene, act, duration_s=duration, render_fps=render_fps,
             reach_radius=reach_radius, dwell_s=dwell_s,
+            criteria=assembly.goal.criteria,
         )
 
     outcome = agent_loop.build(world_desc, runner, use_agent, options.agent_max_iters)
@@ -191,9 +198,14 @@ def run_pipeline(
             "goal_radius": scene.goal_radius,
             "start_xy": list(scene.start_xy),
             "template": scene.template,
+            "world_objects": scene.world_objects,
         },
         "poses": result.poses,
         "qpos": result.frame_qpos,
+        # Precise collision/failure/success markers emitted by the physics
+        # runtime. Always present (possibly empty) so browser clients can rely
+        # on one stable trajectory contract; legacy files without it still parse.
+        "events": result.events,
     }
     _atomic_write_text(run_dir / ARTIFACT_FILES["trajectory"], json.dumps(trajectory))
 
@@ -283,6 +295,7 @@ def run_pipeline(
             poster_file=poster_rel,
             scene_file=ARTIFACT_FILES["scene"],
             telemetry_file=ARTIFACT_FILES["telemetry"],
+            trajectory_file=ARTIFACT_FILES["trajectory"],
             build_plan=build_plan,
             component_images=component_images,
             schematic_svg=schematic_svg,
@@ -301,12 +314,19 @@ def run_pipeline(
         "summary": result.summary,
         "post_mortem": outcome.post_mortem,
         "authored_by": outcome.authored_by,
-        "iterations": outcome.iterations,
+        "iterations": len(outcome.iterations),
+        "iteration_log": outcome.iterations,
         "telemetry": result.telemetry,
         "robot": {
             "device_id": robot.device_id,
+            "asset_id": robot.asset_id,
+            "asset_version": robot.asset_version,
             "kind": robot.kind,
             "provenance": robot.provenance,
+            "shape": robot.shape,
+            "dimensions_m": list(robot.dimensions_m),
+            "color": robot.color,
+            "fidelity": robot.fidelity,
             "base_mass_kg": robot.mass_kg,
             "total_mass_kg": scene.total_mass_kg,
             "mounted_parts": scene.mounted,

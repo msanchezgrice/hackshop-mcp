@@ -28,6 +28,7 @@ class SceneBuild:
     wheel_radius_m: float
     max_wheel_rad_s: float
     obstacle_geoms: List[str]
+    world_objects: List[dict]
     template: str
     mounted: List[dict]
     total_mass_kg: float
@@ -160,6 +161,7 @@ def compile_scene(
         wheel_radius_m=rb.wheel_radius_m,
         max_wheel_rad_s=rb.max_wheel_rad_s,
         obstacle_geoms=w.obstacle_geoms,
+        world_objects=w.visual_objects,
         template=assembly.world.template,
         mounted=rb.mounted,
         total_mass_kg=rb.total_mass_kg,

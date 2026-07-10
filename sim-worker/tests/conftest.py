@@ -32,9 +32,16 @@ def nav_assembly(template: str = "obstacle-course") -> Assembly:
                     "name": "Raspberry Pi 5",
                     "role": "compute",
                 },
+                {
+                    "ref": "lidar",
+                    "device_id": "rplidar-a1m8",
+                    "name": "RPLIDAR A1M8 360° LiDAR",
+                    "role": "sensor",
+                },
             ],
             "edges": [
-                {"from": "pi", "to": "base", "transport": "ros2", "payload": "/cmd_vel"}
+                {"from": "pi", "to": "base", "transport": "ros2", "payload": "/cmd_vel"},
+                {"from": "pi", "to": "lidar", "transport": "usb", "payload": "/scan"},
             ],
             "goal": {
                 "kind": "navigate",
@@ -54,7 +61,7 @@ def full_assembly(template: str = "obstacle-course") -> Assembly:
             "components": [
                 {"ref": "base", "device_id": "irobot-create-3", "name": "iRobot Create 3", "role": "chassis"},
                 {"ref": "pi", "device_id": "raspberry-pi-5", "name": "Raspberry Pi 5", "role": "compute"},
-                {"ref": "lidar", "device_id": "rplidar-c1", "name": "RPLidar C1", "role": "sensor"},
+                {"ref": "lidar", "device_id": "rplidar-a1m8", "name": "RPLIDAR A1M8", "role": "sensor"},
                 {"ref": "cam", "device_id": "pi-camera-3", "name": "Pi Camera 3", "role": "sensor"},
                 {"ref": "batt", "device_id": "lipo-4s", "name": "4S LiPo Pack", "role": "power"},
                 {"ref": "screen", "device_id": "waveshare-3in5", "name": "3.5in LCD", "role": "display"},

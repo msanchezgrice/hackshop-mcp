@@ -14,6 +14,25 @@ const Transport = z.enum([
   "usb", "i2c", "spi", "gpio", "uart", "wifi", "ble", "ros2", "hdmi", "aux", "power",
 ]);
 
+const SimHandle = z.object({
+  asset_id: z.string().min(1).optional(),
+  asset_version: z.string().min(1).optional(),
+  model_uri: z.string().optional(),
+  format: z.enum(["mjcf", "urdf", "proxy"]).optional(),
+  dof: z.number().int().nonnegative().optional(),
+  mass_kg: z.number().positive().optional(),
+  dimensions_m: z.tuple([
+    z.number().positive(),
+    z.number().positive(),
+    z.number().positive(),
+  ]).optional(),
+  fidelity: z.enum([
+    "device-model",
+    "dimensioned-proxy",
+    "generic-placeholder",
+  ]).optional(),
+});
+
 const AssemblyComponent = z.object({
   ref: z.string().min(1),
   device_id: z.string().min(1),
@@ -21,6 +40,7 @@ const AssemblyComponent = z.object({
   role: z.enum([
     "compute", "actuator", "sensor", "display", "power", "chassis", "peripheral",
   ]),
+  sim: SimHandle.optional(),
 });
 
 const ProtocolEdge = z.object({
@@ -38,6 +58,12 @@ const Assembly = z.object({
     kind: z.enum(["navigate", "locomote", "manipulate", "sense-act", "display-loop"]),
     spec: z.string().min(1),
     success_metric: z.string().min(1),
+    criteria: z.object({
+      position_tolerance_m: z.number().positive().max(1),
+      dwell_s: z.number().nonnegative(),
+      max_collision_events: z.number().int().nonnegative(),
+      require_upright: z.boolean(),
+    }).optional(),
   }),
   world: z.object({
     // Canonical WorldTemplate enum — keep in sync with site/lib/assembly.ts

@@ -117,6 +117,34 @@ describe("feasibility DRC", () => {
     expect(report.verdict).toBe("infeasible");
   });
 
+  it("recognizes a TurtleBot 4 Lite as an integrated navigation system", () => {
+    const turtlebot = Assembly.parse({
+      idea: "inspect the office",
+      components: [
+        {
+          ref: "base",
+          device_id: "turtlebot-4-lite",
+          name: "TurtleBot 4 Lite",
+          role: "chassis",
+        },
+      ],
+      edges: [],
+      goal: {
+        kind: "navigate",
+        spec: "reach the inspection point",
+        success_metric: "pass the navigation acceptance criteria",
+      },
+      world: { template: "obstacle-course", goal_xy: [3, 0] },
+    });
+
+    const report = checkFeasibility(turtlebot, new Map());
+    const structural = report.checks.find((check) => check.id === "structural")!;
+
+    expect(structural.status).toBe("pass");
+    expect(structural.detail).toContain("integrated");
+    expect(report.verdict).not.toBe("infeasible");
+  });
+
   it("fails the power budget when draw exceeds supply", () => {
     const hungry = new Map(CAPS);
     hungry.set("pi5", {

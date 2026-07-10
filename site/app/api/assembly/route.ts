@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { assemblyInput, type AssemblyResponse } from "@/lib/assembly";
-import { generateAssembly } from "@/lib/assembly-gen";
+import {
+  generateAssembly,
+  generateDeterministicBuildPlan,
+} from "@/lib/assembly-gen";
+import { resolveBuildCandidateSelection } from "@/lib/build-candidates";
 import { capabilityMapFor } from "@/lib/capabilities";
 import { checkFeasibility } from "@/lib/feasibility";
 
@@ -41,13 +45,6 @@ function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
 }
 
 export async function POST(req: Request): Promise<Response> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json(
-      { error: "Server is not configured: ANTHROPIC_API_KEY missing." },
-      { status: 503 },
-    );
-  }
-
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     req.headers.get("x-real-ip") ??
@@ -79,7 +76,25 @@ export async function POST(req: Request): Promise<Response> {
 
   let gen;
   try {
-    gen = await generateAssembly(parsed.data.idea, parsed.data.device_ids);
+    if (parsed.data.candidate_id) {
+      const candidate = resolveBuildCandidateSelection(
+        parsed.data.idea,
+        parsed.data.candidate_id,
+        parsed.data.device_ids,
+      );
+      if (!candidate) {
+        throw new Error(
+          "candidate_id does not match a supported canonical build",
+        );
+      }
+      gen = {
+        assembly: candidate.assembly,
+        build_plan: generateDeterministicBuildPlan(candidate.assembly),
+        degraded: false,
+      };
+    } else {
+      gen = await generateAssembly(parsed.data.idea, parsed.data.device_ids);
+    }
   } catch (err) {
     return NextResponse.json(
       {

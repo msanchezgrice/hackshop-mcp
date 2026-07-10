@@ -119,6 +119,7 @@ export interface Proposal {
 }
 
 import type { PremiumProposal } from "./premium-types";
+import type { BuildCandidate } from "./assembly";
 
 export type { PremiumProposal };
 
@@ -131,6 +132,7 @@ export interface ProposeResponse {
   degraded: boolean;
   message?: string;
   premium_proposals?: PremiumProposal[];
+  build_candidates?: BuildCandidate[];
   // Set only when include_premium was requested, so the UI can explain an
   // empty premium section instead of silently rendering nothing:
   //   ok    -> at least one premium pick

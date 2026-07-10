@@ -45,6 +45,14 @@ export type Transport = z.infer<typeof Transport>;
 // Asset Resolver fills this in Phase 1. Kept optional so the IR is forward-
 // compatible without forcing sim data now.
 export const SimHandle = z.object({
+  asset_id: z.string().min(1).optional(),
+  asset_version: z.string().min(1).optional(),
+  dimensions_m: z
+    .tuple([z.number().positive(), z.number().positive(), z.number().positive()])
+    .optional(),
+  fidelity: z
+    .enum(["device-model", "dimensioned-proxy", "generic-placeholder"])
+    .optional(),
   model_uri: z.string().optional(),
   format: z.enum(["mjcf", "urdf", "proxy"]).optional(),
   dof: z.number().int().nonnegative().optional(),
@@ -71,6 +79,16 @@ export const ProtocolEdge = z.object({
 });
 export type ProtocolEdge = z.infer<typeof ProtocolEdge>;
 
+export const NavigationSuccessCriteria = z.object({
+  position_tolerance_m: z.number().positive().max(1),
+  dwell_s: z.number().nonnegative(),
+  max_collision_events: z.number().int().nonnegative(),
+  require_upright: z.boolean(),
+});
+export type NavigationSuccessCriteria = z.infer<
+  typeof NavigationSuccessCriteria
+>;
+
 export const AssemblyGoal = z.object({
   kind: z.enum([
     "navigate",
@@ -81,6 +99,9 @@ export const AssemblyGoal = z.object({
   ]),
   spec: z.string().min(1), // "reach the goal marker without hitting obstacles"
   success_metric: z.string().min(1), // "within 0.3m of goal for >2s, zero collisions"
+  // Optional so legacy assembly payloads carrying only success_metric remain
+  // valid. Navigation generators populate this typed wire contract.
+  criteria: NavigationSuccessCriteria.optional(),
 });
 export type AssemblyGoal = z.infer<typeof AssemblyGoal>;
 
@@ -107,6 +128,22 @@ export const Assembly = z.object({
   world: WorldSpec,
 });
 export type Assembly = z.infer<typeof Assembly>;
+
+export const BuildCandidate = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  chassis_device_id: z.enum(["irobot-create-3", "turtlebot-4-lite"]),
+  device_ids: z.array(z.string().min(1)).min(1),
+  included_hardware: z.array(z.string().min(1)).default([]),
+  observation_model: z.enum(["2d-lidar"]),
+  purchase_tier: z.enum(["premium"]),
+  estimated_price_usd: z.object({
+    min: z.number().nonnegative(),
+    max: z.number().nonnegative(),
+  }),
+  assembly: Assembly,
+});
+export type BuildCandidate = z.infer<typeof BuildCandidate>;
 
 // ─────────────────────────────────────────────────────────────────────────
 // Build Plan — the "steps of assembly" deliverable. Text + typed data, never
@@ -199,6 +236,7 @@ export interface FeasibilityReport {
 export const assemblyInput = z.object({
   idea: z.string().min(3, "idea is too short").max(2000, "idea is too long"),
   device_ids: z.array(z.string().min(1)).min(1, "pick at least one device").max(12),
+  candidate_id: z.string().min(1).max(120).optional(),
 });
 export type AssemblyInput = z.infer<typeof assemblyInput>;
 

@@ -14,6 +14,7 @@ from typing import Callable, List, Optional, Tuple
 import mujoco
 import numpy as np
 
+from ..ir import GoalCriteria
 from ..scene.compile import SceneBuild
 
 # Default success criteria when the proposal's success_metric is unparseable.
@@ -52,6 +53,30 @@ def parse_success_metric(
 
     return radius, dwell
 
+
+def evaluate_success(
+    *,
+    reached: bool,
+    tipped: bool,
+    collision_events: int,
+    criteria: Optional[GoalCriteria],
+) -> tuple[bool, dict]:
+    """Apply the typed scoring contract, with legacy behavior as a fallback."""
+    if criteria is None:
+        checks = {
+            "position": reached,
+            "collision_events": True,
+            "upright": not tipped,
+        }
+        return reached and not tipped, checks
+
+    checks = {
+        "position": reached,
+        "collision_events": collision_events <= criteria.max_collision_events,
+        "upright": (not tipped) if criteria.require_upright else True,
+    }
+    return all(checks.values()), checks
+
 # Rangefinder ring: bearings (rad, relative to heading) sampled each step.
 _RAY_BEARINGS = [
     -1.57, -1.05, -0.7, -0.45, -0.22, 0.0, 0.22, 0.45, 0.7, 1.05, 1.57,
@@ -71,6 +96,10 @@ class RunResult:
     frame_qpos: List[List[float]]  # qpos snapshots aligned to render frames
     requested_fps: float = 0.0  # the fps the caller asked for (pre-rounding)
     meta: dict = field(default_factory=dict)
+    # Browser replay markers. Events use the site trajectory contract:
+    # {t, kind, label, position_m}. Keeping this on the rollout result prevents
+    # the pipeline from trying to reconstruct precise contacts from aggregates.
+    events: List[dict] = field(default_factory=list)
 
 
 def _yaw_from_xmat(xmat: np.ndarray) -> float:
@@ -99,6 +128,7 @@ def run_rollout(
     max_forward_mps: Optional[float] = None,
     reach_radius: Optional[float] = None,
     dwell_s: Optional[float] = None,
+    criteria: Optional[GoalCriteria] = None,
 ) -> RunResult:
     model = mujoco.MjModel.from_xml_string(scene.xml)
     data = mujoco.MjData(model)
@@ -141,8 +171,12 @@ def run_rollout(
     # to the world goal_radius / 1.0s dwell when unspecified. The reach radius is
     # the *tighter* of the parsed threshold and the world goal_radius so a
     # proposal can demand more precision than the marker, never less.
-    eff_radius = scene.goal_radius if reach_radius is None else min(reach_radius, scene.goal_radius)
-    eff_dwell = _DEFAULT_DWELL_S if dwell_s is None else max(0.0, dwell_s)
+    if criteria is not None:
+        eff_radius = criteria.position_tolerance_m
+        eff_dwell = criteria.dwell_s
+    else:
+        eff_radius = scene.goal_radius if reach_radius is None else min(reach_radius, scene.goal_radius)
+        eff_dwell = _DEFAULT_DWELL_S if dwell_s is None else max(0.0, dwell_s)
     wb = scene.wheel_base_m
     wr = scene.wheel_radius_m
     max_wheel = scene.max_wheel_rad_s
@@ -166,6 +200,7 @@ def run_rollout(
     # Telemetry accumulators
     poses: List[dict] = []
     frame_qpos: List[List[float]] = []
+    events: List[dict] = []
     dist_series: List[float] = []
     min_dist = float("inf")
     # collision_events = discrete rising-edge contacts (a fresh bump);
@@ -190,6 +225,8 @@ def run_rollout(
     heading_osc_deg = 0.0
 
     for step in range(n_steps):
+        event_t = round(step * dt, 3)
+        pose_failure: Optional[str] = None
         xpos = data.body(chassis_id).xpos
         xmat = data.body(chassis_id).xmat
         x, y = float(xpos[0]), float(xpos[1])
@@ -207,6 +244,7 @@ def run_rollout(
 
         # collision detection this step
         hit = False
+        hit_obstacle: Optional[str] = None
         for ci in range(data.ncon):
             c = data.contact[ci]
             g1, g2 = int(c.geom1), int(c.geom2)
@@ -216,12 +254,22 @@ def run_rollout(
             g2_obs = g2 in obstacle_ids
             if (g1_robot and g2_obs) or (g2_robot and g1_obs):
                 hit = True
+                obstacle_id = g2 if g2_obs else g1
+                hit_obstacle = model.geom(obstacle_id).name or "obstacle"
                 contact_pair_steps += 1  # raw pair count (debug only)
         if hit:
             collision_steps += 1
             if not prev_hit:
                 # Rising edge: one discrete collision event, not one-per-pair.
                 collision_events += 1
+                events.append(
+                    {
+                        "t": event_t,
+                        "kind": "collision",
+                        "label": f"Collision with {hit_obstacle or 'obstacle'}",
+                        "position_m": [round(x, 4), round(y, 4), 0.0],
+                    }
+                )
         prev_hit = hit
 
         obs = {
@@ -269,11 +317,28 @@ def run_rollout(
             if time_in_goal >= eff_dwell and not reached:
                 reached = True
                 reached_t = step * dt
+                events.append(
+                    {
+                        "t": event_t,
+                        "kind": "success",
+                        "label": "Goal reached",
+                        "position_m": [round(x, 4), round(y, 4), 0.0],
+                    }
+                )
         else:
             time_in_goal = 0.0
         if up < 0.5 and not tipped:
             tipped = True
             tipped_t = step * dt
+            pose_failure = "tipped"
+            events.append(
+                {
+                    "t": event_t,
+                    "kind": "tipped",
+                    "label": "Robot tipped over",
+                    "position_m": [round(x, 4), round(y, 4), 0.0],
+                }
+            )
 
         yaw_window.append(yaw)
         pos_window.append((x, y))
@@ -289,6 +354,15 @@ def run_rollout(
                 stuck_t = step * dt
                 stuck_xy = [round(x, 2), round(y, 2)]
                 stuck_recovered = False
+                pose_failure = "stuck"
+                events.append(
+                    {
+                        "t": event_t,
+                        "kind": "stuck",
+                        "label": "Robot became stuck",
+                        "position_m": [round(x, 4), round(y, 4), 0.0],
+                    }
+                )
             elif stuck and span > 0.25:
                 # Robot broke free: it wedged earlier but is moving again. Clear
                 # the live flag so we never assert a bare stuck=True at the end;
@@ -300,7 +374,18 @@ def run_rollout(
             heading_osc_deg = max(heading_osc_deg, osc)
 
         if step % frame_every == 0:
-            poses.append({"t": round(step * dt, 3), "x": round(x, 4), "y": round(y, 4), "yaw": round(yaw, 4)})
+            poses.append(
+                {
+                    "t": event_t,
+                    "x": round(x, 4),
+                    "y": round(y, 4),
+                    "yaw": round(yaw, 4),
+                    # Sampled contact state remains useful to legacy trajectory
+                    # readers; precise rising edges live in `events` above.
+                    "collided": hit,
+                    **({"failure": pose_failure} if pose_failure else {}),
+                }
+            )
             frame_qpos.append([float(q) for q in data.qpos])
 
         mujoco.mj_step(model, data)
@@ -310,7 +395,12 @@ def run_rollout(
                 break
 
     final_dist = dist_series[-1] if dist_series else float("inf")
-    success = reached and not tipped
+    success, criteria_checks = evaluate_success(
+        reached=reached,
+        tipped=tipped,
+        collision_events=collision_events,
+        criteria=criteria,
+    )
 
     # Distinguish "ran out of clock while still closing in" from a real stall.
     # If the rollout used (nearly) all its steps without reaching, and distance
@@ -329,6 +419,30 @@ def run_rollout(
     if reached and (stuck or stuck_t is not None):
         stuck = False
         stuck_recovered = True
+
+    # Terminal failures happen after the last control step, so give the replay
+    # an explicit final marker even when no sampled pose happened on that step.
+    # Stuck/tipped already have precise events from the loop and need no generic
+    # duplicate marker.
+    if not success and poses and not (stuck or tipped):
+        final_pose = poses[-1]
+        if timed_out_approaching:
+            terminal_kind = "timeout"
+            terminal_label = "Timed out while approaching the goal"
+        elif reached:
+            terminal_kind = "criteria_failed"
+            terminal_label = "Goal reached, but success criteria failed"
+        else:
+            terminal_kind = "goal_not_reached"
+            terminal_label = "Goal not reached"
+        events.append(
+            {
+                "t": final_pose["t"],
+                "kind": terminal_kind,
+                "label": terminal_label,
+                "position_m": [final_pose["x"], final_pose["y"], 0.0],
+            }
+        )
 
     # `collisions` now reports discrete collision EVENTS (rising edges), not the
     # old summed contact-pairs-per-step (which inflated ~2.5s of wall contact to
@@ -352,6 +466,9 @@ def run_rollout(
         parts.append("timed-out while still approaching")
     if heading_osc_deg > 25:
         parts.append(f"heading_osc=±{heading_osc_deg/2:.0f}deg")
+    if criteria is not None and not success:
+        failed = [name for name, passed in criteria_checks.items() if not passed]
+        parts.append(f"criteria_failed={','.join(failed)}")
     summary = " ".join(parts)
 
     telemetry = {
@@ -390,6 +507,9 @@ def run_rollout(
         "max_v": round(max_v, 3),
         "max_w": round(max_w, 3),
     }
+    if criteria is not None:
+        telemetry["criteria"] = criteria.model_dump(mode="json")
+        telemetry["criteria_checks"] = criteria_checks
     if scene.approximated_as:
         summary += (
             f" [note: '{scene.template}' geometry approximated as "
@@ -408,4 +528,5 @@ def run_rollout(
         poses=poses,
         frame_qpos=frame_qpos,
         meta={"n_frames": len(frame_qpos), "frame_every": frame_every},
+        events=events,
     )

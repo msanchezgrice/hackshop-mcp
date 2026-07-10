@@ -28,13 +28,61 @@ class WorldBuild:
     goal_radius: float
     # Names of obstacle/wall geoms, so the runtime can classify collisions.
     obstacle_geoms: list[str]
+    # Browser-renderable mirrors of the static MuJoCo geometry. Dimensions are
+    # full x/y/z extents and positions are world-frame geom centers.
+    visual_objects: list[dict]
     # When a requested template isn't modelled distinctly yet (stairs,
     # outdoor-flat) we approximate it with another layout. This carries an
     # honest note so telemetry/summary never silently mislabel the geometry.
     approximated_as: Optional[str] = None
 
 
-def _walls(half: float, h: float = 0.25, t: float = 0.05) -> tuple[str, list[str]]:
+_WALL_COLOR = "#73777F"
+_OBSTACLE_COLOR = "#D9594D"
+
+
+def _visual_box(
+    name: str,
+    x: float,
+    y: float,
+    z: float,
+    sx: float,
+    sy: float,
+    sz: float,
+    color: str,
+    rotation_deg: Optional[list[float]] = None,
+) -> dict:
+    visual = {
+        "name": name,
+        "shape": "box",
+        "position_m": [round(x, 5), round(y, 5), round(z, 5)],
+        "dimensions_m": [round(sx * 2.0, 5), round(sy * 2.0, 5), round(sz * 2.0, 5)],
+        "color": color,
+    }
+    if rotation_deg is not None:
+        visual["rotation_deg"] = rotation_deg
+    return visual
+
+
+def _visual_cylinder(
+    name: str, x: float, y: float, radius: float, height: float, color: str
+) -> dict:
+    return {
+        "name": name,
+        "shape": "cylinder",
+        "position_m": [round(x, 5), round(y, 5), round(height / 2.0, 5)],
+        "dimensions_m": [
+            round(radius * 2.0, 5),
+            round(radius * 2.0, 5),
+            round(height, 5),
+        ],
+        "color": color,
+    }
+
+
+def _walls(
+    half: float, h: float = 0.25, t: float = 0.05
+) -> tuple[str, list[str], list[dict]]:
     """Four perimeter walls enclosing a `2*half` square arena."""
     names = ["wall_n", "wall_s", "wall_e", "wall_w"]
     xml = f"""
@@ -42,7 +90,13 @@ def _walls(half: float, h: float = 0.25, t: float = 0.05) -> tuple[str, list[str
     <geom name="wall_s" type="box" pos="0 {-half} {h/2}" size="{half} {t} {h/2}" material="wall"/>
     <geom name="wall_e" type="box" pos="{half} 0 {h/2}" size="{t} {half} {h/2}" material="wall"/>
     <geom name="wall_w" type="box" pos="{-half} 0 {h/2}" size="{t} {half} {h/2}" material="wall"/>"""
-    return xml, names
+    visuals = [
+        _visual_box("wall_n", 0.0, half, h / 2.0, half, t, h / 2.0, _WALL_COLOR),
+        _visual_box("wall_s", 0.0, -half, h / 2.0, half, t, h / 2.0, _WALL_COLOR),
+        _visual_box("wall_e", half, 0.0, h / 2.0, t, half, h / 2.0, _WALL_COLOR),
+        _visual_box("wall_w", -half, 0.0, h / 2.0, t, half, h / 2.0, _WALL_COLOR),
+    ]
+    return xml, names, visuals
 
 
 def _goal_site(gx: float, gy: float, r: float) -> str:
@@ -188,20 +242,20 @@ def build(
 ) -> WorldBuild:
     if template == "empty-room":
         half = 3.0
-        walls_xml, wall_names = _walls(half)
+        walls_xml, wall_names, visual_objects = _walls(half)
         start = (-2.2, -2.2)
         # Open room: any in-arena point is reachable, so honor a (clamped) override.
         raw = _clamp_arena(*(goal_override or (2.2, 2.2)), half)
         gx, gy = _pull_in(start, raw, goal_override, bounded)
         r = 0.3
         xml = walls_xml + _goal_site(gx, gy, r)
-        return WorldBuild(xml, start, 45.0, (gx, gy), r, wall_names)
+        return WorldBuild(xml, start, 45.0, (gx, gy), r, wall_names, visual_objects)
 
     if template in ("obstacle-course", "stairs", "outdoor-flat"):
         # stairs/outdoor not yet modelled distinctly -> reuse obstacle-course so
         # the slice still runs honestly (labelled in telemetry by template name).
         half = 3.0
-        walls_xml, wall_names = _walls(half)
+        walls_xml, wall_names, visual_objects = _walls(half)
         start = (-2.3, -2.3)
         # The fixed slalom is verified-reachable to its NE corner only. An
         # LLM-supplied goal_xy is unreliable (it has landed at (3,4), outside the
@@ -221,19 +275,36 @@ def build(
             if kind == "cyl":
                 _, _, x, y, rr, hh = entry
                 obs += _cyl(name, x, y, rr, hh)
+                visual_objects.append(
+                    _visual_cylinder(name, x, y, rr, hh, _OBSTACLE_COLOR)
+                )
             else:
                 _, _, x, y, sx, sy, hh = entry
                 obs += _box(name, x, y, sx, sy, hh)
+                visual_objects.append(
+                    _visual_box(
+                        name, x, y, hh / 2.0, sx, sy, hh / 2.0, _OBSTACLE_COLOR
+                    )
+                )
             names.append(name)
         xml = walls_xml + obs + _goal_site(gx, gy, r)
         # stairs / outdoor-flat aren't modelled distinctly yet -> honestly flag
         # that the geometry is approximated by the obstacle-course layout.
         approx = "obstacle-course" if template in ("stairs", "outdoor-flat") else None
-        return WorldBuild(xml, start, 45.0, (gx, gy), r, names, approximated_as=approx)
+        return WorldBuild(
+            xml,
+            start,
+            45.0,
+            (gx, gy),
+            r,
+            names,
+            visual_objects,
+            approximated_as=approx,
+        )
 
     if template == "ramp":
         half = 3.0
-        walls_xml, wall_names = _walls(half)
+        walls_xml, wall_names, visual_objects = _walls(half)
         raw = _clamp_arena(*(goal_override or (2.3, 0.0)), half)
         gx, gy = _pull_in((-2.3, 0.0), raw, goal_override, bounded)
         r = 0.3
@@ -247,21 +318,46 @@ def build(
         # obstacle_geoms so contact with it isn't counted as a crash.
         names = list(wall_names)
         xml = walls_xml + ramp + _goal_site(gx, gy, r)
-        return WorldBuild(xml, (-2.3, 0.0), 0.0, (gx, gy), r, names)
+        visual_objects.append(
+            _visual_box(
+                "ramp",
+                0.0,
+                0.0,
+                0.12,
+                0.9,
+                1.2,
+                0.04,
+                _OBSTACLE_COLOR,
+                rotation_deg=[0.0, 14.0, 0.0],
+            )
+        )
+        return WorldBuild(
+            xml, (-2.3, 0.0), 0.0, (gx, gy), r, names, visual_objects
+        )
 
     if template == "tabletop":
         # Small bounded surface; treat like a tiny empty room.
         half = 1.2
-        walls_xml, wall_names = _walls(half, h=0.12)
+        walls_xml, wall_names, visual_objects = _walls(half, h=0.12)
         gx, gy = _clamp_arena(*(goal_override or (0.7, 0.7)), half)
         r = 0.2
         xml = walls_xml + _goal_site(gx, gy, r)
-        return WorldBuild(xml, (-0.7, -0.7), 45.0, (gx, gy), r, wall_names)
+        return WorldBuild(
+            xml, (-0.7, -0.7), 45.0, (gx, gy), r, wall_names, visual_objects
+        )
 
     # Fallback: empty room.
     half = 3.0
-    walls_xml, wall_names = _walls(half)
+    walls_xml, wall_names, visual_objects = _walls(half)
     start = (-2.2, -2.2)
     raw = _clamp_arena(*(goal_override or (2.2, 2.2)), half)
     gx, gy = _pull_in(start, raw, goal_override, bounded)
-    return WorldBuild(walls_xml + _goal_site(gx, gy, 0.3), start, 45.0, (gx, gy), 0.3, wall_names)
+    return WorldBuild(
+        walls_xml + _goal_site(gx, gy, 0.3),
+        start,
+        45.0,
+        (gx, gy),
+        0.3,
+        wall_names,
+        visual_objects,
+    )

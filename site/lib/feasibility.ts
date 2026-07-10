@@ -284,6 +284,17 @@ function checkMassPayload(
 // deterministic check over our own role assignment, so it's "spec".
 function checkStructural(assembly: Assembly): FeasibilityCheck {
   const roles = new Set<string>(assembly.components.map((c) => c.role));
+  const integratedProducts: string[] = [];
+  for (const component of assembly.components) {
+    if (component.device_id === "turtlebot-4-lite") {
+      // Clearpath ships the Lite as one integrated product with its Create 3
+      // chassis, Raspberry Pi 4 compute, OAK-D camera, and RPLIDAR already
+      // installed. Do not invent duplicate BOM rows just to satisfy role DRC.
+      roles.add("compute");
+      roles.add("sensor");
+      integratedProducts.push(component.name);
+    }
+  }
   const need: Record<Assembly["goal"]["kind"], string[]> = {
     navigate: ["compute", "chassis"],
     locomote: ["compute", "chassis"],
@@ -311,7 +322,11 @@ function checkStructural(assembly: Assembly): FeasibilityCheck {
     status: "pass",
     detail: `All roles required for "${assembly.goal.kind}" are present (${required.join(
       " + ",
-    )}).`,
+    )})${
+      integratedProducts.length > 0
+        ? `; integrated by ${integratedProducts.join(", ")}`
+        : ""
+    }.`,
     provenance: "spec",
   };
 }

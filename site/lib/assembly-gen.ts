@@ -7,10 +7,12 @@ import {
   BuildAction,
   BuildPlan,
   ComponentRole,
+  NavigationSuccessCriteria,
   Transport,
   type AssemblyComponent,
   type BuildStep,
 } from "./assembly";
+import { simulationHandleFor } from "./build-candidates";
 import { loadDeviceDirectory, type DeviceMeta } from "./capabilities";
 import { loadCatalog } from "./catalog";
 import { applyBrickRiskSafety } from "./safety";
@@ -95,11 +97,17 @@ const WORLD_FOR_GOAL: Record<
 
 const GOAL_SPEC: Record<
   Assembly["goal"]["kind"],
-  { spec: string; success_metric: string }
+  Omit<Assembly["goal"], "kind">
 > = {
   navigate: {
     spec: "Drive from start to the goal marker without hitting obstacles.",
     success_metric: "Within 0.3 m of the goal for >2 s with zero collisions.",
+    criteria: {
+      position_tolerance_m: 0.3,
+      dwell_s: 2,
+      max_collision_events: 0,
+      require_upright: true,
+    },
   },
   locomote: {
     spec: "Walk up the ramp and stay upright at the top.",
@@ -125,6 +133,7 @@ function deterministicAssembly(idea: string, metas: DeviceMeta[]): Assembly {
     device_id: m.id,
     name: m.name,
     role: m.defaultRole,
+    sim: simulationHandleFor(m.id),
   }));
 
   // Hub = first compute, else first component, so we always have something to
@@ -164,6 +173,38 @@ function deterministicBuildPlan(
   assembly: Assembly,
   brickNotes: Map<string, string | null>,
 ): BuildPlan {
+  if (
+    assembly.components.length === 1 &&
+    assembly.components[0]?.device_id === "turtlebot-4-lite"
+  ) {
+    return BuildPlan.parse({
+      steps: [
+        {
+          order: 1,
+          action: "calibrate",
+          parts: ["turtlebot-4-lite"],
+          tools: ["level floor", "Clearpath diagnostics"],
+          detail:
+            "Verify the factory-integrated RPLIDAR, wheel odometry, and ROS 2 topics on a level floor.",
+          est_minutes: 10,
+          risk_note: null,
+          depends_on: [],
+        },
+        {
+          order: 2,
+          action: "test",
+          parts: ["turtlebot-4-lite"],
+          tools: ["clear test area", "stopwatch"],
+          detail: `Run the integrated robot against the goal: ${assembly.goal.spec}`,
+          est_minutes: 15,
+          risk_note: null,
+          depends_on: [1],
+        },
+      ],
+      total_minutes: 25,
+    });
+  }
+
   const steps: BuildStep[] = [];
   let order = 1;
   const push = (s: Omit<BuildStep, "order">) =>
@@ -188,8 +229,12 @@ function deterministicBuildPlan(
     push({
       action: "connect",
       parts: [from?.device_id ?? e.from, to?.device_id ?? e.to],
-      tools: [`${e.transport.toUpperCase()} cable/harness`],
-      detail: `Connect ${to?.name ?? e.to} to ${from?.name ?? e.from} over ${e.transport.toUpperCase()}.`,
+      tools: [
+        e.transport === "power" && e.payload
+          ? e.payload
+          : `${e.transport.toUpperCase()} cable/harness`,
+      ],
+      detail: `Connect ${to?.name ?? e.to} to ${from?.name ?? e.from} over ${e.transport.toUpperCase()}${e.payload ? ` (${e.payload})` : ""}.`,
       est_minutes: 8,
       risk_note: null,
       depends_on: [mountOrder],
@@ -249,6 +294,10 @@ function deterministicBuildPlan(
   return BuildPlan.parse({ steps, total_minutes: total });
 }
 
+export function generateDeterministicBuildPlan(assembly: Assembly): BuildPlan {
+  return deterministicBuildPlan(assembly, new Map());
+}
+
 // ── LLM pass ────────────────────────────────────────────────────────────────
 
 // The model only refines structure; device_id/name are pinned from the catalog
@@ -267,6 +316,7 @@ const llmResponse = z.object({
     kind: z.string(),
     spec: z.string(),
     success_metric: z.string(),
+    criteria: NavigationSuccessCriteria.optional(),
   }),
   world: z.object({
     template: z.string(),
@@ -292,7 +342,7 @@ Return JSON only (no markdown) with this exact shape:
 {
   "roles":  [{ "ref": "c1", "role": "compute|actuator|sensor|display|power|chassis|peripheral" }],
   "edges":  [{ "from": "c1", "to": "c2", "transport": "usb|i2c|spi|gpio|uart|wifi|ble|ros2|hdmi|aux|power", "payload": "optional, e.g. /cmd_vel" }],
-  "goal":   { "kind": "navigate|locomote|manipulate|sense-act|display-loop", "spec": "one sentence", "success_metric": "measurable" },
+  "goal":   { "kind": "navigate|locomote|manipulate|sense-act|display-loop", "spec": "one sentence", "success_metric": "measurable", "criteria": { "position_tolerance_m": 0.3, "dwell_s": 2, "max_collision_events": 0, "require_upright": true } },
   "world":  { "template": "empty-room|obstacle-course|ramp|tabletop|stairs|outdoor-flat", "goal_xy": [x, y] },
   "steps":  [{ "action": "solder|flash|glue|connect|crimp|mount|print_3d|calibrate|test", "parts": ["device_id or consumable"], "tools": ["tool"], "detail": "imperative sentence", "est_minutes": 10, "depends_on": [step numbers, 1-based] }]
 }
@@ -301,6 +351,7 @@ Rules:
 - Assign exactly one role per ref. A mobile base is "chassis"; a robot arm is "actuator".
 - Only wire transports an endpoint actually supports when interfaces are known.
 - Pick the goal kind that matches the hardware (a mobile base => navigate; an arm => manipulate; a screen => display-loop).
+- For a navigate goal, always include numeric/boolean criteria. Omit criteria for other goal kinds.
 - Steps must be ordered and realistic: mount/connect before flash before calibrate before test.
 - Keep steps concise; 5-9 steps total.`;
 
@@ -353,31 +404,67 @@ function composeFromLlm(
       device_id: m.id,
       name: m.name,
       role: role.success ? role.data : m.defaultRole,
+      sim: simulationHandleFor(m.id),
     };
   });
 
   const refSet = new Set(components.map((c) => c.ref));
+  const metaByRef = new Map(metas.map((meta, index) => [refFor(index), meta]));
+  const edgeKeys = new Set<string>();
   // Pre-filter edges: drop ones referencing unknown refs OR carrying an invalid
-  // transport token. A single bad edge drops only itself, not the whole plan.
+  // transport token. When the model picks a valid transport token that the
+  // endpoints do not actually share, normalize it to the best declared shared
+  // interface. This keeps protocol labels such as ROS 2 in `payload` while the
+  // feasibility graph describes the real USB/Wi-Fi/I2C connection.
   const edges = parsed.edges
     .filter((e) => refSet.has(e.from) && refSet.has(e.to))
     .map((e) => {
-      const transport = Transport.safeParse(e.transport);
-      if (!transport.success) return null;
+      const requested = Transport.safeParse(e.transport);
+      if (!requested.success) return null;
+      const fromInterfaces = metaByRef.get(e.from)?.capability.interfaces ?? [];
+      const toInterfaces = metaByRef.get(e.to)?.capability.interfaces ?? [];
+      let transport = requested.data;
+      if (fromInterfaces.length > 0 && toInterfaces.length > 0) {
+        const requestedIsShared =
+          fromInterfaces.includes(transport) && toInterfaces.includes(transport);
+        if (!requestedIsShared) {
+          const shared = TRANSPORT_PRIORITY.find(
+            (candidate) =>
+              fromInterfaces.includes(candidate) &&
+              toInterfaces.includes(candidate),
+          );
+          if (!shared) return null;
+          transport = shared;
+        }
+      }
       return {
         from: e.from,
         to: e.to,
-        transport: transport.data,
+        transport,
         payload: e.payload,
       };
     })
-    .filter((e): e is NonNullable<typeof e> => e !== null);
+    .filter((e): e is NonNullable<typeof e> => e !== null)
+    .filter((edge) => {
+      const key = `${edge.from}\u0000${edge.to}\u0000${edge.transport}`;
+      if (edgeKeys.has(key)) return false;
+      edgeKeys.add(key);
+      return true;
+    });
+
+  const goal =
+    parsed.goal.kind === "navigate"
+      ? {
+          ...parsed.goal,
+          criteria: parsed.goal.criteria ?? GOAL_SPEC.navigate.criteria,
+        }
+      : parsed.goal;
 
   const assembly = Assembly.parse({
     idea,
     components,
     edges,
-    goal: parsed.goal,
+    goal,
     world: parsed.world,
   });
 
@@ -449,9 +536,21 @@ function firstBrickNote(
   return null;
 }
 
+type AssemblyTextGenerator = (request: {
+  model: ReturnType<typeof anthropic>;
+  system: string;
+  prompt: string;
+  temperature: number;
+}) => Promise<{ text: string }>;
+
+export interface GenerateAssemblyOptions {
+  generateText?: AssemblyTextGenerator;
+}
+
 export async function generateAssembly(
   idea: string,
   deviceIds: string[],
+  options?: GenerateAssemblyOptions,
 ): Promise<GenerateResult> {
   const metas = resolveMetas(deviceIds);
   if (metas.length === 0) {
@@ -478,7 +577,9 @@ export async function generateAssembly(
 
   let raw: string;
   try {
-    const result = await generateText({
+    const textGenerator: AssemblyTextGenerator =
+      options?.generateText ?? (async (request) => generateText(request));
+    const result = await textGenerator({
       model: anthropic(modelId),
       system: SYSTEM_PROMPT,
       prompt: userPrompt,

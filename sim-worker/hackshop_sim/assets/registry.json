@@ -1,9 +1,18 @@
 {
-  "_comment": "device_id -> simulatable model handle. provenance mirrors the catalog's brick-risk vocabulary: founder-verified | community-reported | llm-inferred | proxy. 'proxy' means parametric primitive bodies (honest 'proxy dynamics'), not a scanned model. Phase 1 ships proxies for the diff-drive slice; real MJCF/URDF models slot in later under the same keys.",
+  "_comment": "Product-specific visual/physics manifests. dimensioned-proxy means the primitive geometry uses first-party product dimensions and measured mass; it does not claim to be detailed CAD.",
+  "aliases": {
+    "turtlebot4": "turtlebot-4-lite"
+  },
   "devices": {
     "irobot-create-3": {
+      "asset_id": "irobot-create-3",
+      "asset_version": "1",
       "format": "proxy",
+      "fidelity": "dimensioned-proxy",
       "kind": "diff_drive",
+      "shape": "cylinder",
+      "dimensions_m": [0.34, 0.34, 0.09],
+      "color": "#3478F6",
       "provenance": "community-reported",
       "mass_kg": 3.0,
       "wheel_base_m": 0.233,
@@ -12,25 +21,78 @@
       "chassis_height_m": 0.09,
       "payload_kg": 9.0,
       "max_wheel_rad_s": 12.0,
-      "notes": "iRobot Create 3 round diff-drive base. Dimensions from public spec sheet; treated as proxy dynamics."
+      "notes": "iRobot Create 3 round diff-drive base. Dimensioned primitive proxy; not detailed CAD."
     },
-    "turtlebot4": {
+    "turtlebot-4-lite": {
+      "asset_id": "turtlebot-4-lite",
+      "asset_version": "1",
       "format": "proxy",
+      "fidelity": "dimensioned-proxy",
       "kind": "diff_drive",
+      "observation_model": "2d-lidar",
+      "shape": "cylinder",
+      "dimensions_m": [0.341, 0.339, 0.192],
+      "color": "#7B61FF",
       "provenance": "community-reported",
-      "mass_kg": 3.5,
+      "mass_kg": 3.3,
       "wheel_base_m": 0.233,
       "wheel_radius_m": 0.036,
-      "chassis_radius_m": 0.17,
-      "chassis_height_m": 0.18,
+      "chassis_radius_m": 0.1695,
+      "chassis_height_m": 0.192,
       "payload_kg": 9.0,
       "max_wheel_rad_s": 12.0,
-      "notes": "TurtleBot 4 sits on a Create 3 base."
+      "notes": "TurtleBot 4 Lite on a Create 3 base. Overall envelope and mass follow the Clearpath product specification."
+    },
+    "raspberry-pi-5": {
+      "asset_id": "raspberry-pi-5",
+      "asset_version": "1",
+      "format": "proxy",
+      "fidelity": "dimensioned-proxy",
+      "kind": "rigid_part",
+      "shape": "box",
+      "dimensions_m": [0.085, 0.056, 0.017],
+      "color": "#2D6A4F",
+      "provenance": "founder-verified",
+      "mass_kg": 0.045,
+      "notes": "Raspberry Pi 5 board-envelope proxy based on the official mechanical drawing."
+    },
+    "rplidar-a1m8": {
+      "asset_id": "rplidar-a1m8",
+      "asset_version": "1",
+      "format": "proxy",
+      "fidelity": "dimensioned-proxy",
+      "kind": "rigid_part",
+      "observation_model": "2d-lidar",
+      "shape": "cylinder",
+      "dimensions_m": [0.0968, 0.0703, 0.055],
+      "color": "#15B8A6",
+      "provenance": "founder-verified",
+      "mass_kg": 0.17,
+      "notes": "RPLIDAR A1M8 360-degree lidar envelope and mass from the official SLAMTEC specification."
+    },
+    "adafruit-vl53l4cd": {
+      "asset_id": "adafruit-vl53l4cd",
+      "asset_version": "1",
+      "format": "proxy",
+      "fidelity": "dimensioned-proxy",
+      "kind": "rigid_part",
+      "shape": "box",
+      "dimensions_m": [0.0255, 0.0177, 0.0047],
+      "color": "#111827",
+      "provenance": "founder-verified",
+      "mass_kg": 0.002,
+      "notes": "Adafruit VL53L4CD breakout board envelope from the product specification."
     }
   },
   "default_diff_drive": {
+    "asset_id": "generic-diff-drive",
+    "asset_version": "1",
     "format": "proxy",
+    "fidelity": "generic-placeholder",
     "kind": "diff_drive",
+    "shape": "box",
+    "dimensions_m": [0.234, 0.186, 0.08],
+    "color": "#3478F6",
     "provenance": "llm-inferred",
     "mass_kg": 2.0,
     "wheel_base_m": 0.24,
@@ -39,6 +101,6 @@
     "chassis_height_m": 0.08,
     "payload_kg": 3.0,
     "max_wheel_rad_s": 12.0,
-    "notes": "Generic parametric diff-drive proxy used when no device-specific model is registered."
+    "notes": "Generic parametric diff-drive placeholder used when no product manifest is registered."
   }
 }

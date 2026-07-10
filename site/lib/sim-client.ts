@@ -58,18 +58,30 @@ export interface SimResult {
   post_mortem?: string;
   authored_by?: string;
   iterations?: number;
+  iteration_log?: Array<Record<string, unknown>>;
   telemetry?: Record<string, unknown>;
   robot?: {
     device_id: string;
+    asset_id?: string;
+    asset_version?: string;
     kind: string;
     provenance: string;
     base_mass_kg: number;
     total_mass_kg: number;
+    /** Browser-renderable visual metadata resolved by the worker. */
+    shape?: string;
+    dimensions_m?: [number, number, number];
+    color?: string;
+    fidelity?: string;
     mounted_parts: {
       ref: string;
       name: string;
       role: string;
       mass_kg: number;
+      position_m?: [number, number, number];
+      dimensions_m?: [number, number, number];
+      shape?: string;
+      color?: string;
     }[];
     notes?: string;
   };

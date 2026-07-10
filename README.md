@@ -57,7 +57,7 @@ Lookup by id, exact name, or substring. Returns the same shape as a single propo
 
 Takes an **Assembly IR** — `{ idea, components[{ref,device_id,name,role}], edges[], goal{kind,spec,success_metric}, world{template,goal_xy?} }` (build it from the site's assembly output or by hand) — drops it into a MuJoCo physics world, and runs a **bounded, synchronous** rollout (`duration_s` ≤ 10, default 8) on the sim-worker. It returns:
 
-- `success` — did the robot actually reach its goal under the stated success metric
+- `success` — did the rollout pass the typed position, collision, and upright acceptance criteria
 - `summary` / `post_mortem` — natural-language verdict plus honest failure theatre (stuck / tipped / collisions / heading-oscillation)
 - `artifacts` — hosted URLs for the rendered `video`, `scene` (MJCF), `control` (control.py), and `telemetry.json`
 - `metric_value`, `telemetry`, `authored_by`, `world_desc`
@@ -66,7 +66,16 @@ Today it simulates the diff-drive **`navigate`** slice; other goal kinds return 
 
 ## Simulation (v2)
 
-The site turns a proposal into a watchable robot: **proposal → build plan + feasibility check → watch the assembled robot navigate an obstacle world in MuJoCo**, with a shareable summary page you can link to. Honest by design — a robot that gets stuck on a ramp gets a post-mortem, not a green checkmark.
+The site turns a proposal into a watchable robot: **proposal → select one complete build → deterministic feasibility check → MuJoCo rollout → interactive 3D replay**, with a shareable summary page you can link to. Honest by design — a robot that gets stuck on a ramp gets a post-mortem, not a green checkmark.
+
+The current navigation slice deliberately has a narrow fidelity contract:
+
+- alternative chassis are separate candidates, never merged into one BOM;
+- Create 3 uses an explicit Pi + RPLIDAR build, while TurtleBot 4 Lite preserves its factory-integrated Pi/camera/lidar stack;
+- versioned manifests provide real outer dimensions and mass to product-specific primitive proxies (not pretend CAD);
+- the controller only runs when the assembly declares the 2D-lidar observations it consumes;
+- typed position/collision/upright criteria drive the verdict; and
+- the browser replay supports orbit, zoom, playback/scrubbing, world geometry, path/goal overlays, and collision/failure markers.
 
 - **Live:** [https://hackshop.dev](https://hackshop.dev)
 - **Worker:** [https://hackshop-sim.fly.dev](https://hackshop-sim.fly.dev)

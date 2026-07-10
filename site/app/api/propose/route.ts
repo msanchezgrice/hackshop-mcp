@@ -3,6 +3,10 @@ import { proposeInput } from "@/lib/types";
 import { loadCatalog } from "@/lib/catalog";
 import { propose } from "@/lib/propose";
 import { loadPremiumCatalog, proposePremium } from "@/lib/premium";
+import {
+  generateBuildCandidates,
+  shouldOfferSimulationCandidates,
+} from "@/lib/build-candidates";
 
 export const runtime = "nodejs";
 // Per Vercel knowledge: default function timeout is 300s on Fluid Compute.
@@ -52,13 +56,6 @@ function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
 }
 
 export async function POST(req: Request): Promise<Response> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json(
-      { error: "Server is not configured: ANTHROPIC_API_KEY missing." },
-      { status: 503 },
-    );
-  }
-
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     req.headers.get("x-real-ip") ??
@@ -88,6 +85,33 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    const buildCandidates = shouldOfferSimulationCandidates(
+      parsed.data.idea,
+      Boolean(parsed.data.include_premium),
+    )
+      ? generateBuildCandidates(
+          parsed.data.idea,
+          undefined,
+          parsed.data.budget_usd,
+        )
+      : [];
+    return NextResponse.json({
+      proposals: [],
+      reasoning:
+        "The recommendation model is not configured, but deterministic physics-ready builds are still available.",
+      degraded: true,
+      message:
+        buildCandidates.length > 0
+          ? "Showing deterministic premium robot builds; configure ANTHROPIC_API_KEY for broader recommendations."
+          : "Configure ANTHROPIC_API_KEY for hardware recommendations.",
+      build_candidates: buildCandidates,
+      ...(parsed.data.include_premium
+        ? { premium_proposals: [], premium_status: "error" as const }
+        : {}),
+    });
+  }
+
   const { devices } = loadCatalog();
 
   // Run primary (used hardware) and premium (open-source new) in parallel
@@ -112,6 +136,34 @@ export async function POST(req: Request): Promise<Response> {
       result.premium_proposals = [];
       result.premium_status = "error";
     }
+  }
+
+  if (
+    shouldOfferSimulationCandidates(
+      parsed.data.idea,
+      Boolean(parsed.data.include_premium),
+    )
+  ) {
+    const recommendedPremiumIds =
+      premiumOutcome?.ok === true
+        ? premiumOutcome.proposals.map((proposal) => proposal.id)
+        : [];
+    const candidates = generateBuildCandidates(
+      parsed.data.idea,
+      undefined,
+      parsed.data.budget_usd,
+    );
+    const preferredOrder = new Map(
+      recommendedPremiumIds.map((deviceId, index) => [deviceId, index]),
+    );
+    result.build_candidates = candidates.sort((left, right) => {
+      const leftRank = preferredOrder.get(left.chassis_device_id);
+      const rightRank = preferredOrder.get(right.chassis_device_id);
+      return (leftRank ?? Number.MAX_SAFE_INTEGER) -
+        (rightRank ?? Number.MAX_SAFE_INTEGER);
+    });
+  } else {
+    result.build_candidates = [];
   }
 
   return NextResponse.json(result);

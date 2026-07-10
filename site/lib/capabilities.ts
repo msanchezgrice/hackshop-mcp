@@ -67,6 +67,11 @@ const SIM_CAPABILITY_OVERRIDES: Record<string, CapabilitySeed> = {
     power_draw_w: 0.1,
     mass_kg: 0.002,
   },
+  "rplidar-a1m8": {
+    interfaces: ["usb", "uart", "power"],
+    power_draw_w: 0.5,
+    mass_kg: 0.17,
+  },
   // ── Manipulation slice (LeRobot arms) ────────────────────────────────
   "lerobot-so-arm100": {
     interfaces: ["usb", "uart"],
@@ -207,6 +212,26 @@ export function loadDeviceDirectory(): Map<string, DeviceMeta> {
       source: "premium",
       defaultRole: role,
       capability: mergeCapability(d, declared, override, derived),
+    });
+  }
+
+  // Simulation-supported add-ons that are not yet first-class recommendation
+  // catalog rows. They still need spec-backed capability data so a canonical
+  // build is checked against the same interfaces and power budget it renders.
+  if (!dir.has("rplidar-a1m8")) {
+    const lidar = SIM_CAPABILITY_OVERRIDES["rplidar-a1m8"]!;
+    dir.set("rplidar-a1m8", {
+      id: "rplidar-a1m8",
+      name: "RPLIDAR A1M8 360° LiDAR",
+      category: "sensor",
+      source: "premium",
+      defaultRole: "sensor",
+      capability: {
+        interfaces: [...(lidar.interfaces ?? [])],
+        interfaces_provenance: "spec",
+        power_draw_w: lidar.power_draw_w,
+        mass_kg: lidar.mass_kg,
+      },
     });
   }
 

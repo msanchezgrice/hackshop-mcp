@@ -7,12 +7,13 @@ import json
 
 from conftest import nav_assembly
 from hackshop_sim import jobs
+from hackshop_sim.agent.loop import _post_mortem
 from hackshop_sim.assets.resolve import resolve
 from hackshop_sim.control.loader import compile_control
 from hackshop_sim.control.scripted import SOURCE
 from hackshop_sim.ir import SimulateOptions
 from hackshop_sim.pipeline import run_pipeline
-from hackshop_sim.runtime.run import parse_success_metric, run_rollout
+from hackshop_sim.runtime.run import RunResult, parse_success_metric, run_rollout
 from hackshop_sim.scene import worlds
 from hackshop_sim.scene.compile import compile_scene
 
@@ -60,6 +61,37 @@ def test_timed_out_approaching_is_not_a_stall():
     assert t["stuck"] is False
 
 
+def test_reached_position_but_failed_typed_criteria_is_narrated_honestly():
+    result = RunResult(
+        success=False,
+        metric_value=0.1,
+        telemetry={
+            "reached": True,
+            "final_dist": 0.1,
+            "min_dist": 0.05,
+            "tipped": False,
+            "stuck": False,
+            "collisions": 1,
+            "contact_seconds": 0.2,
+            "criteria_checks": {
+                "position": True,
+                "collision_events": False,
+                "upright": True,
+            },
+        },
+        summary="position reached; collision criterion failed",
+        fps=30.0,
+        poses=[],
+        frame_qpos=[],
+    )
+
+    post_mortem = _post_mortem(result, "scripted", 1)
+
+    assert "reached the goal position" in post_mortem
+    assert "failed the acceptance criteria" in post_mortem
+    assert "did not reach" not in post_mortem
+
+
 # ── P1-7: collision counter is discrete events, not contact-pairs ─────────────
 def test_collisions_are_discrete_events_not_pairs():
     # The scripted baseline now navigates the slalom cleanly (0 collisions), so to
@@ -84,6 +116,46 @@ def test_collisions_are_discrete_events_not_pairs():
     assert t["contact_pair_steps"] > t["collision_events"]
     # contact_seconds is sane (seconds of wall contact, not minutes).
     assert 0 <= t["contact_seconds"] <= t["duration_s"]
+
+
+def test_rollout_records_viewer_collision_events_and_pose_state():
+    """The browser replay must receive real collision markers, not just a count."""
+    asm = nav_assembly("obstacle-course")
+    scene = compile_scene(asm, resolve(asm).robot, bounded=False)
+
+    def ram(obs):
+        return {"v": obs["max_v"], "w": 0.0}
+
+    result = run_rollout(scene, ram, duration_s=20.0, render_fps=30.0)
+    collision_events = [event for event in result.events if event["kind"] == "collision"]
+
+    assert len(collision_events) == result.telemetry["collision_events"]
+    assert collision_events
+    assert all(
+        set(event) >= {"t", "kind", "label", "position_m"}
+        and len(event["position_m"]) == 3
+        for event in collision_events
+    )
+    assert any(pose["collided"] for pose in result.poses)
+
+
+def test_rollout_records_failure_event_when_robot_gets_stuck():
+    """A failed rollout should put its failure on the replay timeline."""
+    asm = nav_assembly("empty-room")
+    scene = compile_scene(asm, resolve(asm).robot, bounded=False)
+
+    result = run_rollout(
+        scene,
+        lambda _obs: {"v": 0.0, "w": 0.0},
+        duration_s=4.2,
+        render_fps=30.0,
+    )
+
+    assert result.telemetry["stuck"] is True
+    assert any(
+        event["kind"] == "stuck" and event["label"] == "Robot became stuck"
+        for event in result.events
+    )
 
 
 # ── P1-8: stuck never co-asserts with reached ─────────────────────────────────
