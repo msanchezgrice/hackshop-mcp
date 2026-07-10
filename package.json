@@ -51,7 +51,9 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@ai-sdk/anthropic": "^2.0.85",
     "@types/node": "^22.0.0",
+    "ai": "^6.0.223",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
