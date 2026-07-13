@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.hackshop.dev"),
   title:
     "hackshop-mcp — an AI agent that knows what hardware is hackable, repurposable, or protocol-native",
   description:
@@ -11,7 +12,9 @@ export const metadata: Metadata = {
     description:
       "Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.",
     type: "website",
+    url: "https://www.hackshop.dev",
   },
+  alternates: { canonical: "/" },
 };
 
 export const viewport: Viewport = {
