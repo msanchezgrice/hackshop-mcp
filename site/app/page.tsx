@@ -23,6 +23,9 @@ export default function Home() {
           <Link className="badge" href="/inventory">
             Your inventory
           </Link>
+          <Link className="badge" href="/resources">
+            Field guides
+          </Link>
           <a className="badge" href="https://github.com/msanchezgrice/hackshop-mcp">
             GitHub
           </a>
@@ -138,7 +141,9 @@ export default function Home() {
           <a href="https://www.npmjs.com/package/hackshop-mcp">npm</a> ·{" "}
           <a href="https://github.com/msanchezgrice/hackshop-mcp/issues">
             Suggest a device
-          </a>
+          </a>{" "}
+          · <Link href="/resources">field guides</Link> · <Link href="/privacy">privacy</Link> ·{" "}
+          <Link href="/terms">terms</Link>
         </p>
       </footer>
     </main>
