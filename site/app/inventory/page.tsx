@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import { loadCatalog } from "@/lib/catalog";
 import { InventoryEditor } from "@/components/InventoryEditor";
 
-export const metadata: Metadata = {
-  title: "Your inventory · hackshop-mcp",
-  description:
-    "Add the hardware you already own. Hackshop will rank ideas you can build with what you have first, and only suggest new gear when the project genuinely benefits.",
-};
+export const metadata = pageMetadata(
+  "Your inventory · hackshop-mcp",
+  "Add the hardware you already own. Hackshop will rank ideas you can build with what you have first, and only suggest new gear when the project genuinely benefits.",
+  "/inventory",
+);
 
 export default function InventoryPage() {
   const { devices } = loadCatalog();

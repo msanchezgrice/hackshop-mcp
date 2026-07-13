@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import {
   TEMPLATES,
   TEMPLATE_CATEGORIES,
@@ -8,11 +8,11 @@ import {
   type Template,
 } from "@/lib/templates";
 
-export const metadata: Metadata = {
-  title: "Project templates · hackshop-mcp",
-  description:
-    "Verified project templates: idea + recommended hardware + viability assessment. Repurpose old phones, e-readers, Roombas, and DSLRs into useful new things.",
-};
+export const metadata = pageMetadata(
+  "Project templates · hackshop-mcp",
+  "Verified project templates: idea + recommended hardware + viability assessment. Repurpose old phones, e-readers, Roombas, and DSLRs into useful new things.",
+  "/templates",
+);
 
 const VIABILITY_LABEL: Record<Template["viability"], string> = {
   verified: "Verified",
