@@ -13,7 +13,9 @@ export const metadata: Metadata = {
       "Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.",
     type: "website",
     url: "https://www.hackshop.dev",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Hackshop" }],
   },
+  twitter: { card: "summary_large_image", images: ["/opengraph-image"] },
   alternates: { canonical: "/" },
 };
 
