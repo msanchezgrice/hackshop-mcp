@@ -23,6 +23,30 @@ export const viewport: Viewport = {
   themeColor: "#0a0a0a",
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.hackshop.dev/#org",
+      name: "Hackshop",
+      url: "https://www.hackshop.dev",
+      description:
+        "An open-source MCP server that maps a project idea to hackable, repurposable, or protocol-native hardware.",
+      email: "msanchezgrice@gmail.com",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.hackshop.dev/#site",
+      url: "https://www.hackshop.dev",
+      name: "hackshop",
+      description:
+        "Tell your AI agent what you want to build; it returns 3-5 hardware candidates with brick-risk, firmware links, and live eBay searches.",
+      publisher: { "@id": "https://www.hackshop.dev/#org" },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -30,7 +54,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

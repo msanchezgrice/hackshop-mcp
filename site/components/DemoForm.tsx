@@ -152,10 +152,11 @@ function DemoFormInner() {
 
   return (
     <>
-      <form className="demo-form" onSubmit={submit}>
+      <form className="demo-form" onSubmit={submit} data-agent-form="propose-hardware">
         <label htmlFor="idea">Project idea</label>
         <textarea
           id="idea"
+          data-testid="idea-input"
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
           placeholder="e.g. Always-on family calendar in the kitchen, e-paper preferred."
@@ -180,6 +181,7 @@ function DemoFormInner() {
             <label htmlFor="budget">Budget USD (optional)</label>
             <input
               id="budget"
+              data-testid="budget-input"
               type="number"
               min="0"
               step="any"
@@ -192,6 +194,7 @@ function DemoFormInner() {
             <label htmlFor="constraints">Constraints (optional)</label>
             <input
               id="constraints"
+              data-testid="constraints-input"
               type="text"
               value={constraints}
               onChange={(e) => setConstraints(e.target.value)}
@@ -249,7 +252,12 @@ function DemoFormInner() {
           </label>
         </div>
 
-        <button type="submit" disabled={loading || !idea.trim()}>
+        <button
+          type="submit"
+          disabled={loading || !idea.trim()}
+          data-testid="propose-hardware-submit"
+          data-agent-action="propose-hardware"
+        >
           {loading ? (
             <>
               <span className="spinner on-accent" />
