@@ -16,20 +16,24 @@ export default function Home() {
           firmware links, live eBay searches, a step-by-step how-to, and an
           AI-generated architecture diagram.
         </p>
-        <div className="badges">
-          <Link className="badge" href="/templates">
+        <nav className="badges" aria-label="Primary" data-agent-nav="primary">
+          <Link className="badge" href="/templates" data-testid="nav-templates">
             {TEMPLATE_COUNT} templates
           </Link>
-          <Link className="badge" href="/inventory">
+          <Link className="badge" href="/inventory" data-testid="nav-inventory">
             Your inventory
           </Link>
-          <Link className="badge" href="/resources">
+          <Link className="badge" href="/resources" data-testid="nav-resources">
             Field guides
           </Link>
-          <a className="badge" href="https://github.com/msanchezgrice/hackshop-mcp">
+          <a
+            className="badge"
+            href="https://github.com/msanchezgrice/hackshop-mcp"
+            data-testid="nav-github"
+          >
             GitHub
           </a>
-        </div>
+        </nav>
       </header>
 
       <h2>Try it</h2>
@@ -143,7 +147,8 @@ export default function Home() {
             Suggest a device
           </a>{" "}
           · <Link href="/resources">field guides</Link> · <Link href="/privacy">privacy</Link> ·{" "}
-          <Link href="/terms">terms</Link>
+          <Link href="/terms">terms</Link> · <a href="/llms.txt">llms.txt</a> ·{" "}
+          <a href="/agents.md">agents.md</a>
         </p>
       </footer>
     </main>

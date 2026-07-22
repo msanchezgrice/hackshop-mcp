@@ -1,0 +1,22 @@
+{
+  "name": "hackshop",
+  "description": "An open-source MCP server and website that maps a project idea to hackable, repurposable, or protocol-native hardware, returning 3-5 candidates with brick-risk ratings, firmware links, live eBay searches, step-by-step how-tos, and AI-generated architecture diagrams.",
+  "url": "https://www.hackshop.dev",
+  "agent_card": "https://www.hackshop.dev/.well-known/agent-card.json",
+  "guardrails": {
+    "allowed_actions": [
+      "Read any public page (/, /templates, /inventory, /resources, /about, /contact, /privacy, /terms).",
+      "Submit the demo form on / via the button tagged data-agent-action=\"propose-hardware\" when the user asks for hardware proposals.",
+      "Follow outbound reference links (eBay searches, firmware repos, Hackaday, Reddit) for reading and research.",
+      "Install and query the hackshop-mcp MCP server for programmatic access."
+    ],
+    "disallowed_actions": [
+      "Do not activate any control tagged data-agent-danger (e.g. \"Clear all\" on /inventory) without explicit user confirmation; these delete the user's saved inventory.",
+      "Do not loop or retry calls to /api/propose; it is rate limited to 5 requests/hour/IP.",
+      "Do not crawl or scrape /api/* routes; they are disallowed in robots.txt and back the UI only.",
+      "Do not attempt account creation, login, or checkout; this site has no accounts or payment flows.",
+      "Do not complete external purchases (eBay, manufacturer stores) on the user's behalf."
+    ],
+    "contact": "msanchezgrice@gmail.com"
+  }
+}

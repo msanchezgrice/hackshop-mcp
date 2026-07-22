@@ -1,0 +1,25 @@
+{
+  "name": "hackshop",
+  "description": "An open-source MCP server and website that maps a project idea to hackable, repurposable, or protocol-native hardware, returning 3-5 candidates with brick-risk ratings, firmware links, live eBay searches, step-by-step how-tos, and AI-generated architecture diagrams.",
+  "url": "https://www.hackshop.dev",
+  "capabilities": [
+    "hardware-proposal",
+    "hackability-assessment",
+    "brick-risk-rating",
+    "firmware-and-community-links",
+    "live-ebay-search",
+    "how-to-guide-generation",
+    "architecture-diagram-generation",
+    "assembly-planning",
+    "build-simulation"
+  ],
+  "protocols": ["mcp"],
+  "links": {
+    "homepage": "https://www.hackshop.dev",
+    "documentation": "https://github.com/msanchezgrice/hackshop-mcp",
+    "npm": "https://www.npmjs.com/package/hackshop-mcp",
+    "llms_txt": "https://www.hackshop.dev/llms.txt",
+    "agents_md": "https://www.hackshop.dev/agents.md",
+    "ai_agent_manifest": "https://www.hackshop.dev/.well-known/ai-agent.json"
+  }
+}

@@ -70,6 +70,9 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
           <button
             type="button"
             onClick={reset}
+            data-testid="clear-inventory"
+            data-agent-danger="true"
+            data-agent-confirm="Removes every device from the user's saved inventory."
             style={{
               background: "transparent",
               color: "var(--muted)",
@@ -114,6 +117,8 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
                   cursor: "pointer",
                 }}
                 title="Click to remove from inventory"
+                data-agent-danger="true"
+                data-agent-confirm={`Removes ${d.name} from the user's saved inventory.`}
               >
                 {d.name} ✕
               </button>
@@ -215,7 +220,7 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={`/api/img?slug=${d.id}`}
-                    alt=""
+                    alt={d.name}
                     width={48}
                     height={48}
                     referrerPolicy="no-referrer"
