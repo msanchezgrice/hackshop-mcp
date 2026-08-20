@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { GoogleAnalytics } from "../components/GoogleAnalytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.hackshop.dev"),
@@ -60,6 +61,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <GoogleAnalytics />
       </body>
     </html>
   );
