@@ -15,5 +15,7 @@ describe("Google Analytics configuration", () => {
     expect(source).toMatch(/anonymize_ip:\s*true/);
     expect(source).toMatch(/allow_google_signals:\s*false/);
     expect(source).toMatch(/NEXT_PUBLIC_GA_MEASUREMENT_ID/);
+    expect(source).toMatch(/doNotTrack/);
+    expect(source).toMatch(/if\s*\(dnt\)\s*return/);
   });
 });
